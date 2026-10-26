@@ -1,3 +1,4 @@
+import './chatScroll.test';
 import campaign0 from '../../backend/app/content/grid-under-pressure.json';
 import campaign1 from '../../backend/app/content/waterline-alert.json';
 import campaign2 from '../../backend/app/content/care-at-capacity.json';

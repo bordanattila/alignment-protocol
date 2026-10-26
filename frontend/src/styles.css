@@ -130,3 +130,9 @@ textarea { display: block; width: 100%; resize: vertical; min-height: 72px; padd
 @media (max-width: 700px) {
   .active-gameplay .chat-history { max-height: 180px; max-height: min(180px, 25dvh); }
 }
+
+/* Chat scrolling is confined to its history; the unread row never overlays it. */
+.chat-messages { list-style: none; padding: 0; margin: 0; }
+.chat-history { overscroll-behavior-y: contain; }
+.chat-unread { min-height: 56px; padding-top: 8px; }
+.chat-unread button { width: 100%; white-space: normal; overflow-wrap: anywhere; }

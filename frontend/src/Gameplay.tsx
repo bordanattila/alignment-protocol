@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useChatScroll } from './useChatScroll';
 import { ConsequenceOutcome, FinalConsensusScore } from './ConsequenceOutcome';
 import type { ClockSample, LobbyState, MissionIntent } from './types';
 
@@ -60,8 +61,22 @@ export function DecisionStatus({ mission, connected, continuing, onContinue }: {
   </section>;
 }
 
+export function UnreadChatMessages({ count, onJump, history }: {
+  count: number; onJump: () => void; history: { current: HTMLDivElement | null };
+}) {
+  return <div className="chat-unread" aria-live="polite" aria-atomic="true">
+    {count > 0 && <button type="button" aria-label={`Show ${count} new ${count === 1 ? 'message' : 'messages'}; jump to latest`} onClick={event => {
+      onJump();
+      // This button disappears when read. Keep keyboard focus in the history;
+      // incoming messages themselves never change focus.
+      if (document.activeElement === event.currentTarget) history.current?.focus({ preventScroll: true });
+    }}>↓ {count} new {count === 1 ? 'message' : 'messages'}</button>}
+  </div>;
+}
+
 export function ChatPanel({ mission, connected, sendIntent }: Actions) {
   const [text, setText] = useState('');
+  const chatView = useChatScroll(mission.chat, mission.you);
   const writable = mission.phase === 'discussion' || mission.phase === 'consensus_window';
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -75,9 +90,11 @@ export function ChatPanel({ mission, connected, sendIntent }: Actions) {
       <textarea id="chat-message" value={text} onChange={event => setText(event.target.value)} maxLength={500} disabled={!writable || !connected} rows={2} />
       <button disabled={!writable || !connected || !text.trim()}>Send message</button>
     </form>
-    <ol className="chat-history" aria-label="Chat history" aria-live="polite" aria-relevant="additions">
+    <div className="chat-history" aria-label="Chat history" role="region" tabIndex={0} ref={chatView.history}>
+    <ol className="chat-messages" aria-live="polite" aria-relevant="additions" ref={chatView.contents}>
       {mission.chat.map(message => <li key={message.id}><strong>{message.callsign}</strong> {message.crisis_number && <span className="badge">Crisis {message.crisis_number}</span>} <time dateTime={new Date(message.timestamp * 1000).toISOString()}>{new Date(message.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time><p>{message.text}</p></li>)}
-    </ol>
+    </ol></div>
+    <UnreadChatMessages count={chatView.unread} onJump={chatView.jumpToLatest} history={chatView.history} />
     {!mission.chat.length && <p>No messages yet.</p>}
   </section>;
 }
