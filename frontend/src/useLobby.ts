@@ -1,3 +1,4 @@
+import { SnapshotOrder } from './snapshotOrder';
 import { useEffect, useRef, useState } from 'react';
 import type { ClockSample, LobbyState, MissionIntent, Session } from './types';
 
@@ -18,14 +19,18 @@ export function useLobby(session: Session | null) {
     let socket: WebSocket;
     let retry: ReturnType<typeof setTimeout>;
     let attempt = 0;
+    const snapshots = new SnapshotOrder();
     function connect() {
       setStatus(attempt ? 'Reconnecting' : 'Connecting');
-      socket = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/api/missions/${encodeURIComponent(session!.token)}/ws`);
-      socketRef.current = socket;
-      socket.onopen = () => socket.send(JSON.stringify({ type: 'authenticate', credential: session!.credential }));
+      const connection = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/api/missions/${encodeURIComponent(session!.token)}/ws`);
+      socket = connection;
+      socketRef.current = connection;
+      socket.onopen = () => { if (!stopped && socketRef.current === connection) connection.send(JSON.stringify({ type: 'authenticate', credential: session!.credential })); };
       socket.onmessage = event => {
+        if (stopped || socketRef.current !== connection) return;
         const message = JSON.parse(event.data);
         if (message.type === 'state') {
+          if (!snapshots.accept(message.mission)) return;
           setMission(message.mission);
           setClockSample({ serverNow: message.mission.server_now, receivedAt: performance.now() });
           setStatus('Connected');
@@ -35,7 +40,7 @@ export function useLobby(session: Session | null) {
         }
       };
       socket.onclose = event => {
-        if (stopped) return;
+        if (stopped || socketRef.current !== connection) return;
         if (event.code === 1008) {
           setStatus('Session unavailable');
           setRejected(true);

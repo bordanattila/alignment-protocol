@@ -117,7 +117,31 @@ class Decision(BaseModel):
     ai_followed: bool
 
 
+class PublicChoice(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    id: str
+    title: str
+    description: str
+
+
+class RecordedRound(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    round_id: str
+    number: int
+    totals: dict[str, int]
+    abstentions: int
+    eligible_count: int
+
+
 class CrisisResult(BaseModel):
+    model_config = ConfigDict(frozen=True)
+    briefing: str
+    choices: tuple[PublicChoice, ...]
+    ai_recommendation_choice_id: str
+    voting_rounds: tuple[RecordedRound, ...]
+    consensus_window_occurred: bool
+    final_vote_occurred: bool
+    status: Literal["resolved", "collapsed"]
     id: str
     crisis_id: str
     crisis_number: int
@@ -156,6 +180,8 @@ class Mission(BaseModel):
     phase: Phase = Phase.LOBBY
     crisis: Crisis | None = None
     metrics: Metrics = Field(default_factory=Metrics)
+    initial_metrics: Metrics | None = None
+    revision: int = 0
     players: list[Player] = Field(default_factory=list)
     deadline: float | None = None
     rounds: list[VotingRound] = Field(default_factory=list)

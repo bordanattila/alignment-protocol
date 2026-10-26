@@ -10,3 +10,7 @@ def apply_metric_deltas(metrics: Metrics, deltas: MetricDeltas) -> Metrics:
 
 def collapsed_metrics(metrics: Metrics) -> list[str]:
     return [key for key, value in metrics.model_dump().items() if value == 0]
+
+
+def consensus_score(metrics: Metrics) -> float:
+    return sum(metrics.model_dump().values()) / 4

@@ -43,6 +43,7 @@ class LobbyConnections:
         async with self.delivery_lock:
             while True:
                 async with self.lock:
+                    self.store.get(token).revision += 1
                     frames = [(player_id, socket, self.store.project(token, player_id))
                               for player_id, sockets in self.sockets.get(token, {}).items()
                               for socket in list(sockets)]

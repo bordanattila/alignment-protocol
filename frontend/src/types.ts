@@ -3,6 +3,10 @@ export type Metric = 'infrastructure' | 'public_trust' | 'economy' | 'safety';
 export type Civilization = Record<Metric, number>;
 export interface Session { token: string; credential: string }
 export interface LobbyState {
+  revision?: number;
+  history?: CrisisResult[];
+  metrics_timeline?: MetricSnapshot[];
+  summary?: MissionSummary | null;
   token: string;
   phase: 'lobby' | 'briefing' | 'discussion' | 'voting' | 'consensus_window' | 'decision_locked' | 'failed' | 'completed';
   crisis_number: number;
@@ -29,6 +33,13 @@ export type MissionIntent = { type: 'chat'; text: string } | { type: 'vote'; rou
 export interface ClockSample { serverNow: number; receivedAt: number }
 
 export interface CrisisResult {
+  briefing?: string;
+  choices?: { id: string; title: string; description: string }[];
+  ai_recommendation_choice_id?: string;
+  voting_rounds?: RecordedRound[];
+  consensus_window_occurred?: boolean;
+  final_vote_occurred?: boolean;
+  status?: 'resolved' | 'collapsed';
   id: string;
   crisis_id: string;
   crisis_number: number;
@@ -41,4 +52,23 @@ export interface CrisisResult {
   after: Civilization;
   authored_deltas: Civilization;
   applied_deltas: Civilization;
+}
+
+export interface RecordedRound {
+  round_id: string;
+  number: number;
+  totals: Record<string, number>;
+  abstentions: number;
+  eligible_count: number;
+}
+export interface MetricSnapshot { crisis_number: number; metrics: Civilization }
+export interface MissionSummary {
+  outcome: 'victory' | 'defeat';
+  crises_completed: number;
+  total_crises: number;
+  final_metrics: Civilization;
+  consensus_score: number;
+  consensus_windows: number;
+  final_vote_crises: number;
+  resolution_breakdown: Record<CrisisResult['decision']['reason'], number>;
 }

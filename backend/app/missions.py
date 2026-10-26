@@ -3,11 +3,11 @@ import secrets
 import time
 from collections.abc import Callable
 
-from .domain import Mission, Player, Phase, Role, VotingRound, Decision, ChatMessage, Crisis, CrisisResult, Metrics, MetricDeltas
+from .domain import Mission, Player, Phase, Role, VotingRound, Decision, ChatMessage, Crisis, CrisisResult, Metrics, MetricDeltas, PublicChoice, RecordedRound
 from .voting import plurality
 from .crises import load_crisis_sequence
 from .callsigns import normalize_callsign, callsign_key
-from .consequences import apply_metric_deltas, collapsed_metrics
+from .consequences import apply_metric_deltas, collapsed_metrics, consensus_score
 
 
 class MissionError(Exception):
@@ -76,6 +76,7 @@ class MissionStore:
         sequence = [c.model_copy(deep=True) for c in sequence]
         for index, role in enumerate(Role):
             mission.players[index % len(mission.players)].roles.append(role)
+        mission.initial_metrics = mission.metrics.model_copy(deep=True)
         mission.sequence = sequence
         mission.crisis = sequence[0]
         mission.phase = Phase.BRIEFING
@@ -182,6 +183,15 @@ class MissionStore:
         old = before.model_dump()
         after = apply_metric_deltas(before, choice.metric_deltas)
         result = CrisisResult(
+            briefing=mission.crisis.briefing,
+            choices=tuple(PublicChoice(id=c.id, title=c.title, description=c.description) for c in mission.crisis.choices),
+            ai_recommendation_choice_id=mission.crisis.ai_recommendation_choice_id,
+            voting_rounds=tuple(RecordedRound(round_id=r.id, number=r.number, totals=dict(r.totals),
+                                              abstentions=r.abstentions, eligible_count=len(r.eligible))
+                                for r in mission.rounds if r.totals is not None),
+            consensus_window_occurred=len(mission.rounds) > 1,
+            final_vote_occurred=any(r.number == 2 for r in mission.rounds),
+            status="collapsed" if collapsed_metrics(after) else "resolved",
             id=decision.round_id, crisis_id=mission.crisis.id,
             crisis_number=mission.crisis_index + 1, crisis_title=mission.crisis.title,
             choice_title=choice.title, choice_description=choice.description, outcome=choice.consequence,
@@ -210,7 +220,7 @@ class MissionStore:
         mission.acknowledged_results.add(result_id)
         if mission.crisis_index + 1 == len(mission.sequence):
             mission.phase = Phase.COMPLETED
-            mission.consensus_score = sum(mission.metrics.model_dump().values()) / 4
+            mission.consensus_score = consensus_score(mission.metrics)
             return True
         mission.crisis_index += 1
         mission.crisis = mission.sequence[mission.crisis_index]
@@ -254,6 +264,12 @@ class MissionStore:
         # Explicit allowlist: never return credentials or future private engine state.
         return {
             "token": mission.token,
+            "revision": mission.revision,
+            "history": [r.model_dump(mode="json") for r in mission.results],
+            "metrics_timeline": ([] if mission.initial_metrics is None else
+                [{"crisis_number": 0, "metrics": mission.initial_metrics.model_dump()}]
+                + [{"crisis_number": r.crisis_number, "metrics": r.after.model_dump()} for r in mission.results]),
+            "summary": self._summary(mission),
             "phase": mission.phase,
             "host_id": mission.host_id,
             "you": viewer_id,
@@ -289,6 +305,22 @@ class MissionStore:
             },
             "players": [{"id": p.id, "callsign": p.callsign, "connected": p.connected, "roles": list(p.roles)}
                         for p in mission.players],
+        }
+
+    @staticmethod
+    def _summary(mission: Mission) -> dict | None:
+        if mission.phase not in (Phase.COMPLETED, Phase.FAILED):
+            return None
+        breakdown = {reason: sum(r.decision.reason == reason for r in mission.results)
+                     for reason in ("initial_plurality", "final_plurality", "ai_tie_break", "no_vote_ai_fallback")}
+        return {
+            "outcome": "victory" if mission.phase == Phase.COMPLETED else "defeat",
+            "crises_completed": len(mission.results), "total_crises": len(mission.sequence),
+            "final_metrics": mission.metrics.model_dump(),
+            "consensus_score": consensus_score(mission.metrics),
+            "consensus_windows": sum(r.consensus_window_occurred for r in mission.results),
+            "final_vote_crises": sum(r.final_vote_occurred for r in mission.results),
+            "resolution_breakdown": breakdown,
         }
 
     @staticmethod

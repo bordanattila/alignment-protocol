@@ -1,0 +1,142 @@
+import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import { renderToStaticMarkup } from 'react-dom/server';
+import App from '../src/App';
+import { CrisisHistoryEntry, MetricsTimeline, MissionReview } from '../src/MissionReview';
+import { SnapshotOrder } from '../src/snapshotOrder';
+import type { CrisisResult, LobbyState } from '../src/types';
+
+function fixture(defeat=false): LobbyState {
+  const before={infrastructure:70,public_trust:70,economy:70,safety:70};
+  const after={infrastructure:75,public_trust:67,economy:defeat?0:63,safety:72};
+  const decision: CrisisResult['decision']={choice_id:'B',reason:'final_plurality',round_id:'final',totals:{A:1,B:2,C:0},abstentions:0,ai_followed:false};
+  const result: CrisisResult={id:'final',crisis_id:'grid-under-pressure',crisis_number:1,crisis_title:'Grid Under Pressure',briefing:'Extreme heat threatens grid stability.',
+    choices:[{id:'A',title:'Concentrate cuts',description:'Disconnect selected demand.'},{id:'B',title:'Distribute the Burden',description:'Rotate outages.'},{id:'C',title:'Preserve Service',description:'Use reserves.'}],
+    ai_recommendation_choice_id:'A',choice_title:'Distribute the Burden',choice_description:'Rotate outages.',outcome:'Rotating outages spread the burden.',decision,
+    before,after,authored_deltas:{infrastructure:5,public_trust:-3,economy:-7,safety:2},applied_deltas:{infrastructure:5,public_trust:-3,economy:defeat?-70:-7,safety:2},
+    consensus_window_occurred:true,final_vote_occurred:true,status:defeat?'collapsed':'resolved',
+    voting_rounds:[{round_id:'initial',number:1,totals:{A:1,B:1,C:1},abstentions:0,eligible_count:3},{round_id:'final',number:2,totals:{A:1,B:2,C:0},abstentions:0,eligible_count:3}]};
+  return {token:'review',revision:20,phase:defeat?'failed':'completed',crisis_number:1,crisis_count:1,result,collapsed_metrics:defeat?['economy']:[],consensus_score:defeat?null:69.25,
+    server_now:1000,deadline:null,chat:[],voting:null,closed_rounds:[],decision,roles:['safety'],crisis:null,private_intelligence:{safety:'PRIVATE REPORT MUST NOT RENDER'},
+    host_id:'host',you:'guest',metrics:after,players:[],history:[result],metrics_timeline:[{crisis_number:0,metrics:before},{crisis_number:1,metrics:after}],
+    summary:{outcome:defeat?'defeat':'victory',crises_completed:1,total_crises:1,final_metrics:after,consensus_score:defeat?53.5:69.25,consensus_windows:1,final_vote_crises:1,
+      resolution_breakdown:{initial_plurality:0,final_plurality:1,ai_tie_break:0,no_vote_ai_fallback:0}}};
+}
+function renderApp(mission: LobbyState) {
+  globalThis.__testLobby={mission,status:'Connected',rejected:false,actionError:'',clockSample:null,sendIntent:()=>{throw new Error('Review must not send gameplay intents');}};
+  return renderToStaticMarkup(<App />);
+}
+
+test('victory review prominently displays authoritative outcome, completion, score and final metrics',()=>{
+  const mission=fixture(); mission.summary!.consensus_score=42.25;
+  const html=renderApp(mission);
+  for(const label of ['Civilization Survived','MISSION COMPLETE','Crises completed:','1 / 1','42.25 / 100','Infrastructure','Public Trust','Economy','Safety']) assert.ok(html.includes(label),label);
+  assert.equal((html.match(/Final Consensus Score:/g)||[]).length,1);
+  assert.ok(html.indexOf('Final Consensus Score:')<html.indexOf('Civilization performance'));
+});
+test('defeat review explicitly remains defeat despite a numerical score and preserves zero outcome',()=>{
+  const html=renderApp(fixture(true));
+  assert.ok(html.includes('Civilization Collapsed') && html.includes('The mission ended in defeat.'));
+  assert.ok(html.includes('53.5 / 100') && html.includes('Economy: -70'));
+  assert.ok(html.includes('Crisis status: collapsed'));
+  assert.ok(!html.includes('Civilization Survived') && !html.includes('MISSION COMPLETE'));
+});
+test('terminal review has no chat composer, voting or progression controls and retains return navigation',()=>{
+  for(const defeat of [false,true]) {
+    const html=renderApp(fixture(defeat));
+    for(const unwanted of ['<textarea','type="radio"','Submit private vote','Submit Final Vote','Send message','Next crisis','Finish mission','PRIVATE REPORT MUST NOT RENDER']) assert.ok(!html.includes(unwanted),unwanted);
+    assert.ok(html.includes('Return to mission creation') && html.includes('href="/"'));
+  }
+});
+test('timeline includes starting snapshot and every recorded point with exact table values and labeled distinct patterns',()=>{
+  const html=renderToStaticMarkup(<MetricsTimeline snapshots={fixture().metrics_timeline!}/>);
+  assert.ok(html.includes('viewBox="0 0 720 250"'));
+  assert.ok(html.includes('Metric progression — exact recorded values'));
+  assert.equal((html.match(/<polyline/g)||[]).length,4);
+  assert.equal((html.match(/<circle/g)||[]).length,8);
+  assert.ok(html.includes('Start') && html.includes('>70</td>') && html.includes('>63</td>'));
+  for(const name of ['Infrastructure','Public Trust','Economy','Safety']) assert.ok(html.includes(`aria-label="${name}"`));
+  for(const dash of ['9 4','3 4','12 3 2 3']) assert.ok(html.includes(`stroke-dasharray="${dash}"`));
+  assert.ok(html.includes('role="region"') && html.includes('tabindex="0"'));
+});
+test('native collapsed crisis details expose summary and expandable public context without mutating state',()=>{
+  const mission=fixture(); const original=JSON.stringify(mission);
+  const element=CrisisHistoryEntry({result:mission.history![0]});
+  assert.equal(element.type,'details'); assert.equal(element.props.open,undefined);
+  const html=renderToStaticMarkup(element);
+  assert.ok(html.includes('<summary>') && html.includes('Expand / collapse details'));
+  for(const label of ['Grid Under Pressure','B — Distribute the Burden','Extreme heat threatens grid stability.','Concentrate cuts','Preserve Service','AI recommended']) assert.ok(html.includes(label));
+  assert.equal(JSON.stringify(mission),original);
+});
+test('history distinguishes initial and final vote totals, consensus, abstentions and actual applied metric changes',()=>{
+  const mission=fixture(true); mission.history![0].voting_rounds![1].abstentions=1;
+  const html=renderToStaticMarkup(<CrisisHistoryEntry result={mission.history![0]}/>);
+  for(const label of ['Initial vote','Final vote','Choice A: 1','Choice B: 2','Abstentions: 1','Eligible seats: 3','Consensus Window: Yes','Final voting round: Yes','Before and after — actual applied changes','-70']) assert.ok(html.includes(label),label);
+  assert.ok(html.indexOf('Initial vote')<html.indexOf('Final vote</h4>'));
+});
+test('team statistics use the authoritative summary without player rankings',()=>{
+  const html=renderApp(fixture());
+  for(const label of ['Resolved crises','Consensus windows','Crises with final voting','Initial plurality','Final-vote plurality','AI tie-break after final tie','No-vote AI fallback']) assert.ok(html.includes(label));
+  assert.ok(!html.includes('ranking') && !html.includes('Best player'));
+});
+test('reconnecting after completion renders the same authoritative review',()=>{
+  const mission=fixture(); const original=renderApp(mission);
+  assert.equal(renderApp(JSON.parse(JSON.stringify(mission))),original);
+});
+test('missing optional historical context renders unavailable labels, not invented data',()=>{
+  const mission=fixture(); const record=mission.history![0];
+  delete record.briefing; delete record.choices; delete record.voting_rounds;
+  delete record.consensus_window_occurred; delete record.final_vote_occurred; delete record.status;
+  const html=renderApp(mission);
+  for(const label of ['Original briefing unavailable.','Original choice list unavailable.','Separate round tallies unavailable.','Consensus Window: Not recorded','Deciding vote:','Crisis status: Not recorded']) assert.ok(html.includes(label),label);
+  delete mission.history; delete mission.metrics_timeline;
+  const missing=renderApp(mission);
+  assert.ok(missing.includes('Decision history unavailable.') && missing.includes('Metric timeline unavailable.'));
+});
+test('historical text is escaped and chronologically ordered using stable records',()=>{
+  const mission=fixture();
+  mission.history!.push({...mission.history![0],id:'second',crisis_number:2,crisis_title:'Second <script>alert(1)</script>',briefing:'<img src=x onerror=alert(1)>'});
+  const html=renderApp(mission);
+  assert.ok(html.indexOf('Crisis 1 —')<html.indexOf('Crisis 2 —'));
+  assert.ok(html.includes('&lt;script&gt;') && !html.includes('<script>'));
+  assert.ok(!html.includes('<img src=x'));
+});
+test('snapshot ordering rejects duplicate and stale terminal regressions without merging history',()=>{
+  const order=new SnapshotOrder(); const final=fixture();
+  assert.equal(order.accept({...final,revision:18}),true);
+  assert.equal(order.accept(final),true);
+  assert.equal(order.accept(JSON.parse(JSON.stringify(final))),false);
+  assert.equal(order.accept({...final,revision:19,phase:'discussion',history:[]}),false);
+  assert.equal(order.accept({...final,revision:21}),true);
+  assert.equal(order.accept({...final,revision:NaN}),false);
+  assert.equal(order.accept({...final,revision:undefined}),false);
+  assert.equal(new SnapshotOrder().accept({...final,revision:undefined}),true);
+});
+
+test('mobile review confines wide chart/table content to labeled scroll regions', async()=>{
+  const {readFileSync}=await import('node:fs');
+  const css=readFileSync('src/styles.css','utf8');
+  const html=renderApp(fixture());
+  assert.ok(html.includes('Metric trend chart; scroll horizontally on small screens'));
+  assert.match(css,/\.review-chart\s*\{[^}]*max-width: 100%;[^}]*overflow-x: auto;/);
+  assert.match(css,/\.metrics-trend\s*\{[^}]*min-width: 560px;/);
+  assert.match(css,/\.review-table\s*\{[^}]*max-width: 100%;[^}]*overflow-x: auto;/);
+  assert.match(css,/@media \(max-width: 400px\)\s*\{\s*\.review-final-metrics, \.review-statistics \{ grid-template-columns: minmax\(0, 1fr\);/);
+});
+
+test('live victory and defeat snapshots render full review and survive stale snapshot replay', {skip:!process.env.MISSION_REVIEW_FILE}, async()=>{
+  const {readFileSync}=await import('node:fs');
+  const evidence=JSON.parse(readFileSync(process.env.MISSION_REVIEW_FILE!,'utf8'));
+  for(const [label,count] of [['victory',10],['defeat',4]] as const) {
+    const mission={...fixture(label==='defeat'),...evidence[label]} as LobbyState;
+    const html=renderApp(mission);
+    assert.equal((html.match(/class="history-entry"/g)||[]).length,count);
+    assert.equal((html.match(/<circle/g)||[]).length,(count+1)*4);
+    assert.ok(html.includes(label==='victory'?'55.75 / 100':'54.5 / 100'));
+    assert.equal(html,renderApp(JSON.parse(JSON.stringify(mission))));
+    assert.ok(!html.includes('<textarea') && !html.includes('type="radio"'));
+    const order=new SnapshotOrder();
+    assert.ok(order.accept({...mission,revision:100}));
+    assert.equal(order.accept({...mission,revision:99,phase:'discussion',history:[]}),false);
+  }
+});

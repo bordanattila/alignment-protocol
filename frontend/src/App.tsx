@@ -3,6 +3,7 @@ import { clearSession, restoreSession, saveSession } from './session';
 import { CrisisBriefing } from './CrisisBriefing';
 import { RoleBadge } from './RoleBadge';
 import { ActiveGameplay, ChatPanel, ResponseOptions, phaseLabel } from './Gameplay';
+import { MissionReview } from './MissionReview';
 import { useLobby } from './useLobby';
 import { MissionEntryRequest } from './missionEntry';
 import { MissionEntryForm } from './MissionEntryForm';
@@ -66,6 +67,12 @@ export default function App() {
       setCopied(true);
     } catch { setError('Copy the invite URL from the field below.'); }
   }
+
+  if (mission?.summary && (mission.phase === 'completed' || mission.phase === 'failed')) return <main className="active-mission">
+    <header><a className="brand" href="/">CE <span>Consensus Engine</span></a><span className="badge" role="status">{status}</span></header>
+    <MissionReview mission={mission} />
+    <footer><a href="/">Return to mission creation</a><span>Collective judgment. Shared consequences.</span></footer>
+  </main>;
 
   return <main className={activeMission ? 'active-mission' : undefined}>
     <header><a className="brand" href="/">CE <span>Consensus Engine</span></a><span className="badge">v0.1 · Collective decision</span></header>

@@ -20,7 +20,7 @@ async def receive(socket):
     return frame['mission']
 
 
-async def play(client, path, collapse=False):
+async def play(client, path, collapse=False, on_state=None):
     host = client.post('/api/missions', json={'callsign':'Eagle1'}).json()
     token = host['token']; endpoint = f'/api/missions/{token}'
     sessions = [host]+[client.post(endpoint+'/join',json={'callsign':name}).json() for name in ['Eagle2','Eagle3']]
@@ -37,6 +37,8 @@ async def play(client, path, collapse=False):
             sockets.append(socket)
         async def states():
             frames=[await receive(s) for s in sockets]
+            if on_state:
+                for state in frames: on_state(state)
             for key in ['phase','crisis','metrics','result','decision','deadline','crisis_number']:
                 assert all(s[key]==frames[0][key] for s in frames)
             for state in frames:
@@ -112,6 +114,7 @@ async def play(client, path, collapse=False):
         restored=await receive(socket)
         assert restored['phase']==expected_phase and restored['roles']==roles[1]
         assert restored['metrics']==frames[1]['metrics'] and restored['result']==frames[1]['result']
+        if on_state: on_state(restored)
     return log
 
 
