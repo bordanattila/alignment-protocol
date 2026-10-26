@@ -77,11 +77,13 @@ class Player(BaseModel):
     callsign: str
     credential: str
     connected: bool = False
+    roles: list[Role] = Field(default_factory=list)
 
 
 class Mission(BaseModel):
     token: str
     host_id: str
     phase: Phase = Phase.LOBBY
+    crisis: Crisis | None = None
     metrics: Metrics = Field(default_factory=Metrics)
     players: list[Player] = Field(default_factory=list)

@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { clearSession, restoreSession, saveSession } from './session';
+import { CrisisBriefing } from './CrisisBriefing';
+import { RoleBadge } from './RoleBadge';
 import { useLobby } from './useLobby';
 import type { Session } from './types';
 
@@ -15,6 +17,7 @@ export default function App() {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const { mission, status, rejected } = useLobby(session);
+  const activeMission = mission?.phase === 'briefing' || mission?.phase === 'discussion';
 
   async function enter(event: FormEvent) {
     event.preventDefault();
@@ -37,6 +40,23 @@ export default function App() {
     } finally { setBusy(false); }
   }
 
+  async function missionAction(action: 'start' | 'discussion') {
+    if (!session) return;
+    setBusy(true);
+    setError('');
+    try {
+      const response = await fetch(`/api/missions/${encodeURIComponent(session.token)}/${action}`, {
+        method: 'POST', headers: { 'X-Mission-Session': session.credential },
+      });
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(typeof result.detail === 'string' ? result.detail : 'Unable to update mission.');
+      }
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to reach the mission server.');
+    } finally { setBusy(false); }
+  }
+
   async function copyInvite() {
     try {
       await navigator.clipboard.writeText(location.href);
@@ -44,13 +64,16 @@ export default function App() {
     } catch { setError('Copy the invite URL from the field below.'); }
   }
 
-  return <main>
-    <header><a className="brand" href="/">CE <span>Consensus Engine</span></a><span className="badge">v0.1 · Foundation</span></header>
-    <section className="intro">
+  return <main className={activeMission ? 'active-mission' : undefined}>
+    <header><a className="brand" href="/">CE <span>Consensus Engine</span></a><span className="badge">v0.1 · Crisis briefing</span></header>
+    {activeMission ? <section className="mission-header" aria-label="Current mission">
+      <p className="eyebrow">Crisis 01 <span>· {mission.phase === 'briefing' ? 'Briefing' : 'Discussion'}</span></p>
+      <h1>{mission.crisis?.title}</h1>
+    </section> : <section className="intro">
       <p className="eyebrow">Civic coordination network</p>
       <h1>Intelligence proposes.<br /><em>Humanity decides.</em></h1>
       <p className="lede">A shared city. Incomplete information. Decisions you make together.</p>
-    </section>
+    </section>}
     {!session ? <section className="panel entry">
       <div><p className="eyebrow">{inviteToken ? 'Mission invitation' : 'Assemble your team'}</p>
         <h2>{inviteToken ? 'Join the mission' : 'Open a mission'}</h2>
@@ -62,16 +85,22 @@ export default function App() {
       </form>
     </section> : <section className="lobby-grid">
       <div className="panel">
-        <div className="panel-heading"><div><p className="eyebrow">Operations room</p><h2>Mission lobby</h2></div><span className="badge" role="status">{status}</span></div>
+        <div className="panel-heading"><div><p className="eyebrow">Operations room</p><h2>{mission?.phase === 'lobby' || !mission ? 'Mission lobby' : mission.phase === 'briefing' ? 'Mission briefing' : 'Discussion ready'}</h2></div><span className="badge" role="status">{status}</span></div>
         {mission ? <>
-          <p>{mission.players.length} of 4 seats occupied · Invite your team to join.</p>
+          <p>{mission.phase === 'lobby' ? `${mission.players.length} of 4 seats occupied · Invite your team to join.` : 'Review the public briefing and your private intelligence together.'}</p>
+          {mission.phase === 'lobby' && (mission.you === mission.host_id ? <>
+            <button disabled={busy || status !== 'Connected' || mission.players.length < 2 || mission.players.some(player => !player.connected)} onClick={() => missionAction('start')}>Start Mission</button>
+            <p>Start with 2–4 players. Every occupied seat must be connected.</p>
+          </> : <p>Waiting for the host to start the mission.</p>)}
+          {mission.phase === 'briefing' && (mission.you === mission.host_id ? <button disabled={busy || status !== 'Connected' || mission.players.some(player => !player.connected)} onClick={() => missionAction('discussion')}>Begin discussion</button> : <p>Read your briefing while the host prepares discussion.</p>)}
+          {mission.phase === 'discussion' && <p role="status">Discussion ready. Compare your information with the team. Voting is not available yet.</p>}
           <ul className="players">{mission.players.map(player => <li key={player.id}>
-            <div><strong>{player.callsign}</strong><small>{player.id === mission.you ? 'You' : 'Teammate'}{player.id === mission.host_id ? ' · Host' : ''}</small></div>
+            <div><strong>{player.callsign}</strong><small>{player.id === mission.you ? 'You' : 'Teammate'}{player.id === mission.host_id ? ' · Host' : ''}</small><div className="role-badges">{player.roles.map(role => <RoleBadge key={role} role={role} />)}</div></div>
             <span className={player.connected ? 'online' : 'offline'}>{player.connected ? 'Connected' : 'Offline'}</span>
           </li>)}</ul>
-          <button onClick={copyInvite}>{copied ? 'Invite link copied' : 'Copy Invite Link'}</button>
+          {mission.phase === 'lobby' && <><button onClick={copyInvite}>{copied ? 'Invite link copied' : 'Copy Invite Link'}</button>
           <label className="invite-label" htmlFor="invite">Mission invite</label>
-          <input id="invite" value={location.href} readOnly onFocus={event => event.target.select()} />
+          <input id="invite" value={location.href} readOnly onFocus={event => event.target.select()} /></>}
         </> : <p role="status">{rejected ? 'This session is unavailable. The server may have restarted.' : 'Restoring your mission seat…'}</p>}
         {rejected && <button onClick={() => { clearSession(session.token); location.assign('/'); }}>Return to mission creation</button>}
       </div>
@@ -81,8 +110,9 @@ export default function App() {
         </div>)}</div>
       </aside>
     </section>}
+    {mission?.crisis && <CrisisBriefing mission={mission} />}
     {error && <p className="error" role="alert">{error}</p>}
-    <section className="scope"><span className="eyebrow">First milestone</span><p>Mission creation and live lobby are available. Crisis gameplay, role assignment, chat, voting, and QR invites are planned for subsequent passes.</p></section>
+    <section className="scope"><span className="eyebrow">Milestone 2</span><p>Mission start, assigned domains, and Crisis 01 intelligence are available. Discussion is untimed; chat, voting, consequences, and QR invites remain planned.</p></section>
     <footer>Consensus Engine <span>Collective judgment. Shared consequences.</span></footer>
   </main>;
 }

@@ -26,7 +26,7 @@ def create_app() -> FastAPI:
 
     @app.get("/api/health")
     def health():
-        return {"status": "ok", "milestone": "lobby-foundation"}
+        return {"status": "ok", "milestone": "crisis-information"}
 
     @app.post("/api/missions", status_code=201)
     async def create(body: JoinRequest):
@@ -40,6 +40,20 @@ def create_app() -> FastAPI:
             mission, player = store.join(token, body.callsign, x_mission_session)
             await connections.broadcast(token)
             return {"token": mission.token, "credential": player.credential}
+
+    @app.post("/api/missions/{token}/start")
+    async def start(token: str, x_mission_session: str = Header()):
+        async with lock:
+            store.start(token, x_mission_session)
+            await connections.broadcast(token)
+            return {"status": "started"}
+
+    @app.post("/api/missions/{token}/discussion")
+    async def discussion(token: str, x_mission_session: str = Header()):
+        async with lock:
+            store.begin_discussion(token, x_mission_session)
+            await connections.broadcast(token)
+            return {"status": "discussion"}
 
     @app.websocket("/api/missions/{token}/ws")
     async def lobby(socket: WebSocket, token: str):

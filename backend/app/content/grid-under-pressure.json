@@ -1,0 +1,50 @@
+{
+  "id": "grid-under-pressure",
+  "title": "Grid Under Pressure",
+  "briefing": "EXTREME HEAT EVENT \u2014 Record temperatures have pushed the electrical grid to 96% capacity. Engineers predict a major cascading failure within two hours if demand is not reduced.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "The shutdown reduces estimated grid-failure probability from 72% to 18%. District 7 represents one of the easiest loads to isolate.",
+    "community": "District 7 contains 12,400 residents, three senior-care facilities, and a large low-income housing complex.",
+    "economy": "A residential shutdown costs relatively little economically. Curtailing the commercial district instead would cause roughly $2.1M in losses.",
+    "safety": "One hospital serving District 7 has backup power for only about three hours. Emergency generators could be relocated, but not immediately."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Follow the AI Recommendation",
+      "description": "Cut residential power in District 7 for six hours.",
+      "consequence": "The grid stabilizes, but prolonged residential outages strain vulnerable residents and hospital backup power.",
+      "metric_deltas": {
+        "infrastructure": 8,
+        "public_trust": -8,
+        "economy": 2,
+        "safety": -6
+      }
+    },
+    {
+      "id": "B",
+      "title": "Distribute the Burden",
+      "description": "Perform rotating three-hour outages across residential, commercial, and industrial zones.",
+      "consequence": "Rotating outages spread disruption and business losses while reducing sustained pressure on the grid.",
+      "metric_deltas": {
+        "infrastructure": 5,
+        "public_trust": -3,
+        "economy": -7,
+        "safety": 2
+      }
+    },
+    {
+      "id": "C",
+      "title": "Preserve Service",
+      "description": "Avoid forced outages and rely on reserve generation plus voluntary conservation.",
+      "consequence": "Service continues, but reserve generation and uncertain conservation leave the grid exposed.",
+      "metric_deltas": {
+        "infrastructure": -10,
+        "public_trust": 4,
+        "economy": -3,
+        "safety": -4
+      }
+    }
+  ]
+}
