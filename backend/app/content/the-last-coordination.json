@@ -1,0 +1,50 @@
+{
+  "id": "the-last-coordination",
+  "title": "The Last Coordination",
+  "briefing": "The city faces a combined recovery deadline: utility maintenance, medical dispatch, supplier payments and resident support are competing for the same exhausted teams. A cascading outage is possible if coordination fails. Choose how to carry the accumulated civilization state through the final emergency shift.",
+  "ai_recommendation_choice_id": "B",
+  "private_intelligence": {
+    "infrastructure": "Centralised load balancing can recover substantial capacity quickly, but it depends on a controller network that cannot be independently audited before the shift. Lifeline islands are slower and require sacrificing noncritical equipment.",
+    "community": "Residents want a credible recovery timetable more than another blanket promise. Community-led restoration can earn support, but different districts disagree about which services should return first.",
+    "economy": "Small firms can finance neighbourhood restoration if trade reopens immediately. Central stabilisation requires expensive specialist contracts; protected lifeline operations also need paid logistics while limiting normal commerce.",
+    "safety": "Hospitals and dispatch centres can be protected within separate utility islands. A rapid central restart or widely dispersed recovery crews leave less capacity for emergency escort and backup support during the transition."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Stabilise from the Centre",
+      "description": "Concentrate specialists and resources on a rapid central restart of the utility and dispatch network.",
+      "consequence": "Concentrated recovery restores major technical capacity. Specialist costs weaken finances, unequal restoration erodes confidence, and reduced emergency support creates additional harm during the restart.",
+      "metric_deltas": {
+        "infrastructure": 18,
+        "public_trust": -12,
+        "economy": -16,
+        "safety": -10
+      }
+    },
+    {
+      "id": "B",
+      "title": "Protect Lifeline Islands",
+      "description": "Ring-fence hospital, water and dispatch lifelines, publish a staged plan, and accept managed loss of noncritical equipment.",
+      "consequence": "Protected lifelines reduce immediate harm and the staged plan earns confidence. Sacrificed equipment lowers infrastructure capacity, and restricted commerce plus logistics costs weaken the economy.",
+      "metric_deltas": {
+        "infrastructure": -10,
+        "public_trust": 6,
+        "economy": -10,
+        "safety": 14
+      }
+    },
+    {
+      "id": "C",
+      "title": "Release Neighbourhood Recovery",
+      "description": "Reopen local trade and let funded community teams restore services in parallel, with central crews reserved for advice.",
+      "consequence": "Local trade and participation rebuild economic capacity and trust. Dispersed restoration overloads technical coordination, while gaps in emergency support increase harm.",
+      "metric_deltas": {
+        "infrastructure": -18,
+        "public_trust": 12,
+        "economy": 12,
+        "safety": -14
+      }
+    }
+  ]
+}

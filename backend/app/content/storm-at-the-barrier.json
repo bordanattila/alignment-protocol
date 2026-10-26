@@ -1,0 +1,50 @@
+{
+  "id": "storm-at-the-barrier",
+  "title": "Storm at the Barrier",
+  "briefing": "A severe coastal storm is approaching while response crews and service systems remain under strain. Tide forecasts disagree on the size of the surge. Transport capacity can support evacuation or protection of key substations, but not a full version of both before landfall.",
+  "ai_recommendation_choice_id": "B",
+  "private_intelligence": {
+    "infrastructure": "Three substations feed the water pumps and freight signalling. Temporary barriers could keep them operating, but crews assigned there cannot also reopen the main evacuation route before the storm.",
+    "community": "Several neighbourhood groups can organise phased departures with advance notice. A mandatory citywide move would separate some care networks, while sheltering in place will be contested if risk maps are not trusted.",
+    "economy": "Mass evacuation closes most local commerce and requires costly transport contracts. Protecting the substations preserves production; phased evacuation costs less but delays deliveries through residential areas.",
+    "safety": "The official shelter model assumes upper-floor access. A field survey found that two designated buildings have unreliable lifts, and the surge forecast is least certain near their access roads."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Evacuate the Full Risk Zone",
+      "description": "Commit transport and crews to moving the entire forecast risk zone before landfall.",
+      "consequence": "Broad evacuation protects lives despite forecast uncertainty. Abandoned maintenance and damaged exposed assets weaken infrastructure; transport and closures reduce economic capacity, and displacement strains trust.",
+      "metric_deltas": {
+        "infrastructure": -16,
+        "public_trust": -6,
+        "economy": -14,
+        "safety": 18
+      }
+    },
+    {
+      "id": "B",
+      "title": "Defend Lifeline Substations",
+      "description": "Prioritise barriers and utility crews, keep commerce operating, and direct residents to local shelters.",
+      "consequence": "Protected substations sustain essential systems and production. Uneven shelter protection exposes residents to harm, and families excluded from evacuation lose confidence in the response.",
+      "metric_deltas": {
+        "infrastructure": 14,
+        "public_trust": -8,
+        "economy": 2,
+        "safety": -18
+      }
+    },
+    {
+      "id": "C",
+      "title": "Stage Neighbourhood Evacuations",
+      "description": "Move the most exposed blocks first using local networks, while accepting slower protection of remaining assets.",
+      "consequence": "Local participation improves legitimacy and selective evacuation reduces harm. Delayed asset protection weakens infrastructure, while interrupted routes and transport costs reduce economic capacity.",
+      "metric_deltas": {
+        "infrastructure": -10,
+        "public_trust": 10,
+        "economy": -8,
+        "safety": 4
+      }
+    }
+  ]
+}

@@ -35,33 +35,39 @@ class Metrics(BaseModel):
 
 
 class MetricDeltas(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
     infrastructure: int
     public_trust: int
     economy: int
     safety: int
 
 
+AuthoredText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+
+
 class Choice(BaseModel):
-    id: str
-    title: str
-    description: str
-    consequence: str
+    model_config = ConfigDict(extra="forbid")
+    id: AuthoredText
+    title: AuthoredText
+    description: AuthoredText
+    consequence: AuthoredText
     metric_deltas: MetricDeltas
 
 
 class Crisis(BaseModel):
-    id: str
-    title: str
-    briefing: str
-    ai_recommendation_choice_id: str
-    private_intelligence: dict[Role, str]
+    model_config = ConfigDict(extra="forbid")
+    id: Annotated[str, StringConstraints(pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")]
+    title: AuthoredText
+    briefing: AuthoredText
+    ai_recommendation_choice_id: AuthoredText
+    private_intelligence: dict[Role, AuthoredText]
     choices: list[Choice] = Field(min_length=3, max_length=3)
 
     @model_validator(mode="after")
     def validate_content(self):
         ids = {choice.id for choice in self.choices}
-        if len(ids) != 3 or self.ai_recommendation_choice_id not in ids:
-            raise ValueError("Require three distinct choices and a valid recommendation")
+        if ids != {"A", "B", "C"} or self.ai_recommendation_choice_id not in ids:
+            raise ValueError("Require choices A, B, C and a valid recommendation")
         if set(self.private_intelligence) != set(Role):
             raise ValueError("Require intelligence for all four roles")
         return self
@@ -84,6 +90,7 @@ class Player(BaseModel):
 
 
 class ChatMessage(BaseModel):
+    crisis_number: int = 1
     id: str
     sender_id: str
     callsign: str

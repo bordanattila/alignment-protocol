@@ -1,0 +1,50 @@
+{
+  "id": "credit-under-strain",
+  "title": "Credit Under Strain",
+  "briefing": "Emergency expenditure, interrupted trade and storm preparations have unsettled local lenders. Several essential employers may miss payroll before normal credit resumes. Public guarantees could restore confidence, but the city cannot protect every deposit, business and service contract at once.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "Utility suppliers need payment certainty before releasing replacement parts. Secured credit for critical firms can restore that flow; household protection alone leaves maintenance invoices waiting.",
+    "community": "Residents are comparing protection offered to employers with delayed support for households. A transparent household guarantee would reassure them, while selective business support needs a defensible public eligibility rule.",
+    "economy": "The largest employer is solvent on paper but cannot meet payroll this week. An unconditional guarantee would unlock lending fastest; collateral checks reduce exposure but exclude some viable small firms.",
+    "safety": "Care workers without wages are missing shifts. Household protection can stabilise staffing, but targeted business credit may reach only formal employees; broad guarantees use funds needed for emergency support."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Guarantee Business Lending",
+      "description": "Back emergency loans across the employer network without waiting for collateral reviews.",
+      "consequence": "Rapid credit protects production and payroll. Funds diverted from maintenance and emergency support weaken systems and safety, while unequal access undermines public confidence.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": -14,
+        "economy": 18,
+        "safety": -10
+      }
+    },
+    {
+      "id": "B",
+      "title": "Protect Household Payments",
+      "description": "Guarantee essential household payments and care-worker wages while limiting new business guarantees.",
+      "consequence": "Visible household protection rebuilds confidence and stabilises care staffing. Unpaid suppliers delay repairs, while the guarantee and reduced business activity weaken finances.",
+      "metric_deltas": {
+        "infrastructure": -12,
+        "public_trust": 12,
+        "economy": -14,
+        "safety": 6
+      }
+    },
+    {
+      "id": "C",
+      "title": "Secure Critical-Service Credit",
+      "description": "Offer collateral-backed credit to firms supplying essential services and publish the eligibility decisions.",
+      "consequence": "Critical suppliers resume parts deliveries and productive work, improving infrastructure and economic capacity. Excluded households and firms lose confidence, and gaps in emergency staffing increase harm.",
+      "metric_deltas": {
+        "infrastructure": 8,
+        "public_trust": -6,
+        "economy": 8,
+        "safety": -14
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "care-at-capacity",
+  "title": "Care at Capacity",
+  "briefing": "Heat-related illness and the water alert have filled the regional hospitals. A new intake surge is expected overnight. Beds, staff, transport and backup equipment cannot all be expanded at once. The team must decide where to concentrate the next shift’s care capacity.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "A convention hall can support temporary wards, but its cooling must be connected to hospital reserve circuits. Transfers avoid that retrofit and let maintenance crews repair those circuits tonight.",
+    "community": "Patients’ families are already sharing stories of transfers without notice. Nearby care would reassure them; postponing routine appointments is more acceptable if the rescheduling commitment is credible.",
+    "economy": "A staffed temporary ward uses nearly a week of the emergency purchasing reserve. Transfers have a reimbursement agreement, while a planned-care pause sacrifices revenue but releases experienced staff.",
+    "safety": "Two partner hospitals report spare beds, yet the transfer route averages 95 minutes and ambulances lack enough critical-care escorts. Temporary wards can handle observation, not complex surgery."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Open Temporary Care Wards",
+      "description": "Equip the convention hall for staffed observation and divert hospital reserve utilities to support it.",
+      "consequence": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves.",
+      "metric_deltas": {
+        "infrastructure": -12,
+        "public_trust": 4,
+        "economy": -20,
+        "safety": 16
+      }
+    },
+    {
+      "id": "B",
+      "title": "Transfer to Regional Partners",
+      "description": "Use the reimbursement agreement and move suitable patients to hospitals outside the city.",
+      "consequence": "Local utility repairs and reimbursement strengthen systems and finances. Lengthy transfers delay treatment and distress families, increasing health risks and mistrust.",
+      "metric_deltas": {
+        "infrastructure": 4,
+        "public_trust": -10,
+        "economy": 6,
+        "safety": -12
+      }
+    },
+    {
+      "id": "C",
+      "title": "Pause Planned Care",
+      "description": "Suspend scheduled care, redeploy staff, and publish a protected rescheduling programme.",
+      "consequence": "Staff redeployment allows orderly maintenance and a transparent plan improves confidence. Lost treatment revenue weakens finances, while deferred care creates avoidable health complications.",
+      "metric_deltas": {
+        "infrastructure": 6,
+        "public_trust": 8,
+        "economy": -10,
+        "safety": -8
+      }
+    }
+  ]
+}

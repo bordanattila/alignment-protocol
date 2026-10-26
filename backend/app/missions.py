@@ -7,6 +7,7 @@ from .domain import Mission, Player, Phase, Role, VotingRound, Decision, ChatMes
 from .voting import plurality
 from .crises import load_crisis_sequence
 from .callsigns import normalize_callsign, callsign_key
+from .consequences import apply_metric_deltas, collapsed_metrics
 
 
 class MissionError(Exception):
@@ -179,8 +180,7 @@ class MissionStore:
         choice = next(c for c in mission.crisis.choices if c.id == decision.choice_id)
         before = mission.metrics.model_copy(deep=True)
         old = before.model_dump()
-        deltas = choice.metric_deltas.model_dump()
-        after = Metrics(**{key: max(0, min(100, value + deltas[key])) for key, value in old.items()})
+        after = apply_metric_deltas(before, choice.metric_deltas)
         result = CrisisResult(
             id=decision.round_id, crisis_id=mission.crisis.id,
             crisis_number=mission.crisis_index + 1, crisis_title=mission.crisis.title,
@@ -190,7 +190,7 @@ class MissionStore:
             applied_deltas=MetricDeltas(**{key: after.model_dump()[key] - value for key, value in old.items()}))
         mission.results.append(result)
         mission.metrics = after
-        mission.collapsed_metrics = [key for key, value in after.model_dump().items() if value == 0]
+        mission.collapsed_metrics = collapsed_metrics(after)
         if mission.collapsed_metrics:
             mission.phase = Phase.FAILED
         # decision_locked is now the durable, synchronized consequence/result
@@ -235,7 +235,8 @@ class MissionStore:
         if now - mission.last_chat_at.get(player.id, float("-inf")) < 1:
             raise MissionError("Please wait a second before sending another message.", 429)
         mission.last_chat_at[player.id] = now
-        mission.chat.append(ChatMessage(id=secrets.token_urlsafe(16), sender_id=player.id,
+        mission.chat.append(ChatMessage(crisis_number=mission.crisis_index + 1,
+                                        id=secrets.token_urlsafe(16), sender_id=player.id,
                                         callsign=player.callsign, text=text.strip(), timestamp=now))
         mission.chat = mission.chat[-100:]
 

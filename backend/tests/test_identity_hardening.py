@@ -6,6 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import create_app
+from app.crises import load_initial_crisis
 from app.missions import MissionError, MissionStore
 from test_foundation import client, create, authenticate
 from test_milestone3 import Clock
@@ -89,7 +90,7 @@ def test_reserved_disconnected_name_cannot_be_impersonated(client):
 
 def test_three_client_identity_and_completed_score_restore():
     clock = Clock()
-    app = create_app(clock)
+    app = create_app(clock, lambda: [load_initial_crisis()])
     with TestClient(app) as client:
         host = create(client,'Eagle1')
         token = host['token']

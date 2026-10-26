@@ -12,7 +12,7 @@ export interface LobbyState {
   consensus_score: number | null;
   server_now: number;
   deadline: number | null;
-  chat: { id: string; sender_id: string; callsign: string; text: string; timestamp: number }[];
+  chat: { crisis_number?: number; id: string; sender_id: string; callsign: string; text: string; timestamp: number }[];
   voting: { round_id: string; number: number; eligible_count: number; submitted_count: number; your_vote: string | null } | null;
   closed_rounds: { round_id: string; number: number; totals: Record<string, number>; abstentions: number }[];
   decision: { choice_id: string; reason: 'initial_plurality' | 'final_plurality' | 'ai_tie_break' | 'no_vote_ai_fallback'; round_id: string; totals: Record<string, number>; abstentions: number; ai_followed: boolean } | null;

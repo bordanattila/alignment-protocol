@@ -70,7 +70,8 @@ def assert_privacy(store, mission):
 
 def test_packaged_sequence_and_initial_metrics():
     sequence = load_crisis_sequence()
-    assert [c.id for c in sequence] == ['grid-under-pressure']
+    assert sequence[0].id == 'grid-under-pressure' and len(sequence) == 10
+    assert len({c.id for c in sequence}) == 10
     store, mission, _, _ = team()
     assert mission.metrics.model_dump() == dict.fromkeys(['infrastructure','public_trust','economy','safety'], 70)
     state = store.project(mission.token, mission.host_id)

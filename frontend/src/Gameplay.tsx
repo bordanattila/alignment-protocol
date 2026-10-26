@@ -69,14 +69,14 @@ export function ChatPanel({ mission, connected, sendIntent }: Actions) {
   }
   return <section className="panel" aria-label="Mission chat">
     <div className="panel-heading"><h2>Mission chat</h2><span className="badge">{writable ? 'Team channel' : 'Read-only'}</span></div>
-    <p>Share what your team needs to know. Messages are visible to everyone in this mission.</p>
+    <p>Mission-wide history · Latest 100 messages. Share what your team needs to know.</p>
     <form onSubmit={submit}>
       <label htmlFor="chat-message">{writable ? 'Message your team (500 characters max)' : 'Chat opens during discussion and the Consensus Window.'}</label>
       <textarea id="chat-message" value={text} onChange={event => setText(event.target.value)} maxLength={500} disabled={!writable || !connected} rows={2} />
       <button disabled={!writable || !connected || !text.trim()}>Send message</button>
     </form>
     <ol className="chat-history" aria-label="Chat history" aria-live="polite" aria-relevant="additions">
-      {mission.chat.map(message => <li key={message.id}><strong>{message.callsign}</strong> <time dateTime={new Date(message.timestamp * 1000).toISOString()}>{new Date(message.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time><p>{message.text}</p></li>)}
+      {mission.chat.map(message => <li key={message.id}><strong>{message.callsign}</strong> {message.crisis_number && <span className="badge">Crisis {message.crisis_number}</span>} <time dateTime={new Date(message.timestamp * 1000).toISOString()}>{new Date(message.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time><p>{message.text}</p></li>)}
     </ol>
     {!mission.chat.length && <p>No messages yet.</p>}
   </section>;

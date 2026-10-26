@@ -1,7 +1,7 @@
 """Live three-client identity/completion acceptance; automated, not a browser.
 
 Run from root: .venv/bin/python backend/tests/smoke_milestone4_1.py
-Production authored sequence, injected 10x clock, unchanged timing constants.
+Preserved Crisis 01 in a one-crisis fixture; injected 10x clock, unchanged timing constants.
 """
 import asyncio
 from contextlib import AsyncExitStack
@@ -15,6 +15,7 @@ import uvicorn
 from websockets.asyncio.client import connect
 
 from app.main import create_app
+from app.crises import load_initial_crisis
 
 
 async def receive(socket):
@@ -107,5 +108,5 @@ def main():
 
 if __name__ == '__main__':
     if '--serve' in sys.argv:
-        uvicorn.run(create_app(clock=lambda:time.time()*10),host='127.0.0.1',port=18768,ws_max_size=4096,log_level='warning')
+        uvicorn.run(create_app(clock=lambda:time.time()*10, crisis_loader=lambda:[load_initial_crisis()]),host='127.0.0.1',port=18768,ws_max_size=4096,log_level='warning')
     else: main()

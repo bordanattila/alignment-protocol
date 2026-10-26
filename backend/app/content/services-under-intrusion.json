@@ -1,0 +1,50 @@
+{
+  "id": "services-under-intrusion",
+  "title": "Services Under Intrusion",
+  "briefing": "A cyber intrusion is disrupting service scheduling and utility telemetry during the emergency response. Engineers can still operate essential systems, but they cannot yet trust every automated status report. Recovery must balance isolation, continuity and a limited pool of qualified staff.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "Offline images exist for the central controllers, but a full restore requires a coordinated outage. Staged isolation can preserve core functions; leaving automation connected risks corrupted equipment commands.",
+    "community": "Residents have received unexplained appointment cancellations. A clear manual service plan would improve confidence, whereas another unannounced shutdown may reinforce claims that officials are concealing failures.",
+    "economy": "Continuing automated operations preserves invoices and deliveries today. A full disconnect stops settlement at several utilities; staged manual work costs overtime but keeps essential contracts moving.",
+    "safety": "Backup dispatch teams can operate manually for one shift. After that, fatigue raises the chance of missed medical calls. The security team cannot rule out a compromised device in the remaining connected network."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Keep Automation with Monitoring",
+      "description": "Maintain connected operations, add intrusion monitoring, and defer controller isolation until attribution is clearer.",
+      "consequence": "Invoices and deliveries continue, protecting revenue. Corrupted commands damage systems, missed warnings increase harm, and visible service failures weaken confidence.",
+      "metric_deltas": {
+        "infrastructure": -18,
+        "public_trust": -10,
+        "economy": 12,
+        "safety": -10
+      }
+    },
+    {
+      "id": "B",
+      "title": "Disconnect and Rebuild",
+      "description": "Take affected networks offline together and restore controllers from the verified backup images.",
+      "consequence": "A coordinated rebuild improves system reliability and removes immediate automated hazards. The outage interrupts trade and essential routines, imposing financial losses and frustration.",
+      "metric_deltas": {
+        "infrastructure": 16,
+        "public_trust": -8,
+        "economy": -18,
+        "safety": 4
+      }
+    },
+    {
+      "id": "C",
+      "title": "Isolate in Stages",
+      "description": "Move essential services to documented manual operation while isolating and restoring network segments in sequence.",
+      "consequence": "Staged recovery repairs systems and a visible service plan rebuilds confidence. Manual staffing is expensive, and fatigued teams miss some urgent needs.",
+      "metric_deltas": {
+        "infrastructure": 6,
+        "public_trust": 4,
+        "economy": -10,
+        "safety": -6
+      }
+    }
+  ]
+}

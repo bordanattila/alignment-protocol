@@ -2,7 +2,7 @@
 
 *Intelligence proposes. Humanity decides.*
 
-Milestone 4: a React/TypeScript cooperative game with a FastAPI-authoritative 2–4-player mission, timed discussion/chat, hidden plurality voting, authored consequences, and configured crisis progression. Create a mission, share its invite URL, and join with a callsign. Separate browser profiles receive separate seats; refreshes and additional tabs reuse the saved seat credential.
+Milestone 5: a React/TypeScript cooperative game with a FastAPI-authoritative 2–4-player mission, timed discussion/chat, hidden plurality voting, authored consequences, and configured crisis progression. Create a mission, share its invite URL, and join with a callsign. Separate browser profiles receive separate seats; refreshes and additional tabs reuse the saved seat credential.
 
 ## Development
 
@@ -65,9 +65,9 @@ The host starts once 2–4 occupied seats are connected. The backend assigns all
 
 Every decision applies its authored consequence exactly once. The durable `decision_locked` result shows its narrative, before/after metrics, applied changes, and resolution method. The host selects Next crisis after review; the result ID makes retries safe. All occupied seats must reconnect before advancing. Seats/roles/metrics persist; new crises start with fresh briefing and vote state. Zero metrics immediately cause collapse. After the final configured result, Finish mission enters completion and computes the server-side average Consensus Score.
 
-`backend/app/content/sequence.json` currently configures only **Grid Under Pressure**. There is no production Crisis 02 yet; adding validated crisis files and IDs to the manifest extends progression without engine changes. Tests cover two- and ten-crisis fixture sequences. Only the selected public result's consequence/deltas are exposed; future content and other roles' intelligence remain server-side.
+`backend/app/content/sequence.json` configures ten authored crises, beginning with the unchanged **Grid Under Pressure** and ending with **The Last Coordination**. The fixed campaign escalates through water, healthcare, supplies, misinformation, cyberattack, storm, finance, and civic legitimacy. Schema and catalog validation reject malformed, missing, duplicate, or unreachable records. Only the selected public result's consequence/deltas are exposed; future content and other roles' intelligence remain server-side. Chat remains mission-wide, bounded to 100 messages, with each message labeled by its originating crisis.
 
-State persists only within the running process. Five-minute seat removal/role redistribution, additional authored crises, variable pool ordering/weakest-metric finales, QR joining, and replay controls remain future work. Physical browser/device and mobile acceptance remain manual. This is not the complete ten-crisis v0.1 game.
+State persists only within the running process. Five-minute seat removal/role redistribution, variable pool ordering/weakest-metric finales, QR joining, and replay controls remain future work. Physical browser/device and mobile acceptance remain manual. The fixed ten-crisis campaign is playable; this is not the complete v0.1 feature set.
 
 Milestone 4 checks and automated live fixture acceptance:
 
@@ -80,3 +80,15 @@ This test starts a temporary fixture server with a two-crisis sequence and 10x i
 See [Milestone 4 verification](docs/MILESTONE_4_VERIFICATION.md) for current behavior, exact commands/results, architecture decisions, and manual-review limits.
 
 See [Milestone 2 verification](docs/MILESTONE_2_VERIFICATION.md) for implementation decisions, commands, results, and remaining checks.
+
+## Ten-crisis campaign verification
+
+```sh
+.venv/bin/python -m app.campaign_analysis
+.venv/bin/python backend/tests/smoke_milestone5.py
+.venv/bin/python backend/tests/smoke_milestone3.py
+```
+
+The offline analysis enumerates all 59,049 decision paths using production clamping and collapse rules. The Milestone 5 smoke uses three real WebSocket clients, production content and a 20x injected clock; the Milestone 3 smoke retains actual 60/20/30-second timing. Neither changes production duration constants.
+
+See [Milestone 5 verification](docs/MILESTONE_5_VERIFICATION.md) for content design, balance findings, exact validation results, playthrough evidence, changed files, and browser/mobile acceptance limits.

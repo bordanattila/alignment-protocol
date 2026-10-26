@@ -1,3 +1,13 @@
+import campaign0 from '../../backend/app/content/grid-under-pressure.json';
+import campaign1 from '../../backend/app/content/waterline-alert.json';
+import campaign2 from '../../backend/app/content/care-at-capacity.json';
+import campaign3 from '../../backend/app/content/essential-corridor.json';
+import campaign4 from '../../backend/app/content/signal-and-rumour.json';
+import campaign5 from '../../backend/app/content/services-under-intrusion.json';
+import campaign6 from '../../backend/app/content/storm-at-the-barrier.json';
+import campaign7 from '../../backend/app/content/credit-under-strain.json';
+import campaign8 from '../../backend/app/content/a-fair-share.json';
+import campaign9 from '../../backend/app/content/the-last-coordination.json';
 import { MissionEntryForm } from '../src/MissionEntryForm';
 import { MissionEntryRequest, duplicateCallsignMessage } from '../src/missionEntry';
 import { FinalConsensusScore } from '../src/ConsequenceOutcome';
@@ -286,4 +296,43 @@ test('long history stays in one history region after the composer; voting replac
   const voting = render(mission);
   assert.ok(voting.indexOf('Submit private vote') < voting.indexOf('Message 0:'));
   assert.ok(voting.indexOf('Submit private vote') < voting.indexOf('Operations room'));
+});
+
+
+test('all ten authored crises render public text and only authorized multi-role intelligence', () => {
+  const campaign = [campaign0,campaign1,campaign2,campaign3,campaign4,campaign5,campaign6,campaign7,campaign8,campaign9];
+  for (const [index,crisis] of campaign.entries()) {
+    const mission = state('voting');
+    mission.crisis_number = index + 1; mission.crisis_count = campaign.length;
+    mission.roles = ['infrastructure','safety'];
+    mission.crisis = {id:crisis.id,title:crisis.title,briefing:crisis.briefing,
+      ai_recommendation_choice_id:crisis.ai_recommendation_choice_id,
+      choices:crisis.choices.map(({id,title,description}) => ({id,title,description}))};
+    mission.private_intelligence = { infrastructure:crisis.private_intelligence.infrastructure, safety:crisis.private_intelligence.safety };
+    mission.voting = {round_id:`crisis-${index}`,number:1,eligible_count:3,submitted_count:0,your_vote:null};
+    const html = render(mission);
+    assert.ok(html.includes(crisis.title));
+    assert.ok(html.includes(crisis.briefing.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll("'",'&#x27;')));
+    assert.equal((html.match(/type="radio"/g) || []).length,3);
+    assert.ok(html.indexOf('Submit private vote') < html.indexOf('Operations room'));
+    assert.ok(html.indexOf('Submit private vote') < html.indexOf('Your intelligence'));
+    assert.ok(!html.includes(crisis.private_intelligence.community));
+    assert.ok(!html.includes(crisis.private_intelligence.economy));
+    mission.phase='decision_locked';
+    mission.decision = {choice_id:'C',reason:'final_plurality',round_id:`crisis-${index}`,totals:{A:1,B:0,C:2},abstentions:0,ai_followed:crisis.ai_recommendation_choice_id==='C'};
+    mission.result = {...outcome().result!,crisis_id:crisis.id,crisis_number:index+1,crisis_title:crisis.title,
+      choice_title:crisis.choices[2].title,choice_description:crisis.choices[2].description,outcome:crisis.choices[2].consequence,decision:mission.decision};
+    assert.ok(render(mission).includes(crisis.choices[2].consequence.replaceAll('&','&amp;').replaceAll('"','&quot;').replaceAll("'",'&#x27;')));
+  }
+});
+
+test('mission-wide chat labels earlier crises without duplicating the active composer', () => {
+  const mission = state('discussion');
+  mission.crisis_number=7; mission.crisis_count=10;
+  mission.chat=[{...mission.chat[0],crisis_number:3,text:'Earlier ward discussion'}];
+  const html=render(mission);
+  assert.ok(html.includes('Mission-wide history'));
+  assert.ok(html.includes('Crisis 3'));
+  assert.ok(html.includes('Earlier ward discussion'));
+  assert.equal((html.match(/id="chat-message"/g) || []).length,1);
 });

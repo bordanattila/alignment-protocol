@@ -1,0 +1,50 @@
+{
+  "id": "waterline-alert",
+  "title": "Waterline Alert",
+  "briefing": "Heat-stressed pumps have lost pressure near the eastern water-treatment loop. Samples indicate possible contamination, but laboratory confirmation is still hours away. Households, food processors and emergency clinics share the network. Decide how much service to interrupt while engineers contain the exposure.",
+  "ai_recommendation_choice_id": "B",
+  "private_intelligence": {
+    "infrastructure": "A citywide flush can clear the main trunks in eight hours. Isolating the eastern loop is faster, but its pressure imbalance will accelerate wear on two older pumping stations.",
+    "community": "Several eastern apartment towers have no safe water storage. Local volunteers can distribute bottled supplies, but residents say an advisory without delivery would leave people unable to comply.",
+    "economy": "Food processors lose an estimated $3.6M during a full shutdown. Targeted isolation preserves most production; keeping all service open protects today’s payroll but risks rejected shipments if contamination is confirmed.",
+    "safety": "The first positive sample came from a clinic intake, not a household tap. Boiling can address the suspected organism, but dialysis equipment needs certified clean water regardless of the public advisory."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Flush the Entire Network",
+      "description": "Suspend citywide supply and fund a full flush with emergency tanker delivery.",
+      "consequence": "The flush restores network reliability and reduces exposure. Citywide interruptions anger households and close processors, while emergency delivery absorbs substantial funds.",
+      "metric_deltas": {
+        "infrastructure": 12,
+        "public_trust": -10,
+        "economy": -22,
+        "safety": 10
+      }
+    },
+    {
+      "id": "B",
+      "title": "Isolate and Deliver",
+      "description": "Close the eastern loop, deliver certified water there, and keep the remaining network operating.",
+      "consequence": "Targeted delivery earns public confidence and protects exposed residents. Most commerce continues, but distribution costs rise and uneven pressure damages older equipment.",
+      "metric_deltas": {
+        "infrastructure": -8,
+        "public_trust": 6,
+        "economy": -8,
+        "safety": 10
+      }
+    },
+    {
+      "id": "C",
+      "title": "Keep Supply with a Boil Advisory",
+      "description": "Maintain network supply, expand sampling, and ask users to boil water until confirmation arrives.",
+      "consequence": "Businesses retain working supply, but uncertain compliance permits further illness. The delayed response damages confidence, and stressed pumps continue to deteriorate.",
+      "metric_deltas": {
+        "infrastructure": -3,
+        "public_trust": -12,
+        "economy": 8,
+        "safety": -16
+      }
+    }
+  ]
+}

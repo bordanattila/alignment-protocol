@@ -1,0 +1,50 @@
+{
+  "id": "signal-and-rumour",
+  "title": "Signal and Rumour",
+  "briefing": "Conflicting claims about water, hospital access and supply allocation are overwhelming official channels. Some warnings are fabricated; others describe real delays. Residents need usable instructions now, but verification teams cannot investigate every report before the next shift change.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "A reserved alert channel can reach most phones within four minutes. Community relays are slower but do not depend on the overloaded central dispatch system; publishing raw logs diverts repair staff into redaction work.",
+    "community": "Two earlier alerts used language residents understood as a guarantee, then changed. Trusted local groups can reach people who mute official notifications, but those groups disagree about acceptable instructions.",
+    "economy": "A broad broadcast is inexpensive compared with verifying and releasing service records. Uncertainty already delays orders; local relay funding has a smaller cost but leaves firms waiting for a unified position.",
+    "safety": "A forged evacuation image is circulating near a real damaged access road. Fast instructions can prevent injuries, but a blanket message may direct residents away from safer local alternatives."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Reserve a Single Alert Channel",
+      "description": "Issue one mandatory citywide instruction set and reserve dispatch bandwidth for it while verification continues.",
+      "consequence": "Rapid instructions reduce immediate harm and steady dispatch operations. Commercial interruptions cost money, and another centrally imposed message without full evidence sharply erodes confidence.",
+      "metric_deltas": {
+        "infrastructure": 8,
+        "public_trust": -18,
+        "economy": -4,
+        "safety": 8
+      }
+    },
+    {
+      "id": "B",
+      "title": "Publish Verified Service Logs",
+      "description": "Release a checked incident timeline, clearly label uncertainty, and delay new directives until verification is complete.",
+      "consequence": "Visible evidence restores legitimacy. Verification consumes repair capacity and funding, while the delay leaves residents exposed to unresolved hazards.",
+      "metric_deltas": {
+        "infrastructure": -8,
+        "public_trust": 14,
+        "economy": -12,
+        "safety": -6
+      }
+    },
+    {
+      "id": "C",
+      "title": "Fund Trusted Local Relays",
+      "description": "Give neighbourhood groups bounded safety guidance, local updates and resources to reach residents directly.",
+      "consequence": "Local messengers rebuild confidence and help people avoid harm. Supporting the relays costs money and pulls technical staff from recovery, while uneven reach limits the safety gain.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": 6,
+        "economy": -6,
+        "safety": 2
+      }
+    }
+  ]
+}

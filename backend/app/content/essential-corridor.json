@@ -1,0 +1,50 @@
+{
+  "id": "essential-corridor",
+  "title": "The Essential Corridor",
+  "briefing": "Emergency purchasing and disrupted deliveries have left warehouses unevenly stocked. Clinics need filters, repair crews need components, and shops need food. A limited freight corridor can reopen, but fuel, loading crews and bridge capacity cannot serve every destination today.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "The old river bridge needs a restricted-load repair window. A priority corridor can combine deliveries with that work; unrestricted commercial routing would postpone inspection and increase fatigue damage.",
+    "community": "Outer neighbourhoods have fewer shops and cannot bid against large buyers. A corridor serving only institutions may still be seen as abandonment unless residents can see when household deliveries will resume.",
+    "economy": "Emergency bulk purchase would consume $4.2M above the normal budget. Auctioning freight slots raises cash quickly, but essential suppliers say they cannot match supermarket bids.",
+    "safety": "Municipal takeover can place clinical supplies first today. Corridor scheduling is safer for crews but leaves several small clinics dependent on a one-day buffer whose inventory figures are uncertain."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Purchase and Commandeer",
+      "description": "Buy the available stock at emergency prices and redirect depot crews to urgent city orders.",
+      "consequence": "Urgent supplies reach care teams and reduce immediate harm. Costly purchases drain reserves, compulsory redirection damages legitimacy, and rushed freight movements wear the network.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": -12,
+        "economy": -24,
+        "safety": 16
+      }
+    },
+    {
+      "id": "B",
+      "title": "Auction Freight Access",
+      "description": "Sell scarce freight slots and let suppliers choose destinations through the existing market.",
+      "consequence": "Slot revenue and resumed trade improve finances. Uninspected routes deteriorate, poorer districts lose out, and uneven access increases both safety risks and public resentment.",
+      "metric_deltas": {
+        "infrastructure": -10,
+        "public_trust": -14,
+        "economy": 14,
+        "safety": -10
+      }
+    },
+    {
+      "id": "C",
+      "title": "Build a Priority Corridor",
+      "description": "Reserve a restricted route for essential freight, bridge repairs and a published household delivery schedule.",
+      "consequence": "Coordinated repairs strengthen the route and visible scheduling restores confidence. Reserved capacity reduces commercial revenue, while slower clinical deliveries leave immediate health risks.",
+      "metric_deltas": {
+        "infrastructure": 10,
+        "public_trust": 6,
+        "economy": -12,
+        "safety": -8
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "a-fair-share",
+  "title": "A Fair Share",
+  "briefing": "Queues at distribution points are growing as emergency resources remain uneven. Residents question who receives priority, and isolated confrontations are disrupting deliveries. The city must protect access without turning contested allocation into a lasting loss of legitimacy.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "Central dispatch can clear main routes if crews receive protected access. Resident-led quotas need new routing work; open queues have already blocked two maintenance depots.",
+    "community": "Neighbourhood councils have credible organisers, but renters and temporary residents are underrepresented. Transparent quotas could build consent only if those groups receive a meaningful way to appeal.",
+    "economy": "Businesses favour reopening unrestricted queues and trade. Enforced priority lanes preserve some revenue; consultative quotas slow transactions and require paid allocation staff.",
+    "safety": "A small number of incidents are causing most injuries. Protective patrols can separate delivery traffic from crowds, but broad enforcement may escalate fear. First-come access disadvantages people unable to wait safely."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Enforce Protected Priority Lanes",
+      "description": "Use protective patrols to clear delivery routes and enforce centrally assigned access priorities.",
+      "consequence": "Protected routes restore repairs, trade and immediate physical security. Imposed priorities and enforcement sharply damage legitimacy among residents who feel excluded.",
+      "metric_deltas": {
+        "infrastructure": 6,
+        "public_trust": -20,
+        "economy": 6,
+        "safety": 4
+      }
+    },
+    {
+      "id": "B",
+      "title": "Reopen Access without Quotas",
+      "description": "Remove allocation restrictions and let distribution points serve open queues as stock arrives.",
+      "consequence": "Open trade and fewer restrictions improve revenue and confidence for some residents. Crowded depots obstruct maintenance, and people unable to queue suffer greater harm.",
+      "metric_deltas": {
+        "infrastructure": -12,
+        "public_trust": 6,
+        "economy": 8,
+        "safety": -16
+      }
+    },
+    {
+      "id": "C",
+      "title": "Delegate Accountable Quotas",
+      "description": "Fund neighbourhood allocation councils with published quotas, appeals and protected access for vulnerable residents.",
+      "consequence": "Participation and appeals restore legitimacy. Routing changes and administration consume technical and financial capacity, while delayed supplies leave immediate safety gaps.",
+      "metric_deltas": {
+        "infrastructure": -10,
+        "public_trust": 16,
+        "economy": -10,
+        "safety": -6
+      }
+    }
+  ]
+}
