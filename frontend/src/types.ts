@@ -1,8 +1,15 @@
 export type Role = 'infrastructure' | 'community' | 'economy' | 'safety';
+export type Metric = 'infrastructure' | 'public_trust' | 'economy' | 'safety';
+export type Civilization = Record<Metric, number>;
 export interface Session { token: string; credential: string }
 export interface LobbyState {
   token: string;
-  phase: 'lobby' | 'briefing' | 'discussion' | 'voting' | 'consensus_window' | 'decision_locked';
+  phase: 'lobby' | 'briefing' | 'discussion' | 'voting' | 'consensus_window' | 'decision_locked' | 'failed' | 'completed';
+  crisis_number: number;
+  crisis_count: number;
+  result: CrisisResult | null;
+  collapsed_metrics: Metric[];
+  consensus_score: number | null;
   server_now: number;
   deadline: number | null;
   chat: { id: string; sender_id: string; callsign: string; text: string; timestamp: number }[];
@@ -14,9 +21,24 @@ export interface LobbyState {
   private_intelligence: Partial<Record<Role, string>>;
   host_id: string;
   you: string;
-  metrics: Record<'infrastructure' | 'public_trust' | 'economy' | 'safety', number>;
+  metrics: Civilization;
   players: { id: string; callsign: string; connected: boolean; roles: Role[] }[];
 }
 
 export type MissionIntent = { type: 'chat'; text: string } | { type: 'vote'; round_id: string; choice_id: string };
 export interface ClockSample { serverNow: number; receivedAt: number }
+
+export interface CrisisResult {
+  id: string;
+  crisis_id: string;
+  crisis_number: number;
+  crisis_title: string;
+  choice_title: string;
+  choice_description: string;
+  outcome: string;
+  decision: NonNullable<LobbyState['decision']>;
+  before: Civilization;
+  after: Civilization;
+  authored_deltas: Civilization;
+  applied_deltas: Civilization;
+}

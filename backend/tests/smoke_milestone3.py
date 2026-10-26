@@ -72,14 +72,15 @@ async def cycle(client):
         assert all(result == state['decision'] for state in states)
         assert result['reason'] == 'final_plurality' and result['choice_id'] == 'B'
         assert result['totals'] == {'A': 1, 'B': 2, 'C': 0}
-        assert set(states[0]['metrics'].values()) == {70}
+        assert states[0]['metrics'] == {'infrastructure':75, 'public_trust':67, 'economy':63, 'safety':72}
+        assert states[0]['result']['decision'] == result
     async with connect(url) as refresh:
         await refresh.send(json.dumps({'type': 'authenticate', 'credential': host['credential']}))
         state = await receive(refresh)
         assert state['phase'] == 'decision_locked' and state['decision'] == result
         assert state['voting']['your_vote'] == 'B'
         assert state['roles'] == briefing[0]['roles'] and len(state['chat']) == 2
-    print('LIVE SMOKE PASS: three-player A/B/C tie, consensus chat, fresh B/B/A final plurality, unchanged metrics, reconnect', flush=True)
+    print('LIVE SMOKE PASS: three-player A/B/C tie, consensus chat, fresh B/B/A final plurality, authored B consequences, reconnect', flush=True)
 
 
 def main():

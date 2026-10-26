@@ -99,7 +99,10 @@ def test_initial_distribution(choices, phase):
     if phase == Phase.DECISION_LOCKED:
         assert mission.decision.choice_id == 'A'
         assert mission.decision.reason == 'initial_plurality'
-    assert set(mission.metrics.model_dump().values()) == {70}
+    if mission.decision:
+        assert mission.metrics.model_dump() == {'infrastructure':78, 'public_trust':62, 'economy':72, 'safety':64}
+    else:
+        assert set(mission.metrics.model_dump().values()) == {70}
 
 
 @pytest.mark.parametrize('choices,reason,winner', [

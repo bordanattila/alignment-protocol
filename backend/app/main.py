@@ -11,12 +11,18 @@ from pydantic import ValidationError
 from starlette.websockets import WebSocketState
 
 from .connections import LobbyConnections, close_socket
-from .domain import JoinRequest, ChatIntent, VoteIntent
+from .domain import JoinRequest, ChatIntent, VoteIntent, ContinueRequest, Crisis
 from .missions import MissionError, MissionStore
 
 
-def create_app(clock: Callable[[], float] | None = None) -> FastAPI:
-    store = MissionStore(clock) if clock is not None else MissionStore()
+def create_app(clock: Callable[[], float] | None = None,
+               crisis_loader: Callable[[], list[Crisis]] | None = None) -> FastAPI:
+    options = {}
+    if clock is not None:
+        options["clock"] = clock
+    if crisis_loader is not None:
+        options["crisis_loader"] = crisis_loader
+    store = MissionStore(**options)
     lock = asyncio.Lock()
     # Keep membership semantics, but isolate socket delivery from state mutation.
     connections = LobbyConnections(store, lock)
@@ -51,11 +57,11 @@ def create_app(clock: Callable[[], float] | None = None) -> FastAPI:
 
     @app.exception_handler(MissionError)
     async def mission_error(_request: Request, exc: MissionError):
-        return JSONResponse({"detail": exc.message}, status_code=exc.status)
+        return JSONResponse({"detail": exc.message, "code": exc.code}, status_code=exc.status)
 
     @app.get("/api/health")
     def health():
-        return {"status": "ok", "milestone": "discussion-voting-consensus"}
+        return {"status": "ok", "milestone": "consequences-progression"}
 
     @app.post("/api/missions", status_code=201)
     async def create(body: JoinRequest):
@@ -83,6 +89,13 @@ def create_app(clock: Callable[[], float] | None = None) -> FastAPI:
             store.begin_discussion(token, x_mission_session)
         await connections.broadcast(token)
         return {"status": "discussion"}
+
+    @app.post("/api/missions/{token}/continue")
+    async def continue_mission(token: str, body: ContinueRequest, x_mission_session: str = Header()):
+        async with lock:
+            advanced = store.continue_mission(token, x_mission_session, body.result_id)
+        await connections.broadcast(token)
+        return {"advanced": advanced}
 
     @app.websocket("/api/missions/{token}/ws")
     async def lobby(socket: WebSocket, token: str):

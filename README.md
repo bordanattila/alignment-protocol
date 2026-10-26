@@ -2,7 +2,7 @@
 
 *Intelligence proposes. Humanity decides.*
 
-Milestone 2: a React/TypeScript mission screen and a FastAPI-authoritative, live 2–4-seat lobby with host-controlled mission start and Crisis 01 information delivery. Create a mission, share its invite URL, and join with a callsign. Separate browser profiles receive separate seats; refreshes and additional tabs reuse the saved seat credential.
+Milestone 4: a React/TypeScript cooperative game with a FastAPI-authoritative 2–4-player mission, timed discussion/chat, hidden plurality voting, authored consequences, and configured crisis progression. Create a mission, share its invite URL, and join with a callsign. Separate browser profiles receive separate seats; refreshes and additional tabs reuse the saved seat credential.
 
 ## Development
 
@@ -32,11 +32,12 @@ From the repository root:
 .venv/bin/python -m pytest backend/tests -q
 .venv/bin/python -m pip check
 cd frontend
+npm test
 npm run typecheck
 npm run build
 ```
 
-The backend suite covers membership, validation, capacity, credential privacy, WebSocket synchronization, refresh/reconnect identity, malformed messages, multiple tabs, and failed-send cleanup. TypeScript uses strict checking; no separate lint tool or frontend test framework is configured.
+The backend suite covers membership, validation, capacity, credential privacy, WebSocket synchronization, refresh/reconnect identity, malformed messages, multiple tabs, and failed-send cleanup. TypeScript uses strict checking; rendered React tests use the existing esbuild toolchain and Node test runner. No separate linter is configured.
 
 ## Serve the built app
 
@@ -58,10 +59,24 @@ FastAPI serves `frontend/dist` if it exists at startup. Open http://localhost:80
 - `backend/app/main.py`: HTTP/WebSocket transport and static frontend serving. A lock serializes membership operations and snapshots.
 - `frontend/src/`: React UI, per-mission credentials in localStorage, and WebSocket retry.
 
-The invite token permits joining; a separate credential authorizes a seat. Credentials travel in the first WebSocket frame rather than the URL and are excluded from public snapshots. Disconnected lobby seats remain reserved indefinitely. There is no host transfer, mission expiry, persistence, or public deployment abuse limiting yet. One slow socket can delay lobby operations while its bounded send/close attempts finish.
+The invite token permits joining; a separate credential authorizes a seat. Credentials travel in the first WebSocket frame rather than the URL and are excluded from public snapshots. Disconnected lobby seats remain reserved indefinitely. There is no host transfer, mission expiry, persistence, or public deployment abuse limiting yet. Socket sends run outside the state lock, with bounded waits; slow clients can still delay publications.
 
-The host starts once 2–4 occupied seats are connected. The backend assigns all four roles in join order, loads validated authored JSON, and enters `briefing`. The host selects Begin discussion to enter untimed `discussion`; disconnected players must reconnect before this transition. Private intelligence is projected separately for each seat, while briefing, choices, and role ownership are public. Refresh retains the same assignment and crisis. Authored consequences are server-only data and are not executed.
+The host starts once 2–4 occupied seats are connected. The backend assigns all four roles once, loads the packaged scripted sequence, and enters `briefing`. Begin discussion starts 60 seconds of chat, followed by 30-second hidden voting. A tied highest submitted count opens a 20-second chat/Consensus Window and fresh 30-second final vote. Plurality, final AI tie-break, and explicitly labeled no-vote fallback are server-owned. Private intelligence and own-vote state are projected per seat.
 
-This milestone does not implement chat, voting, gameplay timers, consequences, crisis sequencing, QR joining, or five-minute match disconnect handling. Physical browser/device and mobile usability checks remain manual. It is a foundation for the next milestone, not the complete v0.1 game.
+Every decision applies its authored consequence exactly once. The durable `decision_locked` result shows its narrative, before/after metrics, applied changes, and resolution method. The host selects Next crisis after review; the result ID makes retries safe. All occupied seats must reconnect before advancing. Seats/roles/metrics persist; new crises start with fresh briefing and vote state. Zero metrics immediately cause collapse. After the final configured result, Finish mission enters completion and computes the server-side average Consensus Score.
+
+`backend/app/content/sequence.json` currently configures only **Grid Under Pressure**. There is no production Crisis 02 yet; adding validated crisis files and IDs to the manifest extends progression without engine changes. Tests cover two- and ten-crisis fixture sequences. Only the selected public result's consequence/deltas are exposed; future content and other roles' intelligence remain server-side.
+
+State persists only within the running process. Five-minute seat removal/role redistribution, additional authored crises, variable pool ordering/weakest-metric finales, QR joining, and replay controls remain future work. Physical browser/device and mobile acceptance remain manual. This is not the complete ten-crisis v0.1 game.
+
+Milestone 4 checks and automated live fixture acceptance:
+
+```sh
+.venv/bin/python backend/tests/smoke_milestone4.py
+```
+
+This test starts a temporary fixture server with a two-crisis sequence and 10x injected clock. It does not change the production sequence or duration constants.
+
+See [Milestone 4 verification](docs/MILESTONE_4_VERIFICATION.md) for current behavior, exact commands/results, architecture decisions, and manual-review limits.
 
 See [Milestone 2 verification](docs/MILESTONE_2_VERIFICATION.md) for implementation decisions, commands, results, and remaining checks.

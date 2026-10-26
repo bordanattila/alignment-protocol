@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { ConsequenceOutcome, FinalConsensusScore } from './ConsequenceOutcome';
 import type { ClockSample, LobbyState, MissionIntent } from './types';
 
 type Actions = { mission: LobbyState; connected: boolean; sendIntent: (intent: MissionIntent) => boolean };
 export const phaseLabel = (mission: LobbyState) => ({
   lobby: 'Mission lobby', briefing: 'Briefing', discussion: 'Discussion',
   voting: mission.voting?.number === 2 ? 'Final hidden vote' : 'Hidden vote',
-  consensus_window: 'Consensus Window', decision_locked: 'Decision Locked',
+  consensus_window: 'Consensus Window', decision_locked: 'Decision outcome', failed: 'Civilization collapsed', completed: 'Mission complete',
 })[mission.phase];
 
 export function PhaseClock({ mission, sample }: { mission: LobbyState; sample: ClockSample | null }) {
@@ -28,7 +29,9 @@ function Totals({ totals, abstentions }: { totals: Record<string, number>; abste
     <span>Abstentions / nonresponses: <strong>{abstentions}</strong></span></p>;
 }
 
-export function DecisionStatus({ mission }: { mission: LobbyState }) {
+export function DecisionStatus({ mission, connected, continuing, onContinue }: {
+  mission: LobbyState; connected: boolean; continuing: boolean; onContinue: () => void;
+}) {
   const first = mission.closed_rounds[0];
   if (mission.phase === 'consensus_window' && first) {
     const highest = Math.max(...Object.values(first.totals));
@@ -48,10 +51,12 @@ export function DecisionStatus({ mission }: { mission: LobbyState }) {
     no_vote_ai_fallback: 'No valid votes were received. The AI recommendation was selected by the no-vote fallback.',
   };
   return <section className="panel decision-status" aria-label="Final decision">
-    <p className="eyebrow">Decision Locked</p><h2>{choice?.id} — {choice?.title}</h2><p>{choice?.description}</p>
+    <h2>{mission.phase === 'failed' ? 'GAME OVER — CIVILIZATION COLLAPSED' : mission.phase === 'completed' ? 'MISSION COMPLETE' : 'Decision outcome'}</h2>
+    {mission.phase === 'completed' && <FinalConsensusScore score={mission.consensus_score} />}
+    <h3>{result.choice_id} — {mission.result?.choice_title ?? choice?.title}</h3><p>{mission.result?.choice_description ?? choice?.description}</p>
     <p>{reasons[result.reason]}</p><p>AI recommendation {result.ai_followed ? 'followed' : 'not followed'}.</p>
     <Totals totals={result.totals} abstentions={result.abstentions} />
-    <p>Decision recorded. Civilization metrics remain unchanged.</p>
+    <ConsequenceOutcome mission={mission} connected={connected} continuing={continuing} onContinue={onContinue} />
   </section>;
 }
 
@@ -112,9 +117,11 @@ export function ResponseOptions({ mission, connected, sendIntent }: Actions) {
   </section>;
 }
 
-export function ActiveGameplay({ mission, connected, sendIntent, sample }: Actions & { sample: ClockSample | null }) {
+export function ActiveGameplay({ mission, connected, sendIntent, sample, continuing, onContinue }: Actions & {
+  sample: ClockSample | null; continuing: boolean; onContinue: () => void;
+}) {
   const region = useRef<HTMLElement>(null);
-  const interactive = mission.phase === 'discussion' || mission.phase === 'consensus_window' || mission.phase === 'voting' || mission.phase === 'decision_locked';
+  const interactive = mission.phase === 'discussion' || mission.phase === 'consensus_window' || mission.phase === 'voting' || mission.phase === 'decision_locked' || mission.phase === 'failed' || mission.phase === 'completed';
   const roundId = mission.voting?.round_id;
   useEffect(() => {
     if (!interactive) return;
@@ -127,7 +134,7 @@ export function ActiveGameplay({ mission, connected, sendIntent, sample }: Actio
   if (!interactive) return null;
   return <section className="active-gameplay" aria-label="Active gameplay" tabIndex={-1} ref={region}>
     <PhaseClock mission={mission} sample={sample} />
-    <DecisionStatus mission={mission} />
+    <DecisionStatus mission={mission} connected={connected} continuing={continuing} onContinue={onContinue} />
     {(mission.phase === 'discussion' || mission.phase === 'consensus_window') &&
       <ChatPanel mission={mission} connected={connected} sendIntent={sendIntent} />}
     {mission.phase === 'voting' && <ResponseOptions key={roundId} mission={mission} connected={connected} sendIntent={sendIntent} />}

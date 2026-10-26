@@ -116,3 +116,17 @@ textarea { display: block; width: 100%; resize: vertical; min-height: 72px; padd
 .vote-submit { position: sticky; bottom: 0; padding: 8px 0; background: #172329; }
 .active-gameplay .response-card { padding: 12px; }
 .active-gameplay .chat-history { max-height: 220px; }
+
+.civilization-impact { width: 100%; border-collapse: collapse; font-size: 14px; margin: 20px 0; }
+.civilization-impact caption { text-align: left; font-size: 18px; font-weight: 650; margin-bottom: 12px; }
+.civilization-impact th, .civilization-impact td { text-align: left; padding: 10px 6px; border-bottom: 1px solid #36474e; }
+.civilization-impact tbody th { font-weight: 500; }
+.civilization-impact td small { display: block; color: #b6c7cd; max-width: 140px; }
+.consensus-score { font-size: 20px; }
+@media (max-width: 400px) { .civilization-impact { font-size: 12px; } .civilization-impact th, .civilization-impact td { padding: 10px 3px; } }
+
+.chat-history li { overflow-wrap: anywhere; }
+.consensus-score strong { display: block; font-size: clamp(28px, 5vw, 40px); color: #a2dfce; margin-top: 6px; }
+@media (max-width: 700px) {
+  .active-gameplay .chat-history { max-height: 180px; max-height: min(180px, 25dvh); }
+}

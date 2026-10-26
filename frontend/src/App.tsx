@@ -1,9 +1,11 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { clearSession, restoreSession, saveSession } from './session';
 import { CrisisBriefing } from './CrisisBriefing';
 import { RoleBadge } from './RoleBadge';
 import { ActiveGameplay, ChatPanel, ResponseOptions, phaseLabel } from './Gameplay';
 import { useLobby } from './useLobby';
+import { MissionEntryRequest } from './missionEntry';
+import { MissionEntryForm } from './MissionEntryForm';
 import type { Session } from './types';
 
 const inviteToken = new URLSearchParams(location.search).get('mission');
@@ -17,22 +19,21 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const entryRequest = useRef(new MissionEntryRequest());
   const { mission, status, rejected, sendIntent, actionError, clockSample } = useLobby(session);
   const activeMission = mission != null && mission.phase !== 'lobby';
 
   async function enter(event: FormEvent) {
     event.preventDefault();
+    if (entryRequest.current.pending) return;
     setBusy(true);
     setError('');
     try {
       // Verify storage is usable before allocating a seat.
       localStorage.setItem('consensus.storage-check', 'ok');
       localStorage.removeItem('consensus.storage-check');
-      const response = await fetch(inviteToken ? `/api/missions/${encodeURIComponent(inviteToken)}/join` : '/api/missions', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ callsign }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : 'Enter a callsign of 1–24 characters.');
+      const result = await entryRequest.current.submit(inviteToken, callsign);
+      if (!result) return;
       saveSession(result);
       history.replaceState(null, '', `?mission=${encodeURIComponent(result.token)}`);
       setSession(result);
@@ -41,13 +42,14 @@ export default function App() {
     } finally { setBusy(false); }
   }
 
-  async function missionAction(action: 'start' | 'discussion') {
+  async function missionAction(action: 'start' | 'discussion' | 'continue') {
     if (!session) return;
     setBusy(true);
     setError('');
     try {
       const response = await fetch(`/api/missions/${encodeURIComponent(session.token)}/${action}`, {
-        method: 'POST', headers: { 'X-Mission-Session': session.credential },
+        method: 'POST', headers: { 'X-Mission-Session': session.credential, 'Content-Type': 'application/json' },
+        body: action === 'continue' ? JSON.stringify({ result_id: mission?.result?.id }) : undefined,
       });
       if (!response.ok) {
         const result = await response.json();
@@ -68,7 +70,7 @@ export default function App() {
   return <main className={activeMission ? 'active-mission' : undefined}>
     <header><a className="brand" href="/">CE <span>Consensus Engine</span></a><span className="badge">v0.1 · Collective decision</span></header>
     {activeMission ? <section className="mission-header" aria-label="Current mission">
-      <p className="eyebrow">Crisis 01 <span>· {phaseLabel(mission)}</span></p>
+      <p className="eyebrow">Crisis {mission.crisis_number.toString().padStart(2, '0')} / {mission.crisis_count} <span>· {phaseLabel(mission)}</span></p>
       <h1>{mission.crisis?.title}</h1>
     </section> : <section className="intro">
       <p className="eyebrow">Civic coordination network</p>
@@ -76,21 +78,17 @@ export default function App() {
       <p className="lede">A shared city. Incomplete information. Decisions you make together.</p>
     </section>}
     {actionError && <p className="error" role="alert">{actionError}</p>}
-    {mission && <ActiveGameplay mission={mission} connected={status === 'Connected'} sendIntent={sendIntent} sample={clockSample} />}
+    {mission && <ActiveGameplay mission={mission} connected={status === 'Connected'} sendIntent={sendIntent} sample={clockSample} continuing={busy} onContinue={() => missionAction('continue')} />}
     {!session ? <section className="panel entry">
       <div><p className="eyebrow">{inviteToken ? 'Mission invitation' : 'Assemble your team'}</p>
         <h2>{inviteToken ? 'Join the mission' : 'Open a mission'}</h2>
         <p>Bring 2–4 people into a shared operations room. No account required.</p></div>
-      <form onSubmit={enter}>
-        <label htmlFor="callsign">Your callsign</label>
-        <input id="callsign" value={callsign} onChange={event => setCallsign(event.target.value)} placeholder="e.g. Rivera" required maxLength={24} autoComplete="nickname" />
-        <button disabled={busy || !callsign.trim()}>{busy ? 'Connecting…' : inviteToken ? 'Join Mission' : 'Create Mission'}</button>
-      </form>
+      <MissionEntryForm callsign={callsign} busy={busy} error={error} joining={Boolean(inviteToken)} onCallsign={setCallsign} onSubmit={enter} />
     </section> : <section className="lobby-grid">
       <div className="panel">
         <div className="panel-heading"><div><p className="eyebrow">Operations room</p><h2>{mission?.phase === 'lobby' || !mission ? 'Mission lobby' : phaseLabel(mission)}</h2></div><span className="badge" role="status">{status}</span></div>
         {mission ? <>
-          <p>{mission.phase === 'lobby' ? `${mission.players.length} of 4 seats occupied · Invite your team to join.` : ({ briefing: 'Review the public briefing and your private intelligence together.', discussion: 'Share your information in the team chat above.', voting: 'Submit your private vote in the active voting panel above.', consensus_window: 'Discuss your choices in the live chat above before final voting begins.', decision_locked: 'The collective decision is recorded above. Review the result with your team.' }[mission.phase])}</p>
+          <p>{mission.phase === 'lobby' ? `${mission.players.length} of 4 seats occupied · Invite your team to join.` : ({ briefing: 'Review the public briefing and your private intelligence together.', discussion: 'Share your information in the team chat above.', voting: 'Submit your private vote in the active voting panel above.', consensus_window: 'Discuss your choices in the live chat above before final voting begins.', decision_locked: 'The decision and civilization impact are recorded above. Review the result with your team.', failed: 'The civilization has collapsed. Review the final outcome above.', completed: 'The mission is complete. Review your final score and civilization outcome.' }[mission.phase])}</p>
           {mission.phase === 'lobby' && (mission.you === mission.host_id ? <>
             <button disabled={busy || status !== 'Connected' || mission.players.length < 2 || mission.players.some(player => !player.connected)} onClick={() => missionAction('start')}>Start Mission</button>
             <p>Start with 2–4 players. Every occupied seat must be connected.</p>
@@ -107,7 +105,7 @@ export default function App() {
         </> : <p role="status">{rejected ? 'This session is unavailable. The server may have restarted.' : 'Restoring your mission seat…'}</p>}
         {rejected && <button onClick={() => { clearSession(session.token); location.assign('/'); }}>Return to mission creation</button>}
       </div>
-      <aside className="panel"><p className="eyebrow">Civilization baseline</p><h2>Shared stability</h2>
+      <aside className="panel"><p className="eyebrow">Civilization state</p><h2>Shared stability</h2>
         <div className="metrics">{Object.entries(mission?.metrics ?? { infrastructure: 70, public_trust: 70, economy: 70, safety: 70 }).map(([key, value]) => <div key={key}>
           <div><span>{metricNames[key]}</span><strong>{value}<small>/100</small></strong></div><meter min={0} max={100} value={value}>{value}</meter>
         </div>)}</div>
@@ -115,9 +113,9 @@ export default function App() {
     </section>}
     {mission?.crisis && <CrisisBriefing mission={mission} />}
     {mission?.crisis && mission.phase !== 'voting' && <div className="reference-options"><ResponseOptions mission={mission} connected={status === 'Connected'} sendIntent={sendIntent} /></div>}
-    {mission && (mission.phase === 'voting' || mission.phase === 'decision_locked') && <div className="chat-archive"><ChatPanel mission={mission} connected={status === 'Connected'} sendIntent={sendIntent} /></div>}
-    {error && <p className="error" role="alert">{error}</p>}
-    <section className="scope"><span className="eyebrow">Milestone 3</span><p>Discuss, vote privately, and reach one collective decision. Consequences and crisis progression remain planned.</p></section>
+    {mission && (mission.phase === 'voting' || mission.phase === 'decision_locked' || mission.phase === 'failed' || mission.phase === 'completed') && <div className="chat-archive"><ChatPanel mission={mission} connected={status === 'Connected'} sendIntent={sendIntent} /></div>}
+    {session && error && <p className="error" role="alert">{error}</p>}
+    <section className="scope"><span className="eyebrow">Milestone 4</span><p>Combine your information, decide together, and carry the consequences into the next configured crisis.</p></section>
     <footer>Consensus Engine <span>Collective judgment. Shared consequences.</span></footer>
   </main>;
 }

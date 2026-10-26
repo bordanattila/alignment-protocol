@@ -3,20 +3,24 @@ import secrets
 import time
 from collections.abc import Callable
 
-from .domain import Mission, Player, Phase, Role, VotingRound, Decision, ChatMessage
+from .domain import Mission, Player, Phase, Role, VotingRound, Decision, ChatMessage, Crisis, CrisisResult, Metrics, MetricDeltas
 from .voting import plurality
-from .crises import load_initial_crisis
+from .crises import load_crisis_sequence
+from .callsigns import normalize_callsign, callsign_key
 
 
 class MissionError(Exception):
-    def __init__(self, message: str, status: int = 400):
+    def __init__(self, message: str, status: int = 400, code: str = "mission_error"):
         self.message = message
         self.status = status
+        self.code = code
 
 
 class MissionStore:
-    def __init__(self, clock: Callable[[], float] = time.time):
+    def __init__(self, clock: Callable[[], float] = time.time,
+                 crisis_loader: Callable[[], list[Crisis]] = load_crisis_sequence):
         self.clock = clock
+        self.crisis_loader = crisis_loader
         self._missions: dict[str, Mission] = {}
 
     def get(self, token: str) -> Mission:
@@ -36,10 +40,12 @@ class MissionStore:
             return mission, self.authorize(token, credential)
         if mission.phase != "lobby":
             raise MissionError("This mission has already started.", 409)
+        callsign = self._normalize_callsign(callsign)
+        if any(callsign_key(p.callsign) == callsign_key(callsign) for p in mission.players):
+            raise MissionError("That callsign is already taken in this mission. Choose another.",
+                               409, "callsign_taken")
         if len(mission.players) >= 4:
             raise MissionError("This mission has all four seats filled.", 409)
-        if any(p.callsign.casefold() == callsign.casefold() for p in mission.players):
-            raise MissionError("That callsign is already in use.", 409)
         player = self._player(callsign)
         mission.players.append(player)
         return mission, player
@@ -63,10 +69,14 @@ class MissionStore:
             raise MissionError("Start requires 2–4 players with every occupied seat connected.", 409)
         # Validate content before mutating the mission. Join order gives stable,
         # balanced assignment; reconnect never reruns assignment.
-        crisis = load_initial_crisis()
+        sequence = self.crisis_loader()
+        if not sequence or len({c.id for c in sequence}) != len(sequence):
+            raise ValueError("Require a nonempty, nonrepeating authored crisis sequence")
+        sequence = [c.model_copy(deep=True) for c in sequence]
         for index, role in enumerate(Role):
             mission.players[index % len(mission.players)].roles.append(role)
-        mission.crisis = crisis
+        mission.sequence = sequence
+        mission.crisis = sequence[0]
         mission.phase = Phase.BRIEFING
 
     def begin_discussion(self, token: str, credential: str):
@@ -127,6 +137,8 @@ class MissionStore:
             self._resolve(mission)
 
     def _resolve(self, mission: Mission):
+        if mission.phase != Phase.VOTING:
+            return  # repeated or obsolete resolution callback
         current = mission.rounds[-1]
         totals, leaders = plurality((c.id for c in mission.crisis.choices), current.votes.values())
         current.totals = totals
@@ -147,6 +159,68 @@ class MissionStore:
                                     ai_followed=choice == mission.crisis.ai_recommendation_choice_id)
         mission.phase = Phase.DECISION_LOCKED
         mission.deadline = None
+        self._apply_consequences(mission)
+
+    def _apply_consequences(self, mission: Mission) -> CrisisResult:
+        """The one handoff from voting. Caller holds the existing state lock.
+
+        A deciding round ID is an immutable event key. Never apply it twice,
+        even after progressing to another crisis or reaching a terminal phase.
+        Construct and validate the whole result before publishing any mutation.
+        """
+        decision = mission.decision
+        if decision is None:
+            raise MissionError("No decision is available.", 409)
+        existing = next((r for r in mission.results if r.id == decision.round_id), None)
+        if existing is not None:
+            return existing
+        if mission.phase != Phase.DECISION_LOCKED or mission.crisis is None:
+            raise MissionError("Consequences require a newly resolved decision.", 409)
+        choice = next(c for c in mission.crisis.choices if c.id == decision.choice_id)
+        before = mission.metrics.model_copy(deep=True)
+        old = before.model_dump()
+        deltas = choice.metric_deltas.model_dump()
+        after = Metrics(**{key: max(0, min(100, value + deltas[key])) for key, value in old.items()})
+        result = CrisisResult(
+            id=decision.round_id, crisis_id=mission.crisis.id,
+            crisis_number=mission.crisis_index + 1, crisis_title=mission.crisis.title,
+            choice_title=choice.title, choice_description=choice.description, outcome=choice.consequence,
+            decision=decision.model_copy(deep=True), before=before, after=after.model_copy(deep=True),
+            authored_deltas=choice.metric_deltas.model_copy(deep=True),
+            applied_deltas=MetricDeltas(**{key: after.model_dump()[key] - value for key, value in old.items()}))
+        mission.results.append(result)
+        mission.metrics = after
+        mission.collapsed_metrics = [key for key, value in after.model_dump().items() if value == 0]
+        if mission.collapsed_metrics:
+            mission.phase = Phase.FAILED
+        # decision_locked is now the durable, synchronized consequence/result
+        # phase. Host acknowledgement advances, so no result is replaced unseen.
+        return result
+
+    def continue_mission(self, token: str, credential: str, result_id: str) -> bool:
+        mission = self.get(token)
+        self._host(token, credential)
+        if result_id in mission.acknowledged_results:
+            return False  # retry of an earlier acknowledgement, never skip ahead
+        if (mission.phase != Phase.DECISION_LOCKED or not mission.results
+                or mission.results[-1].id != result_id):
+            raise MissionError("This result cannot advance the mission.", 409)
+        if not all(p.connected for p in mission.players):
+            raise MissionError("Wait for every player to reconnect before continuing.", 409)
+        mission.acknowledged_results.add(result_id)
+        if mission.crisis_index + 1 == len(mission.sequence):
+            mission.phase = Phase.COMPLETED
+            mission.consensus_score = sum(mission.metrics.model_dump().values()) / 4
+            return True
+        mission.crisis_index += 1
+        mission.crisis = mission.sequence[mission.crisis_index]
+        mission.phase = Phase.BRIEFING
+        mission.rounds = []
+        mission.decision = None
+        mission.deadline = None
+        # Chat is mission-wide history; keep its retention/rate limits across
+        # crises. Vote maps and local selection keys belong only to this crisis.
+        return True
 
     def send_chat(self, token: str, credential: str, text: str):
         player = self.authorize(token, credential)
@@ -182,6 +256,12 @@ class MissionStore:
             "phase": mission.phase,
             "host_id": mission.host_id,
             "you": viewer_id,
+            "crisis_number": mission.crisis_index + 1 if mission.crisis else 0,
+            "crisis_count": len(mission.sequence),
+            "result": (mission.results[-1].model_dump() if mission.results
+                       and mission.results[-1].crisis_number == mission.crisis_index + 1 else None),
+            "collapsed_metrics": list(mission.collapsed_metrics),
+            "consensus_score": mission.consensus_score,
             "server_now": self.clock(),
             "deadline": mission.deadline,
             "chat": [message.model_dump() for message in mission.chat],
@@ -211,6 +291,14 @@ class MissionStore:
         }
 
     @staticmethod
+    def _normalize_callsign(callsign: str) -> str:
+        try:
+            return normalize_callsign(callsign)
+        except ValueError as exc:
+            raise MissionError(str(exc), 422, "invalid_callsign") from exc
+
+    @staticmethod
     def _player(callsign: str) -> Player:
+        callsign = MissionStore._normalize_callsign(callsign)
         return Player(id=secrets.token_urlsafe(16), callsign=callsign,
                       credential=secrets.token_urlsafe(32))

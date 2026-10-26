@@ -2,7 +2,9 @@
 from enum import StrEnum
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StringConstraints, model_validator
+
+from .callsigns import normalize_callsign
 
 
 class Role(StrEnum):
@@ -65,7 +67,7 @@ class Crisis(BaseModel):
         return self
 
 
-Callsign = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=24)]
+Callsign = Annotated[str, StringConstraints(min_length=1, max_length=24), BeforeValidator(normalize_callsign)]
 
 
 class JoinRequest(BaseModel):
@@ -108,6 +110,26 @@ class Decision(BaseModel):
     ai_followed: bool
 
 
+class CrisisResult(BaseModel):
+    id: str
+    crisis_id: str
+    crisis_number: int
+    crisis_title: str
+    choice_title: str
+    choice_description: str
+    outcome: str
+    decision: Decision
+    before: Metrics
+    after: Metrics
+    authored_deltas: MetricDeltas
+    applied_deltas: MetricDeltas
+
+
+class ContinueRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    result_id: str = Field(min_length=1, max_length=128)
+
+
 class ChatIntent(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     type: Literal["chat"]
@@ -133,3 +155,9 @@ class Mission(BaseModel):
     decision: Decision | None = None
     chat: list[ChatMessage] = Field(default_factory=list)
     last_chat_at: dict[str, float] = Field(default_factory=dict)
+    sequence: list[Crisis] = Field(default_factory=list)
+    crisis_index: int = 0
+    results: list[CrisisResult] = Field(default_factory=list)
+    acknowledged_results: set[str] = Field(default_factory=set)
+    collapsed_metrics: list[str] = Field(default_factory=list)
+    consensus_score: float | None = None
