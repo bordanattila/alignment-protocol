@@ -19,14 +19,5 @@ export function CrisisBriefing({ mission }: { mission: LobbyState }) {
         <h3><RoleBadge role={role} /></h3><p>{mission.private_intelligence[role]}</p>
       </article>)}
     </div>
-    <div className="panel"><p className="eyebrow">Authored responses · Review only</p>
-      {crisis.choices.map(choice => <article key={choice.id}>
-        <div className="choice-heading">
-          <h3>{choice.id} — {choice.title === 'Follow the AI Recommendation' ? 'Follow AI Recommendation' : choice.title}</h3>
-          {choice.id === crisis.ai_recommendation_choice_id && <span className="badge ai-badge">AI Recommended</span>}
-        </div>
-        <p>{choice.description}</p>
-      </article>)}
-    </div>
   </section>;
 }

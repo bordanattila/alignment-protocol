@@ -1,4 +1,4 @@
-"""Lobby socket membership. Call under the transport's lock to order snapshots."""
+"""Snapshot under the state lock; send outside it, ordered by a delivery lock."""
 import asyncio
 
 from fastapi import WebSocket, WebSocketDisconnect
@@ -15,8 +15,10 @@ async def close_socket(socket: WebSocket, code: int = 1008, reason: str = ""):
 
 
 class LobbyConnections:
-    def __init__(self, store: MissionStore):
+    def __init__(self, store: MissionStore, lock: asyncio.Lock | None = None):
         self.store = store
+        self.lock = lock or asyncio.Lock()
+        self.delivery_lock = asyncio.Lock()
         self.sockets: dict[str, dict[str, set[WebSocket]]] = {}
 
     def add(self, token: str, player_id: str, socket: WebSocket):
@@ -34,20 +36,33 @@ class LobbyConnections:
             self.sockets.pop(token, None)
 
     async def broadcast(self, token: str):
-        # On send failure remove the socket immediately, even if its receive task
-        # has not exited yet. Republish corrected presence to surviving clients.
-        # Each retry removes at least one socket, so this loop is bounded.
-        while True:
-            failed = False
-            for player_id, connections in list(self.sockets.get(token, {}).items()):
-                for socket in list(connections):
+        # Callers release the state lock before publishing. Capture fresh immutable
+        # projections only after acquiring the delivery lock, preventing old
+        # broadcasts from overtaking newer snapshots. Never await network under
+        # the state lock. Failed sends republish corrected presence.
+        async with self.delivery_lock:
+            while True:
+                async with self.lock:
+                    frames = [(player_id, socket, self.store.project(token, player_id))
+                              for player_id, sockets in self.sockets.get(token, {}).items()
+                              for socket in list(sockets)]
+                failed = False
+                for player_id, socket, state in frames:
                     try:
                         await asyncio.wait_for(socket.send_json({
-                            "type": "state", "mission": self.store.project(token, player_id)
+                            "type": "state", "mission": state
                         }), timeout=2)
                     except (WebSocketDisconnect, RuntimeError, OSError, asyncio.TimeoutError):
-                        self.remove(token, player_id, socket)
+                        async with self.lock:
+                            self.remove(token, player_id, socket)
                         await close_socket(socket, code=1011, reason="Connection interrupted")
                         failed = True
-            if not failed:
-                return
+                if not failed:
+                    return
+
+    async def error(self, socket: WebSocket, message: str):
+        async with self.delivery_lock:
+            try:
+                await asyncio.wait_for(socket.send_json({"type": "error", "detail": message}), timeout=2)
+            except (WebSocketDisconnect, RuntimeError, OSError, asyncio.TimeoutError):
+                await close_socket(socket, code=1011, reason="Connection interrupted")

@@ -1,24 +1,53 @@
 import asyncio
 import json
 from pathlib import Path
+from contextlib import asynccontextmanager, suppress
+from collections.abc import Callable
 
 from fastapi import FastAPI, Header, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import ValidationError
 from starlette.websockets import WebSocketState
 
 from .connections import LobbyConnections, close_socket
-from .domain import JoinRequest
+from .domain import JoinRequest, ChatIntent, VoteIntent
 from .missions import MissionError, MissionStore
 
 
-def create_app() -> FastAPI:
-    app = FastAPI(title="Consensus Engine", version="0.1.0")
-    store = MissionStore()
-    app.state.missions = store
-    # A player may have multiple tabs. Only their last socket closing marks them offline.
-    connections = LobbyConnections(store)
+def create_app(clock: Callable[[], float] | None = None) -> FastAPI:
+    store = MissionStore(clock) if clock is not None else MissionStore()
     lock = asyncio.Lock()
+    # Keep membership semantics, but isolate socket delivery from state mutation.
+    connections = LobbyConnections(store, lock)
+
+    async def tick():
+        async with lock:
+            changed = store.advance_all_due()
+        for token in changed:
+            await connections.broadcast(token)
+
+    async def scheduler():
+        while True:
+            await asyncio.sleep(0.1)
+            await tick()
+
+    @asynccontextmanager
+    async def lifespan(_app):
+        task = asyncio.create_task(scheduler())
+        _app.state.scheduler_task = task
+        try:
+            yield
+        finally:
+            task.cancel()
+            with suppress(asyncio.CancelledError):
+                await task
+
+    app = FastAPI(title="Consensus Engine", version="0.1.0", lifespan=lifespan)
+    app.state.missions = store
+    # Test hooks exercise the production scheduler path with a controlled clock.
+    app.state.tick = tick
+    app.state.lock = lock
 
     @app.exception_handler(MissionError)
     async def mission_error(_request: Request, exc: MissionError):
@@ -26,7 +55,7 @@ def create_app() -> FastAPI:
 
     @app.get("/api/health")
     def health():
-        return {"status": "ok", "milestone": "crisis-information"}
+        return {"status": "ok", "milestone": "discussion-voting-consensus"}
 
     @app.post("/api/missions", status_code=201)
     async def create(body: JoinRequest):
@@ -38,22 +67,22 @@ def create_app() -> FastAPI:
     async def join(token: str, body: JoinRequest, x_mission_session: str | None = Header(default=None)):
         async with lock:
             mission, player = store.join(token, body.callsign, x_mission_session)
-            await connections.broadcast(token)
-            return {"token": mission.token, "credential": player.credential}
+        await connections.broadcast(token)
+        return {"token": mission.token, "credential": player.credential}
 
     @app.post("/api/missions/{token}/start")
     async def start(token: str, x_mission_session: str = Header()):
         async with lock:
             store.start(token, x_mission_session)
-            await connections.broadcast(token)
-            return {"status": "started"}
+        await connections.broadcast(token)
+        return {"status": "started"}
 
     @app.post("/api/missions/{token}/discussion")
     async def discussion(token: str, x_mission_session: str = Header()):
         async with lock:
             store.begin_discussion(token, x_mission_session)
-            await connections.broadcast(token)
-            return {"status": "discussion"}
+        await connections.broadcast(token)
+        return {"status": "discussion"}
 
     @app.websocket("/api/missions/{token}/ws")
     async def lobby(socket: WebSocket, token: str):
@@ -77,17 +106,41 @@ def create_app() -> FastAPI:
                 return
             async with lock:
                 player = store.authorize(token, message["credential"])
+                store.advance_due(token)
                 connections.add(token, player.id, socket)
-                await connections.broadcast(token)
+            await connections.broadcast(token)
             if socket.application_state == WebSocketState.DISCONNECTED:
                 return
             while True:
-                # This milestone accepts authentication only; game intents come later.
                 frame = await socket.receive()
                 if frame["type"] == "websocket.disconnect":
                     break
-                await close_socket(socket, reason="No lobby actions are available yet")
-                break
+                text = frame.get("text")
+                if text is None or len(text) > 4096:
+                    await close_socket(socket, reason="Expected a small text action message")
+                    break
+                message = json.loads(text)
+                if not isinstance(message, dict) or message.get("type") not in ("chat", "vote"):
+                    await close_socket(socket, reason="Unsupported mission action")
+                    break
+                try:
+                    intent = (ChatIntent if message["type"] == "chat" else VoteIntent).model_validate(message)
+                except ValidationError:
+                    await connections.error(socket, "Invalid action fields or message length.")
+                    continue
+                error = None
+                async with lock:
+                    try:
+                        if isinstance(intent, ChatIntent):
+                            store.send_chat(token, player.credential, intent.text)
+                        else:
+                            store.vote(token, player.credential, intent.round_id, intent.choice_id)
+                    except MissionError as exc:
+                        error = exc.message
+                # A late rejected intent may itself have advanced an expired phase.
+                await connections.broadcast(token)
+                if error:
+                    await connections.error(socket, error)
         except MissionError:
             await close_socket(socket, reason="Mission session unavailable")
         except (ValueError, RecursionError, asyncio.TimeoutError):
@@ -98,7 +151,7 @@ def create_app() -> FastAPI:
             if player:
                 async with lock:
                     connections.remove(token, player.id, socket)
-                    await connections.broadcast(token)
+                await connections.broadcast(token)
 
     build = Path(__file__).resolve().parents[2] / "frontend" / "dist"
     if build.is_dir():

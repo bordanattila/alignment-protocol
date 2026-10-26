@@ -1,7 +1,10 @@
 """Single-process, in-memory mission boundary. No transport objects live here."""
 import secrets
+import time
+from collections.abc import Callable
 
-from .domain import Mission, Player, Phase, Role
+from .domain import Mission, Player, Phase, Role, VotingRound, Decision, ChatMessage
+from .voting import plurality
 from .crises import load_initial_crisis
 
 
@@ -12,7 +15,8 @@ class MissionError(Exception):
 
 
 class MissionStore:
-    def __init__(self):
+    def __init__(self, clock: Callable[[], float] = time.time):
+        self.clock = clock
         self._missions: dict[str, Mission] = {}
 
     def get(self, token: str) -> Mission:
@@ -73,6 +77,93 @@ class MissionStore:
         if not all(p.connected for p in mission.players):
             raise MissionError("Wait for every player to reconnect before continuing.", 409)
         mission.phase = Phase.DISCUSSION
+        mission.deadline = self.clock() + 60
+
+    def advance_due(self, token: str) -> bool:
+        """Called under the state lock; re-check current state, never a stale callback.
+
+        Late scheduler wakeups open a fresh full-duration phase rather than
+        consuming a voting window players never had the opportunity to use.
+        """
+        mission = self.get(token)
+        if mission.deadline is None or self.clock() < mission.deadline:
+            return False
+        if mission.phase in (Phase.DISCUSSION, Phase.CONSENSUS_WINDOW):
+            self._open_vote(mission)
+        elif mission.phase == Phase.VOTING:
+            self._resolve(mission)
+        else:
+            return False
+        return True
+
+    def advance_all_due(self) -> list[str]:
+        return [token for token in self._missions if self.advance_due(token)]
+
+    def _open_vote(self, mission: Mission):
+        mission.phase = Phase.VOTING
+        mission.deadline = self.clock() + 30
+        # All started seats still participate, including temporarily offline ones.
+        mission.rounds.append(VotingRound(
+            id=secrets.token_urlsafe(16), number=len(mission.rounds) + 1,
+            eligible=[p.id for p in mission.players if p.roles], deadline=mission.deadline))
+
+    def vote(self, token: str, credential: str, round_id: str, choice_id: str):
+        player = self.authorize(token, credential)
+        self.advance_due(token)
+        mission = self.get(token)
+        if mission.phase != Phase.VOTING:
+            raise MissionError("Voting is not open.", 409)
+        current = mission.rounds[-1]
+        if current.id != round_id:
+            raise MissionError("This voting round has closed.", 409)
+        if player.id not in current.eligible:
+            raise MissionError("This seat is not eligible to vote.", 403)
+        if choice_id not in {c.id for c in mission.crisis.choices}:
+            raise MissionError("Choose one of the authored responses.")
+        if player.id in current.votes:
+            raise MissionError("Your vote is already final for this round.", 409)
+        current.votes[player.id] = choice_id
+        if len(current.votes) == len(current.eligible):
+            self._resolve(mission)
+
+    def _resolve(self, mission: Mission):
+        current = mission.rounds[-1]
+        totals, leaders = plurality((c.id for c in mission.crisis.choices), current.votes.values())
+        current.totals = totals
+        current.abstentions = len(current.eligible) - len(current.votes)
+        if len(leaders) > 1 and current.number == 1:
+            mission.phase = Phase.CONSENSUS_WINDOW
+            mission.deadline = self.clock() + 20
+            return
+        if not leaders:
+            choice, reason = mission.crisis.ai_recommendation_choice_id, "no_vote_ai_fallback"
+        elif len(leaders) > 1:
+            choice, reason = mission.crisis.ai_recommendation_choice_id, "ai_tie_break"
+        else:
+            choice = leaders[0]
+            reason = "initial_plurality" if current.number == 1 else "final_plurality"
+        mission.decision = Decision(choice_id=choice, reason=reason, round_id=current.id,
+                                    totals=totals, abstentions=current.abstentions,
+                                    ai_followed=choice == mission.crisis.ai_recommendation_choice_id)
+        mission.phase = Phase.DECISION_LOCKED
+        mission.deadline = None
+
+    def send_chat(self, token: str, credential: str, text: str):
+        player = self.authorize(token, credential)
+        self.advance_due(token)
+        mission = self.get(token)
+        if mission.phase not in (Phase.DISCUSSION, Phase.CONSENSUS_WINDOW):
+            raise MissionError("Chat is read-only in this phase.", 409)
+        # Domain callers also enforce bounds; the transport validates exact fields/types.
+        if not isinstance(text, str) or not 1 <= len(text.strip()) <= 500:
+            raise MissionError("Messages must contain 1–500 characters.")
+        now = self.clock()
+        if now - mission.last_chat_at.get(player.id, float("-inf")) < 1:
+            raise MissionError("Please wait a second before sending another message.", 429)
+        mission.last_chat_at[player.id] = now
+        mission.chat.append(ChatMessage(id=secrets.token_urlsafe(16), sender_id=player.id,
+                                        callsign=player.callsign, text=text.strip(), timestamp=now))
+        mission.chat = mission.chat[-100:]
 
     def _host(self, token: str, credential: str):
         player = self.authorize(token, credential)
@@ -91,6 +182,19 @@ class MissionStore:
             "phase": mission.phase,
             "host_id": mission.host_id,
             "you": viewer_id,
+            "server_now": self.clock(),
+            "deadline": mission.deadline,
+            "chat": [message.model_dump() for message in mission.chat],
+            "voting": None if not mission.rounds else {
+                "round_id": mission.rounds[-1].id, "number": mission.rounds[-1].number,
+                "eligible_count": len(mission.rounds[-1].eligible),
+                "submitted_count": len(mission.rounds[-1].votes),
+                "your_vote": mission.rounds[-1].votes.get(viewer_id),
+            },
+            "closed_rounds": [{"round_id": r.id, "number": r.number,
+                               "totals": dict(r.totals), "abstentions": r.abstentions}
+                              for r in mission.rounds if r.totals is not None],
+            "decision": mission.decision.model_dump() if mission.decision else None,
             "metrics": mission.metrics.model_dump(),
             "roles": list(viewer.roles),
             "crisis": None if crisis is None else {

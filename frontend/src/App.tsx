@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { clearSession, restoreSession, saveSession } from './session';
 import { CrisisBriefing } from './CrisisBriefing';
 import { RoleBadge } from './RoleBadge';
+import { ActiveGameplay, ChatPanel, ResponseOptions, phaseLabel } from './Gameplay';
 import { useLobby } from './useLobby';
 import type { Session } from './types';
 
@@ -16,8 +17,8 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
-  const { mission, status, rejected } = useLobby(session);
-  const activeMission = mission?.phase === 'briefing' || mission?.phase === 'discussion';
+  const { mission, status, rejected, sendIntent, actionError, clockSample } = useLobby(session);
+  const activeMission = mission != null && mission.phase !== 'lobby';
 
   async function enter(event: FormEvent) {
     event.preventDefault();
@@ -65,15 +66,17 @@ export default function App() {
   }
 
   return <main className={activeMission ? 'active-mission' : undefined}>
-    <header><a className="brand" href="/">CE <span>Consensus Engine</span></a><span className="badge">v0.1 · Crisis briefing</span></header>
+    <header><a className="brand" href="/">CE <span>Consensus Engine</span></a><span className="badge">v0.1 · Collective decision</span></header>
     {activeMission ? <section className="mission-header" aria-label="Current mission">
-      <p className="eyebrow">Crisis 01 <span>· {mission.phase === 'briefing' ? 'Briefing' : 'Discussion'}</span></p>
+      <p className="eyebrow">Crisis 01 <span>· {phaseLabel(mission)}</span></p>
       <h1>{mission.crisis?.title}</h1>
     </section> : <section className="intro">
       <p className="eyebrow">Civic coordination network</p>
       <h1>Intelligence proposes.<br /><em>Humanity decides.</em></h1>
       <p className="lede">A shared city. Incomplete information. Decisions you make together.</p>
     </section>}
+    {actionError && <p className="error" role="alert">{actionError}</p>}
+    {mission && <ActiveGameplay mission={mission} connected={status === 'Connected'} sendIntent={sendIntent} sample={clockSample} />}
     {!session ? <section className="panel entry">
       <div><p className="eyebrow">{inviteToken ? 'Mission invitation' : 'Assemble your team'}</p>
         <h2>{inviteToken ? 'Join the mission' : 'Open a mission'}</h2>
@@ -85,15 +88,15 @@ export default function App() {
       </form>
     </section> : <section className="lobby-grid">
       <div className="panel">
-        <div className="panel-heading"><div><p className="eyebrow">Operations room</p><h2>{mission?.phase === 'lobby' || !mission ? 'Mission lobby' : mission.phase === 'briefing' ? 'Mission briefing' : 'Discussion ready'}</h2></div><span className="badge" role="status">{status}</span></div>
+        <div className="panel-heading"><div><p className="eyebrow">Operations room</p><h2>{mission?.phase === 'lobby' || !mission ? 'Mission lobby' : phaseLabel(mission)}</h2></div><span className="badge" role="status">{status}</span></div>
         {mission ? <>
-          <p>{mission.phase === 'lobby' ? `${mission.players.length} of 4 seats occupied · Invite your team to join.` : 'Review the public briefing and your private intelligence together.'}</p>
+          <p>{mission.phase === 'lobby' ? `${mission.players.length} of 4 seats occupied · Invite your team to join.` : ({ briefing: 'Review the public briefing and your private intelligence together.', discussion: 'Share your information in the team chat above.', voting: 'Submit your private vote in the active voting panel above.', consensus_window: 'Discuss your choices in the live chat above before final voting begins.', decision_locked: 'The collective decision is recorded above. Review the result with your team.' }[mission.phase])}</p>
           {mission.phase === 'lobby' && (mission.you === mission.host_id ? <>
             <button disabled={busy || status !== 'Connected' || mission.players.length < 2 || mission.players.some(player => !player.connected)} onClick={() => missionAction('start')}>Start Mission</button>
             <p>Start with 2–4 players. Every occupied seat must be connected.</p>
           </> : <p>Waiting for the host to start the mission.</p>)}
           {mission.phase === 'briefing' && (mission.you === mission.host_id ? <button disabled={busy || status !== 'Connected' || mission.players.some(player => !player.connected)} onClick={() => missionAction('discussion')}>Begin discussion</button> : <p>Read your briefing while the host prepares discussion.</p>)}
-          {mission.phase === 'discussion' && <p role="status">Discussion ready. Compare your information with the team. Voting is not available yet.</p>}
+          {mission.phase === 'discussion' && <p role="status">Compare your information with the team in mission chat before the discussion deadline.</p>}
           <ul className="players">{mission.players.map(player => <li key={player.id}>
             <div><strong>{player.callsign}</strong><small>{player.id === mission.you ? 'You' : 'Teammate'}{player.id === mission.host_id ? ' · Host' : ''}</small><div className="role-badges">{player.roles.map(role => <RoleBadge key={role} role={role} />)}</div></div>
             <span className={player.connected ? 'online' : 'offline'}>{player.connected ? 'Connected' : 'Offline'}</span>
@@ -111,8 +114,10 @@ export default function App() {
       </aside>
     </section>}
     {mission?.crisis && <CrisisBriefing mission={mission} />}
+    {mission?.crisis && mission.phase !== 'voting' && <div className="reference-options"><ResponseOptions mission={mission} connected={status === 'Connected'} sendIntent={sendIntent} /></div>}
+    {mission && (mission.phase === 'voting' || mission.phase === 'decision_locked') && <div className="chat-archive"><ChatPanel mission={mission} connected={status === 'Connected'} sendIntent={sendIntent} /></div>}
     {error && <p className="error" role="alert">{error}</p>}
-    <section className="scope"><span className="eyebrow">Milestone 2</span><p>Mission start, assigned domains, and Crisis 01 intelligence are available. Discussion is untimed; chat, voting, consequences, and QR invites remain planned.</p></section>
+    <section className="scope"><span className="eyebrow">Milestone 3</span><p>Discuss, vote privately, and reach one collective decision. Consequences and crisis progression remain planned.</p></section>
     <footer>Consensus Engine <span>Collective judgment. Shared consequences.</span></footer>
   </main>;
 }

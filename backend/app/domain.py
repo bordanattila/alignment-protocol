@@ -1,6 +1,6 @@
 """Domain foundations; transport and client projections must not serialize Mission."""
 from enum import StrEnum
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
@@ -18,6 +18,7 @@ class Phase(StrEnum):
     DISCUSSION = "discussion"
     VOTING = "voting"
     CONSENSUS_WINDOW = "consensus_window"
+    DECISION_LOCKED = "decision_locked"
     RESOLUTION = "resolution"
     RECONNECT_WAIT = "reconnect_wait"
     COMPLETED = "completed"
@@ -80,6 +81,46 @@ class Player(BaseModel):
     roles: list[Role] = Field(default_factory=list)
 
 
+class ChatMessage(BaseModel):
+    id: str
+    sender_id: str
+    callsign: str
+    text: str
+    timestamp: float
+
+
+class VotingRound(BaseModel):
+    id: str
+    number: int
+    eligible: list[str]
+    deadline: float
+    votes: dict[str, str] = Field(default_factory=dict)
+    totals: dict[str, int] | None = None
+    abstentions: int | None = None
+
+
+class Decision(BaseModel):
+    choice_id: str
+    reason: Literal["initial_plurality", "final_plurality", "ai_tie_break", "no_vote_ai_fallback"]
+    round_id: str
+    totals: dict[str, int]
+    abstentions: int
+    ai_followed: bool
+
+
+class ChatIntent(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    type: Literal["chat"]
+    text: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
+
+
+class VoteIntent(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    type: Literal["vote"]
+    round_id: str = Field(min_length=1, max_length=128)
+    choice_id: str = Field(min_length=1, max_length=128)
+
+
 class Mission(BaseModel):
     token: str
     host_id: str
@@ -87,3 +128,8 @@ class Mission(BaseModel):
     crisis: Crisis | None = None
     metrics: Metrics = Field(default_factory=Metrics)
     players: list[Player] = Field(default_factory=list)
+    deadline: float | None = None
+    rounds: list[VotingRound] = Field(default_factory=list)
+    decision: Decision | None = None
+    chat: list[ChatMessage] = Field(default_factory=list)
+    last_chat_at: dict[str, float] = Field(default_factory=dict)
