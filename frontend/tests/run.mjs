@@ -8,7 +8,8 @@ import { spawnSync } from 'node:child_process';
 const directory = await mkdtemp(join(tmpdir(), 'consensus-ui-'));
 try {
   const result = await build({
-    entryPoints: [new URL('./gameplay.test.tsx', import.meta.url).pathname],
+    entryPoints: ['gameplay.test.tsx', 'missionConnection.test.ts'].map(file => new URL(file, import.meta.url).pathname),
+    outdir: directory,
     bundle: true, platform: 'node', format: 'cjs', jsx: 'automatic', write: false,
     banner: { js: 'globalThis.location = { search: "", href: "http://localhost/?mission=test" };' },
     plugins: [{
@@ -26,9 +27,8 @@ try {
       },
     }],
   });
-  const output = join(directory, 'gameplay.test.cjs');
-  await writeFile(output, result.outputFiles[0].contents);
-  const execution = spawnSync(process.execPath, ['--test', output], { stdio: 'inherit' });
+  for (const output of result.outputFiles) await writeFile(output.path.replace(/\.js$/, '.cjs'), output.contents);
+  const execution = spawnSync(process.execPath, ['--test', join(directory, 'gameplay.test.cjs'), join(directory, 'missionConnection.test.cjs')], { stdio: 'inherit' });
   process.exitCode = execution.status ?? 1;
 } finally {
   await rm(directory, { recursive: true, force: true });

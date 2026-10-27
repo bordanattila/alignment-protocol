@@ -85,6 +85,7 @@ class Player(BaseModel):
     id: str
     callsign: str
     credential: str
+    credential_hash: str = ""
     connected: bool = False
     roles: list[Role] = Field(default_factory=list)
 
@@ -182,6 +183,8 @@ class Mission(BaseModel):
     metrics: Metrics = Field(default_factory=Metrics)
     initial_metrics: Metrics | None = None
     revision: int = 0
+    recovery_phase: Phase | None = None
+    recovery_deadline: float | None = None
     players: list[Player] = Field(default_factory=list)
     deadline: float | None = None
     rounds: list[VotingRound] = Field(default_factory=list)

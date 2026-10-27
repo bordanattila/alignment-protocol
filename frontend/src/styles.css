@@ -146,18 +146,18 @@ textarea { display: block; width: 100%; resize: vertical; min-height: 72px; padd
 .review-final-metrics dt, .review-statistics dt { color: #cedadd; }
 .trend-legend { display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 0; list-style: none; }
 .trend-legend li { display: flex; gap: 8px; align-items: center; }
-.review-chart { max-width: 100%; overflow-x: auto; }
-.metrics-trend { width: 100%; min-width: 560px; height: auto; display: block; }
+.review-chart { width: 100%; max-width: 100%; min-width: 0; }
+.metrics-trend { width: 100%; min-width: 0; height: auto; display: block; }
 .metrics-trend text { fill: #cedadd; font-size: 16px; }
-.review-table { max-width: 100%; overflow-x: auto; }
-.review-table table { width: 100%; min-width: 360px; border-collapse: collapse; }
-.review-table th, .review-table td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #42565e; }
+.review-table { max-width: 100%; overflow-x: auto; padding: 4px; overscroll-behavior-x: contain; }
+.review-table table { width: 100%; min-width: 36rem; border-collapse: collapse; overflow-wrap: normal; word-break: normal; }
+.review-table th, .review-table td { min-width: 5.5rem; padding: 10px 8px; text-align: right; font-variant-numeric: tabular-nums; border-bottom: 1px solid #42565e; }
 .review-table caption { text-align: left; margin: 12px 0; color: #cedadd; }
 .history-entry { border-top: 1px solid #42565e; padding: 14px 0; }
 .history-entry summary { cursor: pointer; min-height: 48px; padding: 4px; line-height: 1.6; }
 .history-entry summary > span { display: block; }
 .history-entry summary > span:first-child { display: inline; font-weight: 650; }
-.history-changes > span, .recorded-tally { display: inline-block; margin-right: 16px; }
+.recorded-tally { display: inline-block; margin: 0 12px 4px 0; }
 .history-hint { color: #a2dfce; font-size: 13px; }
 .history-context { padding: 8px 4px; }
 .history-context li { margin-bottom: 16px; }
@@ -165,4 +165,45 @@ textarea { display: block; width: 100%; resize: vertical; min-height: 72px; padd
 @media (max-width: 400px) {
   .review-final-metrics, .review-statistics { grid-template-columns: minmax(0, 1fr); }
   .review-table th, .review-table td { padding: 10px 5px; font-size: 13px; }
+}
+
+/* Review polish: shrink grid items, not words or the underlying data. */
+.mission-review, .mission-review > *, .history-entry, .history-context { min-width: 0; max-width: 100%; }
+.review-table th { white-space: nowrap; overflow-wrap: normal; word-break: normal; }
+.review-table th:first-child { min-width: 10rem; text-align: left; }
+.review-table-hint { display: none; font-size: 12px; color: #a8bdc4; }
+.history-entry summary .history-changes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.metric-delta { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 6px; max-width: 100%; padding: 4px 8px; border: 1px solid #42565e; border-radius: 4px; font-size: 13px; line-height: 1.5; font-weight: 400; }
+.metric-delta strong { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.metric-delta--positive { color: #a2dfce; background: #1b3532; border-color: #467b71; }
+.metric-delta--negative { color: #ffd2b4; background: #382c27; border-color: #876e40; }
+.metric-delta--neutral { color: #bacdd2; background: #172329; }
+.history-context ul { padding-left: 20px; }
+.history-context p, .history-context li, .history-entry summary { overflow-wrap: anywhere; }
+.mission-review + footer { flex-wrap: wrap; }
+.mission-review + footer a { display: inline-flex; align-items: center; min-height: 48px; max-width: 100%; overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .mission-review .trend-legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; font-size: 12px; }
+  .mission-review .trend-legend li { min-width: 0; }
+  .mission-review .trend-legend svg { flex: 0 0 24px; }
+  .review-table-hint { display: block; }
+}
+
+/* Live presence stays above gameplay; cached presence is explicitly labeled. */
+.connection-notice { margin: 20px 0 12px; padding: 12px 16px; border: 1px solid #467b71; border-left-width: 4px; border-radius: 4px; color: #a2dfce; background: #172b29; overflow-wrap: anywhere; }
+.connection-notice--warning { position: sticky; top: 8px; z-index: 5; border-color: #a88a56; color: #ffdfad; background: #30291f; }
+.connection-notice p { margin: 8px 0 0; line-height: 1.6; color: #e6eeef; }
+.player-presence { min-width: 0; margin: 12px 0 24px; padding: 12px 16px; border: 1px solid #42565e; border-radius: 4px; background: #172329; }
+.presence-count { margin: 0 0 10px; color: #cedadd; }
+.presence-seats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 8px 16px; list-style: none; padding: 0; margin: 0; }
+.presence-seats li { min-width: 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 6px 0; border-top: 1px solid #304149; overflow-wrap: anywhere; }
+.presence-seats li > span { min-width: 0; flex: 1 1 100px; }
+.presence-seats strong { font-size: 13px; }
+.presence-online strong { color: #a2dfce; }
+.presence-offline strong { color: #ffdfad; }
+.presence-stale { margin: 10px 0 0; color: #ffdfad; }
+.continue-status { overflow-wrap: anywhere; line-height: 1.6; }
+@media (max-width: 400px) {
+  .connection-notice, .player-presence { padding: 12px; }
+  .presence-seats { grid-template-columns: minmax(0, 1fr); }
 }

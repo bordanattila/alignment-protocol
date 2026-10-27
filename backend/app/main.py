@@ -1,5 +1,7 @@
 import asyncio
 import json
+import os
+import logging
 from pathlib import Path
 from contextlib import asynccontextmanager, suppress
 from collections.abc import Callable
@@ -13,33 +15,49 @@ from starlette.websockets import WebSocketState
 from .connections import LobbyConnections, close_socket
 from .domain import JoinRequest, ChatIntent, VoteIntent, ContinueRequest, Crisis
 from .missions import MissionError, MissionStore
+from .persistence import SQLiteMissions, PersistenceError
 
 
 def create_app(clock: Callable[[], float] | None = None,
-               crisis_loader: Callable[[], list[Crisis]] | None = None) -> FastAPI:
+               crisis_loader: Callable[[], list[Crisis]] | None = None,
+               database_path: str | Path | None = None) -> FastAPI:
     options = {}
     if clock is not None:
         options["clock"] = clock
     if crisis_loader is not None:
         options["crisis_loader"] = crisis_loader
+    if database_path is not None:
+        options["persistence"] = SQLiteMissions(database_path)
     store = MissionStore(**options)
     lock = asyncio.Lock()
     # Keep membership semantics, but isolate socket delivery from state mutation.
     connections = LobbyConnections(store, lock)
 
     async def tick():
+        changed = set()
         async with lock:
-            changed = store.advance_all_due()
-        for token in changed:
-            await connections.broadcast(token)
+            for token in store.mission_tokens():
+                try:
+                    if store.advance_due(token): changed.add(token)
+                except PersistenceError:
+                    logging.getLogger(__name__).error("Mission storage unavailable; timer will retry.")
+        for token in changed | set(connections.pending):
+            try:
+                await connections.broadcast(token, retry_only=token not in changed)
+            except PersistenceError:
+                logging.getLogger(__name__).error("Mission publication waiting for storage recovery.")
 
     async def scheduler():
         while True:
             await asyncio.sleep(0.1)
-            await tick()
+            try:
+                await tick()
+            except PersistenceError:
+                logging.getLogger(__name__).error("Mission storage unavailable; scheduler will retry.")
 
     @asynccontextmanager
     async def lifespan(_app):
+        store.initialize()
         task = asyncio.create_task(scheduler())
         _app.state.scheduler_task = task
         try:
@@ -48,12 +66,18 @@ def create_app(clock: Callable[[], float] | None = None,
             task.cancel()
             with suppress(asyncio.CancelledError):
                 await task
+            store.close()
 
     app = FastAPI(title="Consensus Engine", version="0.1.0", lifespan=lifespan)
     app.state.missions = store
     # Test hooks exercise the production scheduler path with a controlled clock.
     app.state.tick = tick
     app.state.lock = lock
+
+    @app.exception_handler(PersistenceError)
+    async def storage_error(_request: Request, _exc: PersistenceError):
+        return JSONResponse({"detail": "Mission storage is temporarily unavailable. Retry after reconnecting.",
+                             "code": "storage_unavailable"}, status_code=503)
 
     @app.exception_handler(MissionError)
     async def mission_error(_request: Request, exc: MissionError):
@@ -74,7 +98,7 @@ def create_app(clock: Callable[[], float] | None = None,
         async with lock:
             mission, player = store.join(token, body.callsign, x_mission_session)
         await connections.broadcast(token)
-        return {"token": mission.token, "credential": player.credential}
+        return {"token": mission.token, "credential": x_mission_session or player.credential}
 
     @app.post("/api/missions/{token}/start")
     async def start(token: str, x_mission_session: str = Header()):
@@ -117,8 +141,9 @@ def create_app(clock: Callable[[], float] | None = None,
                     or len(message["credential"]) > 128):
                 await close_socket(socket, reason="Invalid session message")
                 return
+            credential = message["credential"]
             async with lock:
-                player = store.authorize(token, message["credential"])
+                player = store.authorize(token, credential)
                 store.advance_due(token)
                 connections.add(token, player.id, socket)
             await connections.broadcast(token)
@@ -145,15 +170,17 @@ def create_app(clock: Callable[[], float] | None = None,
                 async with lock:
                     try:
                         if isinstance(intent, ChatIntent):
-                            store.send_chat(token, player.credential, intent.text)
+                            store.send_chat(token, credential, intent.text)
                         else:
-                            store.vote(token, player.credential, intent.round_id, intent.choice_id)
+                            store.vote(token, credential, intent.round_id, intent.choice_id)
                     except MissionError as exc:
                         error = exc.message
                 # A late rejected intent may itself have advanced an expired phase.
                 await connections.broadcast(token)
                 if error:
                     await connections.error(socket, error)
+        except PersistenceError:
+            await close_socket(socket, code=1011, reason="Mission storage unavailable; reconnect to retry")
         except MissionError:
             await close_socket(socket, reason="Mission session unavailable")
         except (ValueError, RecursionError, asyncio.TimeoutError):
@@ -162,9 +189,12 @@ def create_app(clock: Callable[[], float] | None = None,
             pass
         finally:
             if player:
-                async with lock:
-                    connections.remove(token, player.id, socket)
-                await connections.broadcast(token)
+                try:
+                    async with lock:
+                        connections.remove(token, player.id, socket)
+                    await connections.broadcast(token)
+                except PersistenceError:
+                    await close_socket(socket, code=1011, reason="Mission storage unavailable; reconnect to retry")
 
     build = Path(__file__).resolve().parents[2] / "frontend" / "dist"
     if build.is_dir():
@@ -173,4 +203,4 @@ def create_app(clock: Callable[[], float] | None = None,
     return app
 
 
-app = create_app()
+app = create_app(database_path=os.environ.get("CONSENSUS_DB_PATH", "data/consensus-engine.sqlite3"))

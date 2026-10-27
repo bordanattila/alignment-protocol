@@ -1,9 +1,11 @@
-"""Single-process, in-memory mission boundary. No transport objects live here."""
+"""Single-process mission cache; optional SQLite commits precede publication."""
 import secrets
 import time
+from functools import wraps
 from collections.abc import Callable
 
 from .domain import Mission, Player, Phase, Role, VotingRound, Decision, ChatMessage, Crisis, CrisisResult, Metrics, MetricDeltas, PublicChoice, RecordedRound
+from .persistence import SQLiteMissions, credential_digest
 from .voting import plurality
 from .crises import load_crisis_sequence
 from .callsigns import normalize_callsign, callsign_key
@@ -17,24 +19,115 @@ class MissionError(Exception):
         self.code = code
 
 
+def persisted(method):
+    """Commit one complete outer intent, including an expired-phase rejection."""
+    @wraps(method)
+    def execute(self, *args, **kwargs):
+        if self.persistence is None or self._transaction_depth:
+            return method(self, *args, **kwargs)
+        token = (args[0] if args else kwargs.get("token")) if method.__name__ != "create" else None
+        before = self._missions[token].model_copy(deep=True) if token in self._missions else None
+        keys = set(self._missions)
+        self._transaction_depth += 1
+        rejection = None
+        try:
+            try:
+                result = method(self, *args, **kwargs)
+            except MissionError as error:
+                rejection = error
+            changed = self._missions.get(token) if token else next((m for k,m in self._missions.items() if k not in keys), None)
+            if changed is not None and (before is None or self.persistence.payload(changed) != self.persistence.payload(before)):
+                self.persistence.save(changed)
+        except Exception:
+            if before is not None:
+                self._missions[token].__dict__.update(before.__dict__)
+            for key in set(self._missions)-keys: del self._missions[key]
+            raise
+        finally:
+            self._transaction_depth -= 1
+        if rejection is not None: raise rejection
+        return result
+    return execute
+
+
 class MissionStore:
     def __init__(self, clock: Callable[[], float] = time.time,
-                 crisis_loader: Callable[[], list[Crisis]] = load_crisis_sequence):
+                 crisis_loader: Callable[[], list[Crisis]] = load_crisis_sequence,
+                 persistence: SQLiteMissions | None = None):
+        self.persistence = persistence
+        self._transaction_depth = 0
         self.clock = clock
         self.crisis_loader = crisis_loader
         self._missions: dict[str, Mission] = {}
+
+    def initialize(self):
+        if self.persistence is None: return
+        self.persistence.open()
+        try:
+            self._missions = self.persistence.load()
+            for mission in self._missions.values():
+                for player in mission.players: player.connected = False
+                if mission.phase in (Phase.DISCUSSION, Phase.VOTING, Phase.CONSENSUS_WINDOW):
+                    mission.recovery_phase = mission.phase
+                    mission.recovery_deadline = mission.deadline
+                    mission.phase = Phase.RECONNECT_WAIT
+                    mission.deadline = None
+                self._reconcile_recovery(mission)
+                mission.revision += 1
+                self.persistence.save(mission)
+        except Exception:
+            self.persistence.close()
+            raise
+
+    def close(self):
+        if self.persistence is not None: self.persistence.close()
+
+    def _reconcile_recovery(self, mission: Mission) -> bool:
+        if (mission.phase != Phase.RECONNECT_WAIT or mission.recovery_phase != Phase.VOTING
+                or mission.recovery_deadline is None or self.clock() < mission.recovery_deadline):
+            return False
+        mission.phase = Phase.VOTING
+        mission.deadline = mission.recovery_deadline
+        mission.recovery_phase = None
+        mission.recovery_deadline = None
+        self._resolve(mission)
+        if mission.phase == Phase.CONSENSUS_WINDOW:
+            # A new mandatory window has not yet been played. Its 20s starts
+            # only when all reserved seats reconnect, never during downtime.
+            mission.recovery_phase = Phase.CONSENSUS_WINDOW
+            mission.phase = Phase.RECONNECT_WAIT
+            mission.deadline = None
+        return True
+
+    def _resume_recovery(self, mission: Mission):
+        self._reconcile_recovery(mission)
+        if mission.phase != Phase.RECONNECT_WAIT or not all(p.connected for p in mission.players): return
+        mission.phase = mission.recovery_phase
+        mission.deadline = mission.recovery_deadline
+        mission.recovery_phase = None
+        mission.recovery_deadline = None
+        if mission.deadline is None:
+            mission.deadline = self.clock() + 20  # newly required Consensus Window
+        elif self.clock() >= mission.deadline:
+            self.advance_due(mission.token)  # fresh next phase, not a reset
+
+    @persisted
+    def bump_revision(self, token: str):
+        self.get(token).revision += 1
 
     def get(self, token: str) -> Mission:
         if token not in self._missions:
             raise MissionError("This mission invite is unavailable.", 404)
         return self._missions[token]
 
+    @persisted
     def create(self, callsign: str) -> tuple[Mission, Player]:
         player = self._player(callsign)
         mission = Mission(token=secrets.token_urlsafe(24), host_id=player.id, players=[player])
         self._missions[mission.token] = mission
         return mission, player
 
+    @persisted
     def join(self, token: str, callsign: str, credential: str | None = None) -> tuple[Mission, Player]:
         mission = self.get(token)
         if credential is not None:
@@ -53,14 +146,17 @@ class MissionStore:
 
     def authorize(self, token: str, credential: str) -> Player:
         for player in self.get(token).players:
-            if secrets.compare_digest(player.credential.encode(), credential.encode()):
+            if secrets.compare_digest(player.credential_hash or credential_digest(player.credential), credential_digest(credential)):
                 return player
         raise MissionError("Your mission session could not be restored.", 401)
 
+    @persisted
     def set_connected(self, token: str, player_id: str, connected: bool):
         player = next(p for p in self.get(token).players if p.id == player_id)
         player.connected = connected
+        if connected: self._resume_recovery(self.get(token))
 
+    @persisted
     def start(self, token: str, credential: str):
         mission = self.get(token)
         self._host(token, credential)
@@ -81,6 +177,7 @@ class MissionStore:
         mission.crisis = sequence[0]
         mission.phase = Phase.BRIEFING
 
+    @persisted
     def begin_discussion(self, token: str, credential: str):
         mission = self.get(token)
         self._host(token, credential)
@@ -91,6 +188,7 @@ class MissionStore:
         mission.phase = Phase.DISCUSSION
         mission.deadline = self.clock() + 60
 
+    @persisted
     def advance_due(self, token: str) -> bool:
         """Called under the state lock; re-check current state, never a stale callback.
 
@@ -98,6 +196,8 @@ class MissionStore:
         consuming a voting window players never had the opportunity to use.
         """
         mission = self.get(token)
+        if mission.phase == Phase.RECONNECT_WAIT:
+            return self._reconcile_recovery(mission)
         if mission.deadline is None or self.clock() < mission.deadline:
             return False
         if mission.phase in (Phase.DISCUSSION, Phase.CONSENSUS_WINDOW):
@@ -107,6 +207,9 @@ class MissionStore:
         else:
             return False
         return True
+
+    def mission_tokens(self) -> tuple[str, ...]:
+        return tuple(self._missions)
 
     def advance_all_due(self) -> list[str]:
         return [token for token in self._missions if self.advance_due(token)]
@@ -119,6 +222,7 @@ class MissionStore:
             id=secrets.token_urlsafe(16), number=len(mission.rounds) + 1,
             eligible=[p.id for p in mission.players if p.roles], deadline=mission.deadline))
 
+    @persisted
     def vote(self, token: str, credential: str, round_id: str, choice_id: str):
         player = self.authorize(token, credential)
         self.advance_due(token)
@@ -207,6 +311,7 @@ class MissionStore:
         # phase. Host acknowledgement advances, so no result is replaced unseen.
         return result
 
+    @persisted
     def continue_mission(self, token: str, credential: str, result_id: str) -> bool:
         mission = self.get(token)
         self._host(token, credential)
@@ -232,6 +337,7 @@ class MissionStore:
         # crises. Vote maps and local selection keys belong only to this crisis.
         return True
 
+    @persisted
     def send_chat(self, token: str, credential: str, text: str):
         player = self.authorize(token, credential)
         self.advance_due(token)
@@ -265,6 +371,7 @@ class MissionStore:
         return {
             "token": mission.token,
             "revision": mission.revision,
+            "recovery": None if mission.recovery_phase is None else {"phase": mission.recovery_phase, "original_deadline": mission.recovery_deadline},
             "history": [r.model_dump(mode="json") for r in mission.results],
             "metrics_timeline": ([] if mission.initial_metrics is None else
                 [{"crisis_number": 0, "metrics": mission.initial_metrics.model_dump()}]
@@ -333,5 +440,6 @@ class MissionStore:
     @staticmethod
     def _player(callsign: str) -> Player:
         callsign = MissionStore._normalize_callsign(callsign)
+        credential = secrets.token_urlsafe(32)
         return Player(id=secrets.token_urlsafe(16), callsign=callsign,
-                      credential=secrets.token_urlsafe(32))
+                      credential=credential, credential_hash=credential_digest(credential))

@@ -1,4 +1,5 @@
 import type { LobbyState, Metric } from './types';
+import { ContinueStatus } from './MissionPresence';
 
 const names: Record<Metric, string> = {
   infrastructure: 'Infrastructure', public_trust: 'Public Trust', economy: 'Economy', safety: 'Safety',
@@ -28,9 +29,9 @@ export function ConsequenceOutcome({ mission, connected, continuing, onContinue 
     {mission.phase === 'decision_locked' && <>
       <p>{mission.crisis_number === mission.crisis_count ? 'All configured crises survived. Finish the mission after reviewing the outcome.' : 'Review the outcome with your team before the next crisis.'}</p>
       {mission.you === mission.host_id
-        ? <button disabled={!connected || continuing || mission.players.some(player => !player.connected)} onClick={onContinue}>{mission.crisis_number === mission.crisis_count ? 'Finish mission' : 'Next crisis'}</button>
-        : <p>Waiting for the host to continue after reviewing the result.</p>}
-      {mission.players.some(player => !player.connected) && <p>Waiting for every player to reconnect before continuing.</p>}
+        ? <button aria-describedby="continue-status" disabled={!connected || continuing || mission.players.some(player => !player.connected)} onClick={onContinue}>{mission.crisis_number === mission.crisis_count ? 'Finish mission' : 'Next crisis'}</button>
+        : null}
+      <ContinueStatus mission={mission} connected={connected} continuing={continuing} />
     </>}
   </div>;
 }

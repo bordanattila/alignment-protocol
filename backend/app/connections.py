@@ -4,6 +4,7 @@ import asyncio
 from fastapi import WebSocket, WebSocketDisconnect
 
 from .missions import MissionStore
+from .persistence import PersistenceError
 
 
 async def close_socket(socket: WebSocket, code: int = 1008, reason: str = ""):
@@ -19,6 +20,7 @@ class LobbyConnections:
         self.store = store
         self.lock = lock or asyncio.Lock()
         self.delivery_lock = asyncio.Lock()
+        self.pending: set[str] = set()
         self.sockets: dict[str, dict[str, set[WebSocket]]] = {}
 
     def add(self, token: str, player_id: str, socket: WebSocket):
@@ -35,31 +37,39 @@ class LobbyConnections:
         if not players:
             self.sockets.pop(token, None)
 
-    async def broadcast(self, token: str):
+    async def broadcast(self, token: str, retry_only: bool = False):
         # Callers release the state lock before publishing. Capture fresh immutable
         # projections only after acquiring the delivery lock, preventing old
         # broadcasts from overtaking newer snapshots. Never await network under
         # the state lock. Failed sends republish corrected presence.
         async with self.delivery_lock:
-            while True:
-                async with self.lock:
-                    self.store.get(token).revision += 1
-                    frames = [(player_id, socket, self.store.project(token, player_id))
-                              for player_id, sockets in self.sockets.get(token, {}).items()
-                              for socket in list(sockets)]
-                failed = False
-                for player_id, socket, state in frames:
-                    try:
-                        await asyncio.wait_for(socket.send_json({
-                            "type": "state", "mission": state
-                        }), timeout=2)
-                    except (WebSocketDisconnect, RuntimeError, OSError, asyncio.TimeoutError):
-                        async with self.lock:
-                            self.remove(token, player_id, socket)
-                        await close_socket(socket, code=1011, reason="Connection interrupted")
-                        failed = True
-                if not failed:
-                    return
+            if retry_only and token not in self.pending:
+                return
+            self.pending.discard(token)
+            try:
+                while True:
+                    async with self.lock:
+                        self.store.bump_revision(token)
+                        frames = [(player_id, socket, self.store.project(token, player_id))
+                                  for player_id, sockets in self.sockets.get(token, {}).items()
+                                  for socket in list(sockets)]
+                    failed = False
+                    for player_id, socket, state in frames:
+                        try:
+                            await asyncio.wait_for(socket.send_json({
+                                "type": "state", "mission": state
+                            }), timeout=2)
+                        except (WebSocketDisconnect, RuntimeError, OSError, asyncio.TimeoutError):
+                            async with self.lock:
+                                self.remove(token, player_id, socket)
+                            await close_socket(socket, code=1011, reason="Connection interrupted")
+                            failed = True
+                    if not failed:
+                        self.pending.discard(token)
+                        return
+            except PersistenceError:
+                self.pending.add(token)
+                raise
 
     async def error(self, socket: WebSocket, message: str):
         async with self.delivery_lock:

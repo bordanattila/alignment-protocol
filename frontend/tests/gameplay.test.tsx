@@ -1,5 +1,6 @@
 import './missionReview.test';
 import './chatScroll.test';
+import { ConnectionNotice, PlayerPresence, ContinueStatus } from '../src/MissionPresence';
 import campaign0 from '../../backend/app/content/grid-under-pressure.json';
 import campaign1 from '../../backend/app/content/waterline-alert.json';
 import campaign2 from '../../backend/app/content/care-at-capacity.json';
@@ -43,7 +44,7 @@ function state(phase: LobbyState['phase'], viewer = 0): LobbyState {
 function render(mission: LobbyState, connected = true) {
   globalThis.__testLobby = {
     mission, status: connected ? 'Connected' : 'Reconnecting', rejected: false,
-    actionError: '', clockSample: { serverNow: 1000, receivedAt: performance.now() }, sendIntent: () => true,
+    actionError: '', clockSample: { serverNow: mission.server_now, receivedAt: performance.now() }, sendIntent: () => true,
   };
   return renderToStaticMarkup(<App />);
 }
@@ -337,4 +338,177 @@ test('mission-wide chat labels earlier crises without duplicating the active com
   assert.ok(html.includes('Crisis 3'));
   assert.ok(html.includes('Earlier ward discussion'));
   assert.equal((html.match(/id="chat-message"/g) || []).length,1);
+});
+
+test('recovered mission waits explicitly for all participants with restored read-only chat and no timer reset',()=>{
+  const mission=state('reconnect_wait'); mission.deadline=null;
+  mission.recovery={phase:'consensus_window',original_deadline:900};
+  const html=render(mission);
+  assert.ok(html.includes('Recovering mission') && html.includes('Waiting for every player to reconnect'));
+  assert.ok(html.includes('History message'));
+  assert.ok(textarea(html).includes('disabled'));
+  assert.ok(!html.includes('Submit Final Vote') && !html.includes('Submit private vote'));
+  assert.ok(!html.includes('remaining'));
+});
+
+test('restored voting keeps the saved own vote and disables duplicate submission',()=>{
+  const mission=state('voting'); mission.voting!.your_vote='B'; mission.revision=400;
+  const html=render(JSON.parse(JSON.stringify(mission)));
+  assert.ok(html.includes('Vote submitted.') && html.includes('Your response: B'));
+  assert.ok(fieldset(html).includes('disabled'));
+  const chosen=html.match(/<input[^>]*value="B"[^>]*>/)![0];
+  assert.ok(chosen.includes('checked=""'));
+});
+
+test('restored discussion shows each stable chat message once without changing the saved deadline',()=>{
+  const mission=state('discussion'); mission.deadline=1015;
+  mission.chat=[{...mission.chat[0],crisis_number:2},{...mission.chat[0],id:'second',text:'Recovered reply',crisis_number:2}];
+  const original=JSON.stringify(mission);
+  const html=render(JSON.parse(original));
+  assert.equal((html.match(/History message/g)||[]).length,1);
+  assert.equal((html.match(/Recovered reply/g)||[]).length,1);
+  assert.ok(html.includes('00:15'));
+  assert.equal(JSON.stringify(mission),original);
+});
+
+test('expired restored deadline never displays a negative countdown while waiting for server transition',()=>{
+  const mission=state('discussion'); mission.deadline=900;
+  const html=render(mission);
+  assert.ok(html.includes('00:00') && html.includes('Waiting for server update'));
+  assert.ok(!html.includes('-00:'));
+});
+
+test('restored mission controls stay disabled while the socket is reconnecting',()=>{
+  const mission=state('discussion');
+  assert.ok(textarea(render(mission,false)).includes('disabled'));
+  const voting=state('voting'); voting.voting!.your_vote=null;
+  assert.ok(fieldset(render(voting,false)).includes('disabled'));
+});
+
+test('real process-restart snapshots restore discussion, final voting and terminal reviews', {skip:!process.env.MISSION_RESTART_FILE}, async()=>{
+  const {readFileSync}=await import('node:fs');
+  const evidence=JSON.parse(readFileSync(process.env.MISSION_RESTART_FILE!,'utf8'));
+  for(const key of ['discussion','voting','victory','defeat']) {
+    const mission=evidence[key] as LobbyState;
+    const html=render(mission);
+    if(key==='discussion') {
+      assert.ok(html.includes('Water risk needs accessible distribution.'));
+      assert.ok(html.includes('01:00'));
+      assert.equal((html.match(/Water risk needs accessible distribution\./g)||[]).length,1);
+    } else if(key==='voting') assert.ok(html.includes('Final Vote — 30 seconds') && html.includes('00:30'));
+    else {
+      assert.ok(html.includes(key==='victory'?'Civilization Survived':'Civilization Collapsed'));
+      assert.ok(html.includes(key==='victory'?'55.75 / 100':'54.5 / 100'));
+      assert.equal((html.match(/class="history-entry"/g)||[]).length,key==='victory'?10:4);
+      assert.ok(!html.includes('<textarea'));
+    }
+  }
+});
+
+test('reconnection statuses are announced and disconnected voting/chat stay disabled', () => {
+  for (const status of ['Connection lost — reconnecting', 'Connection unavailable — continuing to retry', 'Session no longer recoverable']) {
+    const mission=state('voting'); mission.voting!.your_vote=null;
+    render(mission,false);
+    globalThis.__testLobby.status=status;
+    const html=renderToStaticMarkup(<App />);
+    assert.ok(html.includes('aria-label="Your connection" role="status"'));
+    assert.ok(html.includes(status.startsWith('Session') ? 'Session no longer recoverable' : status.startsWith('Connection unavailable') ? 'continuing to retry automatically' : 'reconnecting automatically'));
+    assert.ok(fieldset(html).includes('disabled'));
+    assert.ok(textarea(html).includes('disabled'));
+  }
+});
+test('Reconnected status resumes interactions and remains visible on terminal review', () => {
+  const mission=state('voting');mission.voting!.your_vote=null;
+  render(mission);
+  Object.assign(globalThis.__testLobby,{status:'Reconnected',connected:true});
+  let html=renderToStaticMarkup(<App />);
+  assert.ok(!fieldset(html).includes('disabled'));
+  mission.phase='completed';mission.summary={outcome:'victory',consensus_score:70,crises_completed:1,total_crises:1,final_metrics:mission.metrics,consensus_windows:0,final_vote_crises:0,resolution_breakdown:{initial_plurality:1,final_plurality:0,ai_tie_break:0,no_vote_ai_fallback:0}};
+  html=renderToStaticMarkup(<App />);
+  assert.ok(html.includes('Reconnected — mission state restored.'));
+  assert.ok(html.includes('aria-label="Your connection" role="status"'));
+});
+
+
+test('connection warning precedes gameplay in every live phase and clears after snapshot restore', () => {
+  for (const phase of ['lobby','briefing','discussion','voting','consensus_window','decision_locked','reconnect_wait'] as const) {
+    const mission=state(phase);
+    if(phase==='voting') mission.deadline=900; // Expired cached clock must not be the only disconnect cue.
+    const offline=render(mission,false);
+    if(phase==='voting') assert.ok(offline.includes('Waiting for server update'));
+    assert.ok(offline.includes('Connection lost — reconnecting automatically.'));
+    assert.ok(offline.includes('Displayed mission state may be outdated'));
+    assert.ok(offline.includes('Voting and chat are unavailable'));
+    assert.ok(offline.includes('refreshing should not normally be required'));
+    assert.ok(offline.indexOf('aria-label="Your connection"')<offline.indexOf('Operations room'));
+    if(offline.includes('aria-label="Active gameplay"')) assert.ok(offline.indexOf('aria-label="Your connection"')<offline.indexOf('aria-label="Active gameplay"'));
+    assert.ok(!render(mission,true).includes('Displayed mission state may be outdated'));
+  }
+});
+test('terminal review retains visible connection warning and participant presence', () => {
+  for(const phase of ['completed','failed'] as const){
+    const mission=state(phase);mission.summary={outcome:phase==='completed'?'victory':'defeat',consensus_score:70,crises_completed:0,total_crises:1,final_metrics:mission.metrics,consensus_windows:0,final_vote_crises:0,resolution_breakdown:{initial_plurality:0,final_plurality:0,ai_tie_break:0,no_vote_ai_fallback:0}};
+    const html=render(mission,false);
+    assert.ok(html.includes('Connection lost — reconnecting automatically.'));
+    assert.ok(html.includes('aria-label="Player presence"'));
+  }
+});
+test('presence shows authoritative assigned seat counts and text labels without secret fields', () => {
+  const mission=state('voting');mission.players[2].connected=false;
+  const html=renderToStaticMarkup(<PlayerPresence mission={mission} connected />);
+  assert.ok(html.includes('Players connected: <strong>2 of 3</strong>'));
+  for(const player of mission.players) assert.ok(html.includes(player.callsign));
+  assert.equal((html.match(/<strong>Connected<\/strong>/g)||[]).length,2);
+  assert.ok(html.includes('<strong>Disconnected</strong>'));
+  assert.ok(!html.includes('infrastructure')&&!html.includes('initial')&&!html.includes('intelligence'));
+  assert.ok(html.includes('aria-live="polite" aria-atomic="true"'));
+});
+test('disconnected browser labels cached presence instead of claiming live teammate status', () => {
+  const html=renderToStaticMarkup(<PlayerPresence mission={state('voting')} connected={false} />);
+  assert.ok(html.includes('Last known players connected'));
+  assert.ok(html.includes('Presence reflects the last server update.'));
+});
+test('presence reflects reconnect snapshot without stale offline labels', () => {
+  const mission=state('discussion');mission.players[1].connected=false;
+  assert.ok(renderToStaticMarkup(<PlayerPresence mission={mission} connected />).includes('Disconnected'));
+  mission.players[1].connected=true;
+  const html=renderToStaticMarkup(<PlayerPresence mission={mission} connected />);
+  assert.ok(!html.includes('Disconnected'));assert.ok(html.includes('<strong>3 of 3</strong>'));
+});
+test('Next crisis names a missing seat and remains disabled until all seats restore', () => {
+  const mission=outcome();mission.players[2].connected=false;
+  let html=render(mission);
+  assert.ok(html.includes('Waiting for Player 2 to reconnect before continuing. Players connected: 2 of 3.'));
+  assert.match(html,/<button aria-describedby="continue-status" disabled="">Next crisis<\/button>/);
+  mission.players[2].connected=true;html=render(mission);
+  assert.ok(!html.includes('Waiting for Player 2 to reconnect'));
+  assert.match(html,/<button aria-describedby="continue-status">Next crisis<\/button>/);
+});
+test('multiple missing seats are identified and guest host requirement stays accurate', () => {
+  const mission=outcome();mission.players[1].connected=mission.players[2].connected=false;
+  let html=render(mission);
+  assert.ok(html.includes('Waiting for Player 1, Player 2 to reconnect'));assert.ok(html.includes('1 of 3'));
+  mission.you='p1';html=render(mission);
+  assert.ok(!html.includes('>Next crisis</button>'));assert.ok(html.includes('The host can continue once every assigned player reconnects.'));
+});
+test('other progression blocks distinguish local loss, pending request and host ownership', () => {
+  const mission=outcome();
+  assert.ok(renderToStaticMarkup(<ContinueStatus mission={mission} connected={false} continuing={false} />).includes('Reconnect and restore'));
+  assert.ok(renderToStaticMarkup(<ContinueStatus mission={mission} connected continuing />).includes('Sending the request'));
+  mission.you='p1';assert.ok(renderToStaticMarkup(<ContinueStatus mission={mission} connected continuing={false} />).includes('Waiting for the host'));
+});
+test('unrecoverable and initial connection notices never promise an active automatic retry', () => {
+  const html=renderToStaticMarkup(<ConnectionNotice status="Session no longer recoverable" connected={false} />);
+  assert.ok(!html.includes('reconnecting automatically'));assert.ok(html.includes('Check your invite'));
+  const initial=renderToStaticMarkup(<ConnectionNotice status="Connecting" connected={false} />);
+  assert.ok(initial.includes('Waiting for an authoritative mission update'));
+});
+test('mobile presence uses a shrinkable single column and wrapping callsigns', async () => {
+  const {readFileSync}=await import('node:fs');const css=readFileSync('src/styles.css','utf8');
+  assert.match(css,/\.connection-notice--warning \{[^}]*position: sticky;[^}]*top: 8px;/);
+  assert.match(css,/\.presence-seats li[^}]*flex-wrap: wrap[^}]*overflow-wrap: anywhere/s);
+  assert.match(css,/@media \(max-width: 400px\)\s*\{\s*\.connection-notice, \.player-presence[^}]*}\s*\.presence-seats \{ grid-template-columns: minmax\(0, 1fr\);/s);
+  const mission=state('discussion');mission.players[0].callsign='Long callsign <script>';
+  const html=renderToStaticMarkup(<PlayerPresence mission={mission} connected />);
+  assert.ok(html.includes('&lt;script&gt;'));assert.ok(!html.includes('<script>'));
 });

@@ -5,7 +5,7 @@ import type { ClockSample, LobbyState, MissionIntent } from './types';
 
 type Actions = { mission: LobbyState; connected: boolean; sendIntent: (intent: MissionIntent) => boolean };
 export const phaseLabel = (mission: LobbyState) => ({
-  lobby: 'Mission lobby', briefing: 'Briefing', discussion: 'Discussion',
+  reconnect_wait: 'Recovering mission', lobby: 'Mission lobby', briefing: 'Briefing', discussion: 'Discussion',
   voting: mission.voting?.number === 2 ? 'Final hidden vote' : 'Hidden vote',
   consensus_window: 'Consensus Window', decision_locked: 'Decision outcome', failed: 'Civilization collapsed', completed: 'Mission complete',
 })[mission.phase];
