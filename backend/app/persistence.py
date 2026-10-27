@@ -9,6 +9,7 @@ import sqlite3
 
 from .domain import Mission, Phase, Role
 from .callsigns import callsign_key
+from .campaign import validate_catalog, STAGES
 
 
 class PersistenceError(Exception):
@@ -111,6 +112,19 @@ class SQLiteMissions:
 
     @staticmethod
     def validate(mission: Mission):
+        if mission.campaign is not None:
+            validate_catalog(mission.campaign.scenarios)
+            if len(mission.sequence) != 10 or len({c.id for c in mission.sequence}) != 10:
+                raise ValueError('Campaign length/uniqueness invariant')
+            catalog = {s.crisis.id:s for s in mission.campaign.scenarios}
+            for index,crisis in enumerate(mission.sequence):
+                if crisis.id not in catalog or catalog[crisis.id].stage != STAGES[index]:
+                    raise ValueError('Campaign stage invariant')
+                dependency = catalog[crisis.id].prerequisite
+                if index <= mission.crisis_index and dependency:
+                    if not any(r.crisis_id == dependency.crisis_id and r.decision.choice_id in dependency.choice_ids
+                               for r in mission.results[:index]):
+                        raise ValueError('Campaign prerequisite invariant')
         players = mission.players
         ids = {p.id for p in players}
         if not 1 <= len(players) <= 4 or len(ids) != len(players) or mission.host_id not in ids:
@@ -171,6 +185,9 @@ class SQLiteMissions:
                 if not isinstance(payload, str) or not isinstance(token, str) or version != 1 or hashlib.sha256(payload.encode()).hexdigest() != checksum:
                     raise ValueError('Record format/checksum')
                 raw = json.loads(payload)
+                # The only optional v1 aggregate extension is campaign metadata.
+                # Old payloads/ledger hashes remain valid and unchanged.
+                if isinstance(raw, dict) and 'campaign' not in raw: raw['campaign'] = None
                 if not isinstance(raw, dict) or set(raw) != set(Mission.model_fields)-{'crisis'}:
                     raise ValueError('Record fields do not match format version')
                 sequence = raw.get('sequence', [])

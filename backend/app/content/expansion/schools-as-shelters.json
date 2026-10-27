@@ -1,0 +1,50 @@
+{
+  "id": "schools-as-shelters",
+  "title": "Classrooms or Shelter",
+  "briefing": "Storm displacement has filled city shelters, and schools are the next accessible buildings. Families need roofs tonight, while schools provide meals, routine and trusted adult contact for children already under pressure. AI recommendation: Open suitable classrooms and suspend in-person lessons. This prioritizes immediate safety under the current constraints.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "Only half the schools have separate washrooms and backup power sufficient for continuous overnight occupancy.",
+    "community": "School closures affect families unable to work remotely; displaced families fear being blamed for disrupting lessons.",
+    "economy": "Hotels offer rooms at a capped price if the city guarantees a minimum occupancy, even after the weather improves.",
+    "safety": "Crowded multipurpose halls increase safeguarding risks unless sleeping areas and supervision are carefully separated."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Use Schools and Small Lodgings",
+      "description": "Fund supervised school halls plus capped-price rooms.",
+      "consequence": "A mixed network protects family routines and reduces crowding, while staffing and room guarantees strain reserves.",
+      "metric_deltas": {
+        "infrastructure": -5,
+        "public_trust": 8,
+        "economy": -9,
+        "safety": 6
+      }
+    },
+    {
+      "id": "B",
+      "title": "Preserve School Operations",
+      "description": "Keep lessons open and expand central temporary shelters.",
+      "consequence": "School routines and local employment continue, but stretched shelter capacity leaves more households exposed.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": 6,
+        "economy": 5,
+        "safety": -8
+      }
+    },
+    {
+      "id": "C",
+      "title": "Convert Schools Immediately",
+      "description": "Open suitable classrooms and suspend in-person lessons.",
+      "consequence": "More households gain safe overnight space, but interrupted schooling and lost working time widen public frustration.",
+      "metric_deltas": {
+        "infrastructure": 5,
+        "public_trust": -8,
+        "economy": -6,
+        "safety": 9
+      }
+    }
+  ]
+}

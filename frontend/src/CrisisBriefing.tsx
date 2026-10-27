@@ -7,7 +7,7 @@ export function CrisisBriefing({ mission }: { mission: LobbyState }) {
   return <section className="crisis-stack" aria-label="Current crisis">
     <div className="panel">
       <p className="eyebrow">Crisis {mission.crisis_number.toString().padStart(2, '0')} · Public briefing</p>
-      <h2>{crisis.title}</h2><p>{crisis.briefing}</p>
+      <h2>{crisis.title}</h2><p className="outcome-narrative">{crisis.briefing}</p>
       <p className="eyebrow">AI recommendation</p>
       <p className="recommendation">{crisis.choices.find(choice => choice.id === crisis.ai_recommendation_choice_id)?.description}</p>
     </div>

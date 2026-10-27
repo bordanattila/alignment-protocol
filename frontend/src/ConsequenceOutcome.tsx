@@ -13,7 +13,8 @@ export function ConsequenceOutcome({ mission, connected, continuing, onContinue 
   if (!result) return null;
   return <div className="consequence-outcome">
     <p className="eyebrow">Crisis {result.crisis_number.toString().padStart(2, '0')} outcome</p>
-    <p>{result.outcome}</p>
+    <h3>Immediate consequences</h3>
+    <p className="outcome-narrative">{result.outcome}</p>
     <table className="civilization-impact">
       <caption>Civilization impact</caption>
       <thead><tr><th scope="col">Metric</th><th scope="col">Before → After</th><th scope="col">Change</th></tr></thead>

@@ -64,6 +64,8 @@ export interface RecordedRound {
 }
 export interface MetricSnapshot { crisis_number: number; metrics: Civilization }
 export interface MissionSummary {
+  narrative_outcome?: string;
+  notable_decisions?: {crisis_number: number; crisis_title: string; choice_title: string; outcome: string}[];
   outcome: 'victory' | 'defeat';
   crises_completed: number;
   total_crises: number;

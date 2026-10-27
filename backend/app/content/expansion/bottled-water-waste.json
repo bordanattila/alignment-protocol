@@ -1,0 +1,50 @@
+{
+  "id": "bottled-water-waste",
+  "title": "The Delivery Backlog",
+  "briefing": "The earlier bottled-water delivery strategy has left distribution depots full of empty containers and tanker queues. Essential deliveries continue, but a cleanup contract would displace the vehicles and funds that brought emergency supply into the neighborhoods. AI recommendation: Hire an emergency collection fleet and keep sealed-water deliveries. This prioritizes immediate safety under the current constraints.",
+  "ai_recommendation_choice_id": "B",
+  "private_intelligence": {
+    "infrastructure": "Refill stations need pressure tests before use; opening all of them today would risk contaminating clean hoses.",
+    "community": "Community volunteers can manage a deposit return, but residents without spare cash would need a deposit waiver.",
+    "economy": "A packaging buyer offers revenue for sorted material, provided collection vehicles deliver it outside normal shifts.",
+    "safety": "Container piles block emergency access to two depots; clearing those routes is more urgent than reaching a recycling target."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Sell and Sort Locally",
+      "description": "Pay neighborhood teams to sort containers for commercial recovery.",
+      "consequence": "Sorting creates local income and keeps water deliveries moving, but blocked depots clear slowly and supervision is uneven.",
+      "metric_deltas": {
+        "infrastructure": -3,
+        "public_trust": 6,
+        "economy": 8,
+        "safety": -8
+      }
+    },
+    {
+      "id": "B",
+      "title": "Clear Depots Centrally",
+      "description": "Hire an emergency collection fleet and keep sealed-water deliveries.",
+      "consequence": "Depot access improves quickly, but the costly parallel supply and waste routes strain the maintenance budget.",
+      "metric_deltas": {
+        "infrastructure": 6,
+        "public_trust": -3,
+        "economy": -9,
+        "safety": 8
+      }
+    },
+    {
+      "id": "C",
+      "title": "Build a Refill Network",
+      "description": "Test neighborhood refill points and waive deposits where needed.",
+      "consequence": "Local refill access restores confidence and reduces material use, while testing and new routing slow immediate delivery.",
+      "metric_deltas": {
+        "infrastructure": -5,
+        "public_trust": 8,
+        "economy": -5,
+        "safety": 5
+      }
+    }
+  ]
+}

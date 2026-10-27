@@ -127,7 +127,7 @@ export default function App() {
     {mission?.crisis && mission.phase !== 'voting' && <div className="reference-options"><ResponseOptions mission={mission} connected={connected} sendIntent={sendIntent} /></div>}
     {mission && (mission.phase === 'reconnect_wait' || mission.phase === 'voting' || mission.phase === 'decision_locked' || mission.phase === 'failed' || mission.phase === 'completed') && <div className="chat-archive"><ChatPanel mission={mission} connected={connected} sendIntent={sendIntent} /></div>}
     {session && error && <p className="error" role="alert">{error}</p>}
-    <section className="scope"><span className="eyebrow">Milestone 4</span><p>Combine your information, decide together, and carry the consequences into the next configured crisis.</p></section>
+    <section className="scope"><span className="eyebrow">Mission protocol</span><p>Combine your information, decide together, and carry the consequences across ten crises.</p></section>
     <footer>Consensus Engine <span>Collective judgment. Shared consequences.</span></footer>
   </main>;
 }

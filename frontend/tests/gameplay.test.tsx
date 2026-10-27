@@ -512,3 +512,14 @@ test('mobile presence uses a shrinkable single column and wrapping callsigns', a
   const html=renderToStaticMarkup(<PlayerPresence mission={mission} connected />);
   assert.ok(html.includes('&lt;script&gt;'));assert.ok(!html.includes('<script>'));
 });
+
+test('resolved decision shows immediate consequences and recorded connection to prior choices', () => {
+  const mission=outcome();mission.result!.outcome='Local repairs begin. Earlier decision — Crisis 1, Grid Under Pressure: A — Follow the AI Recommendation.';
+  const html=render(mission);
+  assert.ok(html.includes('<h3>Immediate consequences</h3>'));
+  assert.ok(html.includes(mission.result!.outcome));
+  assert.ok(html.includes('Civilization impact'));
+  assert.ok(html.includes(mission.result!.choice_title));
+  const before=state('voting');before.result=null;before.decision=null;
+  assert.ok(!render(before).includes(mission.result!.outcome));
+});

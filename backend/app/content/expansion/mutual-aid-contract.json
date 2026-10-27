@@ -1,0 +1,50 @@
+{
+  "id": "mutual-aid-contract",
+  "title": "The Mutual Aid Price",
+  "briefing": "A neighboring region offers mobile generators and repair crews, but asks for fuel and equipment in return. Both cities are under strain. AI recommendation: Swap fuel and equipment for immediate generators and crews. This prioritizes service resilience under the current constraints.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "The incoming generators fit the substations, but their maintenance software requires support from the lending region.",
+    "community": "Residents want the aid terms published; secret reciprocity would be difficult to defend if local fuel is rationed again.",
+    "economy": "The exchange avoids immediate hiring costs, but pledged equipment may be worth more during the next local repair cycle.",
+    "safety": "The neighbor needs ambulances more urgently than generators; redirecting help could reduce regional harm without solving the local outage."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Negotiate a Smaller Public Pact",
+      "description": "Publish terms and buy only the most urgent specialist support.",
+      "consequence": "A narrower pact builds confidence and shares risk, while slower restoration and paid assistance consume reserves.",
+      "metric_deltas": {
+        "infrastructure": -4,
+        "public_trust": 10,
+        "economy": -10,
+        "safety": 8
+      }
+    },
+    {
+      "id": "B",
+      "title": "Prioritize Regional Medical Aid",
+      "description": "Send medical support and retain local repair autonomy.",
+      "consequence": "Regional safety improves and the city keeps its equipment, but local repair delays and lost operating time strain infrastructure and trade.",
+      "metric_deltas": {
+        "infrastructure": -10,
+        "public_trust": 8,
+        "economy": -6,
+        "safety": 12
+      }
+    },
+    {
+      "id": "C",
+      "title": "Accept the Equipment Exchange",
+      "description": "Swap fuel and equipment for immediate generators and crews.",
+      "consequence": "Repairs accelerate and immediate expenses fall, but dependence and undisclosed future obligations weaken local confidence.",
+      "metric_deltas": {
+        "infrastructure": 14,
+        "public_trust": -10,
+        "economy": 8,
+        "safety": -8
+      }
+    }
+  ]
+}

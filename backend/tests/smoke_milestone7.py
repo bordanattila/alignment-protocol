@@ -13,6 +13,7 @@ import uvicorn
 from websockets.asyncio.client import connect
 
 from app.main import create_app
+from app.crises import load_crisis_sequence
 from app.persistence import canonical
 
 PORT=18770
@@ -171,5 +172,5 @@ def main():
 if __name__=='__main__':
     if '--serve' in sys.argv:
         clock_path=Path(sys.argv[3])
-        uvicorn.run(create_app(clock=lambda:float(clock_path.read_text()),database_path=sys.argv[2]),host='127.0.0.1',port=PORT,log_level='warning')
+        uvicorn.run(create_app(clock=lambda:float(clock_path.read_text()),crisis_loader=load_crisis_sequence,database_path=sys.argv[2]),host='127.0.0.1',port=PORT,log_level='warning')
     else: main()

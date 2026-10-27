@@ -2,7 +2,7 @@
 
 *Intelligence proposes. Humanity decides.*
 
-Milestone 7: a React/TypeScript cooperative game with a FastAPI-authoritative 2–4-player mission, timed discussion/chat, hidden plurality voting, authored consequences, and configured crisis progression. Create a mission, share its invite URL, and join with a callsign. Separate browser profiles receive separate seats; refreshes and additional tabs reuse the saved seat credential.
+Milestone 8: a React/TypeScript cooperative game with a FastAPI-authoritative 2–4-player mission, timed discussion/chat, hidden plurality voting, authored consequences, and configured crisis progression. Create a mission, share its invite URL, and join with a callsign. Separate browser profiles receive separate seats; refreshes and additional tabs reuse the saved seat credential.
 
 ## Development
 
@@ -65,9 +65,9 @@ The host starts once 2–4 occupied seats are connected. The backend assigns all
 
 Every decision applies its authored consequence exactly once. The durable `decision_locked` result shows its narrative, before/after metrics, applied changes, and resolution method. The host selects Next crisis after review; the result ID makes retries safe. All occupied seats must reconnect before advancing. Seats/roles/metrics persist; new crises start with fresh briefing and vote state. Zero metrics immediately cause collapse. After the final configured result, Finish mission enters completion and computes the server-side average Consensus Score.
 
-`backend/app/content/sequence.json` configures ten authored crises, beginning with the unchanged **Grid Under Pressure** and ending with **The Last Coordination**. The fixed campaign escalates through water, healthcare, supplies, misinformation, cyberattack, storm, finance, and civic legitimacy. Schema and catalog validation reject malformed, missing, duplicate, or unreachable records. Only the selected public result's consequence/deltas are exposed; future content and other roles' intelligence remain server-side. Chat remains mission-wide, bounded to 100 messages, with each message labeled by its originating crisis.
+`backend/app/content/expansion/catalog.json` configures the 30-crisis library and escalation stages. Standard missions select ten crises, beginning with the unchanged **Grid Under Pressure** and ending with **The Last Coordination**. The original `sequence.json` remains the fixed legacy/reference campaign. Schema and catalog validation reject malformed, missing, duplicate, or unreachable records. Only the selected public result's consequence/deltas are exposed; future content and other roles' intelligence remain server-side. Chat remains mission-wide, bounded to 100 messages, with each message labeled by its originating crisis.
 
-Production state persists in SQLite; live sockets and presence are reconstructed on restart. Five-minute seat removal/role redistribution, variable pool ordering/weakest-metric finales, QR joining, and replay controls remain future work. Physical browser/device and mobile acceptance remain manual. The fixed ten-crisis campaign is playable; this is not the complete v0.1 feature set.
+Production state persists in SQLite; live sockets and presence are reconstructed on restart. Five-minute seat removal/role redistribution, weakest-metric finales, QR joining, and replay controls remain future work. Physical browser/device and mobile acceptance remain manual. The seeded ten-crisis campaign selects from 30 authored crises; this is not the complete v0.1 feature set.
 
 Milestone 4 checks and automated live fixture acceptance:
 
@@ -115,3 +115,22 @@ Database schema version 2 automatically migrates both known version-1 resolution
 ```
 
 `create_app(database_path=...)` is the persistent application factory. Its omitted-path form and standalone MissionStore retain isolated in-memory behavior for existing tests/embedding; production should use `app.main:app` or supply an explicit database path. No database is opened merely by importing the module.
+
+
+## Seeded campaigns and authored follow-ups
+
+New missions created through the default application factory use the 30-crisis catalog. Every standard run has exactly ten crises: Grid Under Pressure, two more early crises, three middle crises, three late crises, then The Last Coordination. Decisions can qualify five authored follow-ups; otherwise independent fallback crises keep the run valid. Existing saved missions keep their original campaign. The fixed ten-entry loader remains an explicit legacy/reference fixture for regression tests and exhaustive analysis.
+
+A new optional campaign aggregate stores the immutable seed (the mission invite token), full authored catalog snapshot and dependency metadata. Executed decisions remain the existing immutable result ledger. No SQL migration or result-hash rewrite is needed; old aggregates without campaign metadata load as legacy missions. Do not downgrade an active expanded database to an older application that cannot read this metadata.
+
+Offline debugging and sampled balance checks:
+
+```sh
+.venv/bin/python -m app.expansion_analysis --seed debug-example
+.venv/bin/python -m app.expansion_analysis --seed debug-example --choices BBBCCBCAAC
+.venv/bin/python -m app.expansion_analysis --sample 100
+.venv/bin/python backend/tests/smoke_milestone8.py
+node --experimental-websocket frontend/tests/smokeReconnection.mjs
+```
+
+These tools simulate production rules offline; they do not change live missions. A seed plus the same choices reproduces scenario selection, consequences and final metrics. See [Milestone 8 gameplay expansion](docs/MILESTONE_8_GAMEPLAY_EXPANSION.md) for inventory, prerequisites, compatibility, exact validation results and manual acceptance.

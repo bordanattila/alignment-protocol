@@ -1,0 +1,50 @@
+{
+  "id": "transit-at-dawn",
+  "title": "Transit at Dawn",
+  "briefing": "A cracked junction has closed the city rail interchange just before the morning shift. Replacement buses can cover workers or hospital routes, but not both at full frequency. AI recommendation: Reserve replacement buses for registered essential workers. This prioritizes immediate safety under the current constraints.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "The bypass can carry half the usual trains, but running it continuously postpones the only safe repair window.",
+    "community": "Night-shift cleaners and unpaid carers are missing from the essential-worker register; eligibility checks would strand them.",
+    "economy": "The freight depot shares bus drivers with public transport; reallocating all drivers will delay food deliveries.",
+    "safety": "Hospital shuttle stops have supervised boarding, while the general interchange has no safe queue space."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Prioritize Registered Staff",
+      "description": "Reserve replacement buses for registered essential workers.",
+      "consequence": "Hospitals regain reliable staffing, but excluded workers lose shifts and faith in the eligibility register.",
+      "metric_deltas": {
+        "infrastructure": 3,
+        "public_trust": -6,
+        "economy": 2,
+        "safety": 5
+      }
+    },
+    {
+      "id": "B",
+      "title": "Run Shared Frequent Loops",
+      "description": "Use open-access loops and close the junction for repairs.",
+      "consequence": "Open buses distribute access and create a repair window, while slower arrivals cost businesses working hours.",
+      "metric_deltas": {
+        "infrastructure": 5,
+        "public_trust": 3,
+        "economy": -5,
+        "safety": -2
+      }
+    },
+    {
+      "id": "C",
+      "title": "Keep the Bypass Running",
+      "description": "Operate limited rail service and reserve buses for vulnerable riders.",
+      "consequence": "More workplaces remain reachable, but continuous bypass use adds wear and leaves the cracked junction unrepaired.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": 2,
+        "economy": 5,
+        "safety": -2
+      }
+    }
+  ]
+}

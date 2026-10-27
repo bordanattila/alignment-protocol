@@ -1,0 +1,50 @@
+{
+  "id": "repair-strike",
+  "title": "The Repair Mandate",
+  "briefing": "Maintenance crews are refusing overtime after a near miss on a rushed repair. The city can negotiate safer schedules, outsource urgent work, or compel a short emergency rotation before another service failure. AI recommendation: Require a short emergency shift for the lift-station repair. This prioritizes service resilience under the current constraints.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "Two damaged conduits can wait a day; the third feeds a sewage lift station and has no tested bypass.",
+    "community": "Workers want publication of fatigue logs, and residents near the lift station want a guaranteed repair date rather than a general promise.",
+    "economy": "The outside contractor can mobilize tonight but charges a premium and cannot maintain the installed equipment afterward.",
+    "safety": "A mandatory shift would put certified but fatigued workers into a confined space with unreliable ventilation."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Mandate a Critical Rotation",
+      "description": "Require a short emergency shift for the lift-station repair.",
+      "consequence": "The lifeline repair advances and immediate costs stay low, but fatigue risk and compulsory hours damage confidence.",
+      "metric_deltas": {
+        "infrastructure": 9,
+        "public_trust": -8,
+        "economy": 5,
+        "safety": -6
+      }
+    },
+    {
+      "id": "B",
+      "title": "Negotiate a Safe Work Plan",
+      "description": "Fund rested crews and publish a phased repair timetable.",
+      "consequence": "A credible timetable rebuilds trust and reduces fatigue exposure, while slower repair and paid relief strain budgets.",
+      "metric_deltas": {
+        "infrastructure": -3,
+        "public_trust": 8,
+        "economy": -8,
+        "safety": 6
+      }
+    },
+    {
+      "id": "C",
+      "title": "Outsource the Emergency Work",
+      "description": "Buy one night of outside specialist repair capacity.",
+      "consequence": "Specialists protect immediate safety and reopen service, but the premium contract diverts money from local renewal.",
+      "metric_deltas": {
+        "infrastructure": 5,
+        "public_trust": -5,
+        "economy": -9,
+        "safety": 8
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "freight-debt",
+  "title": "The Cost of Priority",
+  "briefing": "The priority freight corridor chosen earlier has kept lifeline deliveries moving, but ordinary traders now face missed contracts and mounting fees. AI recommendation: Maintain the corridor until all critical inventories meet the target. This prioritizes service resilience under the current constraints.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "Opening general traffic at peak hours would delay filter deliveries needed to keep water plants operating.",
+    "community": "Small traders want a published exit condition; repeated emergency extensions are being read as a permanent two-tier system.",
+    "economy": "Freight firms will waive late fees if the city guarantees future slots, transferring present debt into tomorrow's capacity.",
+    "safety": "Food and medicine inventories are recovering unevenly, so a single end date may restore traffic before some lifelines are secure."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Publish Staged Reopening",
+      "description": "Reopen audited off-peak slots and fund limited debt mediation.",
+      "consequence": "A visible path back to trade rebuilds confidence, while reduced corridor efficiency and mediation consume resources.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": 10,
+        "economy": -8,
+        "safety": 6
+      }
+    },
+    {
+      "id": "B",
+      "title": "Guarantee Future Freight Slots",
+      "description": "Offer fee waivers backed by reserved future capacity.",
+      "consequence": "Immediate cash pressure eases and trade resumes, but the promised slots constrain repairs and create later safety bottlenecks.",
+      "metric_deltas": {
+        "infrastructure": -10,
+        "public_trust": 6,
+        "economy": 10,
+        "safety": -8
+      }
+    },
+    {
+      "id": "C",
+      "title": "Extend Lifeline Priority",
+      "description": "Maintain the corridor until all critical inventories meet the target.",
+      "consequence": "Lifeline stores stabilize, but extended exclusions deepen trader losses and distrust of emergency authority.",
+      "metric_deltas": {
+        "infrastructure": 12,
+        "public_trust": -12,
+        "economy": -8,
+        "safety": 8
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "ration-appeals",
+  "title": "A Right to Appeal",
+  "briefing": "A resource-allocation model has issued ration limits that keep total demand within supply. Appeals reveal households whose medical and care needs are missing from the records. AI recommendation: Keep current quotas and review disputes after the demand peak. This prioritizes service resilience under the current constraints.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "The meters can apply exceptions quickly, but many concurrent changes make demand forecasts less dependable.",
+    "community": "A public appeal route would improve legitimacy only if people without documents can obtain an independent assessment.",
+    "economy": "Blanket increases for disputed accounts would exceed procurement reserves; targeted advances have a smaller but real cost.",
+    "safety": "Some medical uses cannot safely wait for next-day review, yet a vague emergency category invites inconsistent decisions."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Enforce Limits Before Review",
+      "description": "Keep current quotas and review disputes after the demand peak.",
+      "consequence": "Supply remains predictable and operating costs stay controlled, but deferred medical exceptions reduce safety and trust.",
+      "metric_deltas": {
+        "infrastructure": 12,
+        "public_trust": -12,
+        "economy": 8,
+        "safety": -10
+      }
+    },
+    {
+      "id": "B",
+      "title": "Open an Independent Appeal Desk",
+      "description": "Fund rapid reviewed exceptions for medical and care needs.",
+      "consequence": "Urgent needs receive a credible route and households cooperate, while forecast uncertainty and review costs increase.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": 12,
+        "economy": -10,
+        "safety": 8
+      }
+    },
+    {
+      "id": "C",
+      "title": "Raise Limits for All Disputed Cases",
+      "description": "Grant temporary extra supply wherever an appeal is filed.",
+      "consequence": "Rapid access rebuilds goodwill and supports local activity, but poorly bounded demand and uneven urgency threaten service and safety.",
+      "metric_deltas": {
+        "infrastructure": -12,
+        "public_trust": 10,
+        "economy": 8,
+        "safety": -8
+      }
+    }
+  ]
+}

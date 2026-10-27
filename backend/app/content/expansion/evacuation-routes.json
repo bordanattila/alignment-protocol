@@ -1,0 +1,50 @@
+{
+  "id": "evacuation-routes",
+  "title": "One Bridge, Two Queues",
+  "briefing": "Smoke from an industrial fire is approaching a low-lying neighborhood. A single bridge supports both evacuation traffic and incoming suppression vehicles. AI recommendation: Protect an inbound responder lane and meter outbound traffic. This prioritizes immediate safety under the current constraints.",
+  "ai_recommendation_choice_id": "B",
+  "private_intelligence": {
+    "infrastructure": "The bridge can sustain two light lanes, but heavy engines require alternating access to avoid stressing temporary joints.",
+    "community": "Many households cannot drive; a car-based evacuation order would leave the least mobile residents waiting for buses.",
+    "economy": "A warehouse on the exit route contains perishable medicine; complete closure would interrupt regional deliveries.",
+    "safety": "Wind may change within an hour, so moving everyone immediately is safer than assuming the smoke plume will remain narrow."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Open the Full Exit",
+      "description": "Make both lanes outbound until the threatened district is clear.",
+      "consequence": "A rapid exit restores confidence and local movement, but delayed suppression increases exposure for crews and remaining facilities.",
+      "metric_deltas": {
+        "infrastructure": -4,
+        "public_trust": 4,
+        "economy": 3,
+        "safety": -5
+      }
+    },
+    {
+      "id": "B",
+      "title": "Reserve Responder Access",
+      "description": "Protect an inbound responder lane and meter outbound traffic.",
+      "consequence": "Fire crews arrive reliably, but the slower evacuation and freight restrictions leave households anxious and shops short of stock.",
+      "metric_deltas": {
+        "infrastructure": 3,
+        "public_trust": -3,
+        "economy": -4,
+        "safety": 6
+      }
+    },
+    {
+      "id": "C",
+      "title": "Run Assisted Convoys",
+      "description": "Close private traffic briefly and move buses with escorted vehicles.",
+      "consequence": "Assisted convoys reach residents without cars and reduce exposure, but staging consumes staff and delays bridge work.",
+      "metric_deltas": {
+        "infrastructure": -3,
+        "public_trust": 4,
+        "economy": -4,
+        "safety": 6
+      }
+    }
+  ]
+}

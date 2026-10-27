@@ -1,0 +1,50 @@
+{
+  "id": "reservoir-bloom",
+  "title": "Bloom at the Intake",
+  "briefing": "A warm reservoir has developed an algal bloom near a drinking-water intake. Laboratory confirmation will arrive after the next pumping cycle. AI recommendation: Stop reservoir distribution until sampling is complete. This prioritizes public confidence under the current constraints.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "The deep intake is clean in the last sample, but its older pumps cannot sustain normal pressure at every elevation.",
+    "community": "Hill districts already store water in shared tanks; another restriction may be seen as preferential treatment elsewhere.",
+    "economy": "Food processors can suspend one cycle if compensation is paid promptly; small laundries cannot afford a similar shutdown.",
+    "safety": "Boiling will not remove every possible toxin, so a generic boil-water notice could create false reassurance."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Switch Intakes",
+      "description": "Use the deep intake and limit nonessential demand.",
+      "consequence": "Cleaner intake water reduces exposure, but low pressure and business curtailment burden the higher districts.",
+      "metric_deltas": {
+        "infrastructure": 4,
+        "public_trust": -3,
+        "economy": -5,
+        "safety": 6
+      }
+    },
+    {
+      "id": "B",
+      "title": "Buy Treatment Time",
+      "description": "Purchase emergency filtration and maintain a restricted supply.",
+      "consequence": "Emergency filters preserve pressure and public access, but fast procurement consumes reserves and needs technical supervision.",
+      "metric_deltas": {
+        "infrastructure": -2,
+        "public_trust": 3,
+        "economy": -6,
+        "safety": 5
+      }
+    },
+    {
+      "id": "C",
+      "title": "Pause and Test",
+      "description": "Stop reservoir distribution until sampling is complete.",
+      "consequence": "A clear precaution builds confidence and avoids uncertain exposure, while interrupted supply damages service and commerce.",
+      "metric_deltas": {
+        "infrastructure": -5,
+        "public_trust": 5,
+        "economy": -3,
+        "safety": 4
+      }
+    }
+  ]
+}

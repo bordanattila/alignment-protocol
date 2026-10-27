@@ -1,0 +1,50 @@
+{
+  "id": "air-quality-orders",
+  "title": "The Air We Share",
+  "briefing": "A stagnant weather system is trapping particulate pollution over homes and industrial yards. Small workshops contribute less individually but sit closer to housing, making a simple volume-based order contentious. AI recommendation: Temporarily halt the largest sources and protect repair exemptions. This prioritizes immediate safety under the current constraints.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "Factory filtration can be improved within a day, but rushing installation may require interrupting water-treatment supply lines.",
+    "community": "Residents near small workshops report exposure not reflected in the citywide averages used by the restriction model.",
+    "economy": "A blanket industrial shutdown will also stop parts production for emergency vehicle repairs.",
+    "safety": "Outdoor workers face the highest immediate dose; masks help, but rest and filtered spaces matter more than a warning alone."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Restrict Largest Emitters",
+      "description": "Temporarily halt the largest sources and protect repair exemptions.",
+      "consequence": "Total emissions fall quickly, but exemption disputes reduce trust and interrupted production costs jobs.",
+      "metric_deltas": {
+        "infrastructure": 5,
+        "public_trust": -6,
+        "economy": -8,
+        "safety": 9
+      }
+    },
+    {
+      "id": "B",
+      "title": "Target Exposure Hotspots",
+      "description": "Fund filters and paid work pauses around measured hotspots.",
+      "consequence": "Local protection follows measured exposure and improves confidence, while inspection demands and subsidies reduce reserves.",
+      "metric_deltas": {
+        "infrastructure": -5,
+        "public_trust": 8,
+        "economy": -8,
+        "safety": 6
+      }
+    },
+    {
+      "id": "C",
+      "title": "Keep Industry on Reduced Shifts",
+      "description": "Require staggered production and expand public exposure warnings.",
+      "consequence": "Reduced shifts preserve repair supply and local income, but prolonged exposure and slower equipment renewal retain health risks.",
+      "metric_deltas": {
+        "infrastructure": -5,
+        "public_trust": 5,
+        "economy": 6,
+        "safety": -9
+      }
+    }
+  ]
+}

@@ -16,6 +16,7 @@ from .connections import LobbyConnections, close_socket
 from .domain import JoinRequest, ChatIntent, VoteIntent, ContinueRequest, Crisis
 from .missions import MissionError, MissionStore
 from .persistence import SQLiteMissions, PersistenceError
+from .campaign import load_campaign_catalog
 
 
 def create_app(clock: Callable[[], float] | None = None,
@@ -26,6 +27,8 @@ def create_app(clock: Callable[[], float] | None = None,
         options["clock"] = clock
     if crisis_loader is not None:
         options["crisis_loader"] = crisis_loader
+    else:
+        options["campaign_loader"] = load_campaign_catalog
     if database_path is not None:
         options["persistence"] = SQLiteMissions(database_path)
     store = MissionStore(**options)

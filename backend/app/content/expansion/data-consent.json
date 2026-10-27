@@ -1,0 +1,50 @@
+{
+  "id": "data-consent",
+  "title": "Consent Under Pressure",
+  "briefing": "An emergency welfare service can identify isolated residents by linking utility use with health records. The city must weigh speed against consent, false positives and the ability to revoke access after the emergency. AI recommendation: Grant a time-limited citywide linkage with audit logging. This prioritizes immediate safety under the current constraints.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "The shared identity service has no tested bulk-revocation tool; temporary access could last longer than planned.",
+    "community": "Low utility use often means a shared household meter, so several minority neighborhoods will be poorly represented.",
+    "economy": "A private operator offers the linkage quickly but would charge for every subsequent data correction.",
+    "safety": "A narrower clinician referral list misses some isolated residents, yet supplies better evidence for urgent checks."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Use Opt-In Local Teams",
+      "description": "Fund neighborhood enrollment and clinician referrals.",
+      "consequence": "Consent and local knowledge improve trust, while slower coverage and additional staffing consume scarce funds.",
+      "metric_deltas": {
+        "infrastructure": -2,
+        "public_trust": 6,
+        "economy": -5,
+        "safety": 3
+      }
+    },
+    {
+      "id": "B",
+      "title": "Keep Records Separate",
+      "description": "Use existing referrals and expand a public help line.",
+      "consequence": "Separation protects data systems and operating costs, but residents who cannot ask for help remain harder to reach.",
+      "metric_deltas": {
+        "infrastructure": 4,
+        "public_trust": 3,
+        "economy": 3,
+        "safety": -6
+      }
+    },
+    {
+      "id": "C",
+      "title": "Authorize Emergency Linkage",
+      "description": "Grant a time-limited citywide linkage with audit logging.",
+      "consequence": "More welfare visits can be targeted quickly, but broad access and correction costs undermine consent and future service capacity.",
+      "metric_deltas": {
+        "infrastructure": -3,
+        "public_trust": -6,
+        "economy": -2,
+        "safety": 7
+      }
+    }
+  ]
+}

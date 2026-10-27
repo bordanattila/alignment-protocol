@@ -141,8 +141,8 @@ def test_real_choices_can_collapse_early_middle_and_late_and_block_advancement(b
 
 
 class CampaignClients:
-    def __init__(self,count):
-        self.count=count; self.clock=Clock(); self.app=create_app(self.clock)
+    def __init__(self,count,crisis_loader=load_crisis_sequence):
+        self.count=count; self.clock=Clock(); self.app=create_app(self.clock, crisis_loader=crisis_loader)
         self.stack=ExitStack()
 
     def __enter__(self):

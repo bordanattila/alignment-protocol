@@ -1,0 +1,188 @@
+[
+  {
+    "id": "grid-under-pressure",
+    "stage": 1,
+    "category": "infrastructure"
+  },
+  {
+    "id": "waterline-alert",
+    "stage": 1,
+    "category": "environment"
+  },
+  {
+    "id": "care-at-capacity",
+    "stage": 1,
+    "category": "safety"
+  },
+  {
+    "id": "essential-corridor",
+    "stage": 2,
+    "category": "economy"
+  },
+  {
+    "id": "signal-and-rumour",
+    "stage": 2,
+    "category": "public_trust"
+  },
+  {
+    "id": "services-under-intrusion",
+    "stage": 2,
+    "category": "infrastructure"
+  },
+  {
+    "id": "storm-at-the-barrier",
+    "stage": 3,
+    "category": "environment"
+  },
+  {
+    "id": "credit-under-strain",
+    "stage": 3,
+    "category": "economy"
+  },
+  {
+    "id": "a-fair-share",
+    "stage": 3,
+    "category": "ethics"
+  },
+  {
+    "id": "the-last-coordination",
+    "stage": 4,
+    "category": "safety"
+  },
+  {
+    "id": "transit-at-dawn",
+    "stage": 1,
+    "category": "infrastructure"
+  },
+  {
+    "id": "cooling-access",
+    "stage": 1,
+    "category": "public_trust"
+  },
+  {
+    "id": "reservoir-bloom",
+    "stage": 1,
+    "category": "environment"
+  },
+  {
+    "id": "payroll-gap",
+    "stage": 1,
+    "category": "economy"
+  },
+  {
+    "id": "evacuation-routes",
+    "stage": 1,
+    "category": "safety"
+  },
+  {
+    "id": "data-consent",
+    "stage": 1,
+    "category": "ethics"
+  },
+  {
+    "id": "substation-reckoning",
+    "stage": 2,
+    "category": "public_trust",
+    "prerequisite": {
+      "crisis_id": "grid-under-pressure",
+      "choice_ids": [
+        "A"
+      ],
+      "context": "The concentrated outage has created documented household losses that now shape access to repairs."
+    }
+  },
+  {
+    "id": "bottled-water-waste",
+    "stage": 2,
+    "category": "environment",
+    "prerequisite": {
+      "crisis_id": "waterline-alert",
+      "choice_ids": [
+        "B"
+      ],
+      "context": "The chosen delivery strategy kept supply moving; its container and transport burden now needs a decision."
+    }
+  },
+  {
+    "id": "care-workforce",
+    "stage": 2,
+    "category": "safety",
+    "prerequisite": {
+      "crisis_id": "care-at-capacity",
+      "choice_ids": [
+        "A"
+      ],
+      "context": "Opening temporary wards created capacity that now requires a sustainable staffing plan."
+    }
+  },
+  {
+    "id": "repair-strike",
+    "stage": 2,
+    "category": "infrastructure"
+  },
+  {
+    "id": "market-cold-chain",
+    "stage": 2,
+    "category": "economy"
+  },
+  {
+    "id": "schools-as-shelters",
+    "stage": 2,
+    "category": "ethics"
+  },
+  {
+    "id": "air-quality-orders",
+    "stage": 2,
+    "category": "environment"
+  },
+  {
+    "id": "housing-inspections",
+    "stage": 2,
+    "category": "public_trust"
+  },
+  {
+    "id": "freight-debt",
+    "stage": 3,
+    "category": "economy",
+    "prerequisite": {
+      "crisis_id": "essential-corridor",
+      "choice_ids": [
+        "C"
+      ],
+      "context": "The priority corridor protected lifelines while deferring costs to ordinary traders."
+    }
+  },
+  {
+    "id": "identity-recovery",
+    "stage": 3,
+    "category": "ethics",
+    "prerequisite": {
+      "crisis_id": "services-under-intrusion",
+      "choice_ids": [
+        "A",
+        "C"
+      ],
+      "context": "Service isolation contained the intrusion but left residents needing a trusted route back into their accounts."
+    }
+  },
+  {
+    "id": "floodplain-pumps",
+    "stage": 3,
+    "category": "environment"
+  },
+  {
+    "id": "mutual-aid-contract",
+    "stage": 3,
+    "category": "infrastructure"
+  },
+  {
+    "id": "ration-appeals",
+    "stage": 3,
+    "category": "public_trust"
+  },
+  {
+    "id": "autonomy-review",
+    "stage": 3,
+    "category": "ethics"
+  }
+]

@@ -219,3 +219,40 @@ test('long expanded content and keyboard-native summaries keep wrapping and visi
   assert.match(css,/\.history-context p, \.history-context li, \.history-entry summary \{ overflow-wrap: anywhere;/);
   assert.match(css,/\.history-entry summary \.history-changes \{[^}]*flex-wrap: wrap;/);
 });
+
+test('review renders only authoritative narrative outcome and recorded notable decisions', () => {
+  const mission=fixture();
+  mission.summary!.narrative_outcome='The city survived. Earlier decision — Grid Under Pressure: Distribute the Burden.';
+  mission.summary!.notable_decisions=[{crisis_number:1,crisis_title:mission.result!.crisis_title,choice_title:mission.result!.choice_title,outcome:mission.result!.outcome}];
+  const html=renderToStaticMarkup(<MissionReview mission={mission} />);
+  assert.ok(html.includes('aria-label="Mission narrative outcome"'));
+  assert.ok(html.includes(mission.summary!.narrative_outcome));
+  assert.ok(html.includes('aria-label="Notable decisions"'));
+  assert.ok(html.includes(mission.result!.choice_title)&&html.includes(mission.result!.outcome));
+  assert.ok(!html.includes('PRIVATE REPORT MUST NOT RENDER'));
+  delete mission.summary!.narrative_outcome;delete mission.summary!.notable_decisions;
+  const legacy=renderToStaticMarkup(<MissionReview mission={mission} />);
+  assert.ok(!legacy.includes('aria-label="Mission narrative outcome"')&&!legacy.includes('aria-label="Notable decisions"'));
+});
+test('review narrative escapes authored text without fabricating additional events', () => {
+  const mission=fixture(true);mission.summary!.narrative_outcome='Safety failed <script>never execute</script>';
+  mission.summary!.notable_decisions=[];
+  const html=renderToStaticMarkup(<MissionReview mission={mission} />);
+  assert.ok(html.includes('&lt;script&gt;never execute&lt;/script&gt;'));
+  assert.ok(!html.includes('<script>'));
+  assert.ok(!html.includes('aria-label="Notable decisions"'));
+});
+
+test('expanded real-process campaign review matches its authoritative captured history and summary', {skip:!process.env.EXPANSION_REVIEW_FILE}, async()=>{
+  const {readFileSync}=await import('node:fs');
+  const evidence=JSON.parse(readFileSync(process.env.EXPANSION_REVIEW_FILE!,'utf8'));
+  const mission={...fixture(),...evidence};
+  const html=renderToStaticMarkup(<MissionReview mission={mission} />);
+  assert.equal((html.match(/class="history-entry"/g)||[]).length,10);
+  assert.ok(html.includes(renderToStaticMarkup(<p className="outcome-narrative">{evidence.summary.narrative_outcome}</p>)));
+  assert.equal(evidence.summary.consensus_score,Object.values(evidence.metrics).reduce((sum:number,value:any)=>sum+value,0)/4);
+  for(const highlight of evidence.summary.notable_decisions){
+    const record=evidence.history[highlight.crisis_number-1];assert.equal(highlight.outcome,record.outcome);
+    assert.ok(html.includes(record.choice_title));
+  }
+});

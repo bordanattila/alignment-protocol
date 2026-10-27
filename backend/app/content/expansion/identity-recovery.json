@@ -1,0 +1,50 @@
+{
+  "id": "identity-recovery",
+  "title": "Who Can Restore Access?",
+  "briefing": "Earlier service isolation has removed compromised credentials but locked some residents out of benefits and permits. Community groups warn that the same checks exclude people whose records were lost. AI recommendation: Restore only accounts that pass the clean digital checks. This prioritizes service resilience under the current constraints.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "A clean credential directory is ready, but importing old account links would reintroduce the pathway used by the intrusion.",
+    "community": "Residents with changed names or shared phones fail the automated checks most often and cannot wait weeks for benefits.",
+    "economy": "Manual identity desks cost more per case; a frozen benefit also costs local shops immediate purchasing power.",
+    "safety": "Emergency one-time access can restore urgent prescriptions, but repeat use must be checked to prevent diverted supplies."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Use Strict Digital Reissue",
+      "description": "Restore only accounts that pass the clean digital checks.",
+      "consequence": "The new directory remains dependable and low-cost, but excluded residents face interrupted access and legitimacy falls.",
+      "metric_deltas": {
+        "infrastructure": 12,
+        "public_trust": -12,
+        "economy": 6,
+        "safety": -6
+      }
+    },
+    {
+      "id": "B",
+      "title": "Fund Supervised Recovery Desks",
+      "description": "Issue reviewed credentials through neighborhood identity desks.",
+      "consequence": "Residents regain a usable route and urgent needs are screened, while manual review consumes staff and money.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": 12,
+        "economy": -10,
+        "safety": 6
+      }
+    },
+    {
+      "id": "C",
+      "title": "Grant Temporary Basic Access",
+      "description": "Allow limited benefits while full identity records are rebuilt.",
+      "consequence": "Purchasing power and basic access recover quickly, but unresolved account links and diversion risks persist.",
+      "metric_deltas": {
+        "infrastructure": -10,
+        "public_trust": 8,
+        "economy": 10,
+        "safety": -10
+      }
+    }
+  ]
+}

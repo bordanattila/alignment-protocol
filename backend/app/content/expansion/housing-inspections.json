@@ -1,0 +1,50 @@
+{
+  "id": "housing-inspections",
+  "title": "Cracks in the Register",
+  "briefing": "An inspection model flags hundreds of apartment blocks as unsafe after heavy rain. Inspectors can visit only a fraction tonight. AI recommendation: Send inspectors to the highest digitally scored buildings first. This prioritizes service resilience under the current constraints.",
+  "ai_recommendation_choice_id": "B",
+  "private_intelligence": {
+    "infrastructure": "Digital records accurately identify roof loading, but miss basement conversions and later changes to drainage.",
+    "community": "Tenants may not report cracks if inspection could trigger eviction; landlords and occupants need separate reporting routes.",
+    "economy": "Vacating every flagged building would consume the emergency lodging budget before engineering checks are complete.",
+    "safety": "Visible movement and jammed exits are stronger immediate warning signs than several high model scores."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Vacate Broadly as a Precaution",
+      "description": "Provide temporary lodging for occupants of all high-risk blocks.",
+      "consequence": "Precaution reduces immediate exposure and reassures many tenants, but vacant buildings and lodging costs erode service capacity.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": 6,
+        "economy": -9,
+        "safety": 8
+      }
+    },
+    {
+      "id": "B",
+      "title": "Follow the Risk Register",
+      "description": "Send inspectors to the highest digitally scored buildings first.",
+      "consequence": "Registered structural risks receive quick attention, but excluded tenants lose trust and some unrecorded hazards persist.",
+      "metric_deltas": {
+        "infrastructure": 8,
+        "public_trust": -8,
+        "economy": 3,
+        "safety": -5
+      }
+    },
+    {
+      "id": "C",
+      "title": "Combine Reports and Engineering",
+      "description": "Create protected tenant reporting with mobile engineer triage.",
+      "consequence": "More hidden hazards become visible and residents cooperate, while slower visits and extra staffing consume funds.",
+      "metric_deltas": {
+        "infrastructure": -3,
+        "public_trust": 9,
+        "economy": -8,
+        "safety": 5
+      }
+    }
+  ]
+}

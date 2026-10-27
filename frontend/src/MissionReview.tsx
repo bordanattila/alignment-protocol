@@ -127,6 +127,16 @@ export function MissionReview({ mission }: { mission: LobbyState }) {
       {summary.outcome === 'defeat' && <p>The mission ended in defeat. Collapsed metrics: {mission.collapsed_metrics.map(key=>metrics.find(m=>m.key===key)?.name ?? key).join(', ')}. The score does not indicate survival.</p>}
       <dl className="review-final-metrics">{metrics.map(m=><div key={m.key}><dt>{m.name}</dt><dd>{summary.final_metrics[m.key]} / 100</dd></div>)}</dl>
     </section>
+    {summary.narrative_outcome && <section className="panel" aria-label="Mission narrative outcome">
+      <h2>The city after your decisions</h2><p className="outcome-narrative">{summary.narrative_outcome}</p>
+    </section>}
+    {!!summary.notable_decisions?.length && <section className="panel" aria-label="Notable decisions">
+      <h2>Notable decisions</h2><p>The largest total applied metric movements, shown in crisis order.</p>
+      <ol className="notable-decisions">{summary.notable_decisions.map(record => <li key={record.crisis_number}>
+        <h3>Crisis {record.crisis_number} — {record.crisis_title}</h3>
+        <p><strong>{record.choice_title}</strong></p><p className="outcome-narrative">{record.outcome}</p>
+      </li>)}</ol>
+    </section>}
     <MetricsTimeline snapshots={mission.metrics_timeline ?? []} />
     <section className="panel" aria-label="Team decision summary"><h2>Team decision summary</h2>
       <dl className="review-statistics"><div><dt>Resolved crises</dt><dd>{summary.crises_completed}</dd></div><div><dt>Consensus windows</dt><dd>{summary.consensus_windows}</dd></div><div><dt>Crises with final voting</dt><dd>{summary.final_vote_crises}</dd></div>

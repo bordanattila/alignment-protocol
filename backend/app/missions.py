@@ -8,6 +8,8 @@ from .domain import Mission, Player, Phase, Role, VotingRound, Decision, ChatMes
 from .persistence import SQLiteMissions, credential_digest
 from .voting import plurality
 from .crises import load_crisis_sequence
+from .campaign import Campaign, initial_sequence, select_crisis, validate_catalog
+from .domain import Scenario
 from .callsigns import normalize_callsign, callsign_key
 from .consequences import apply_metric_deltas, collapsed_metrics, consensus_score
 
@@ -53,11 +55,13 @@ def persisted(method):
 class MissionStore:
     def __init__(self, clock: Callable[[], float] = time.time,
                  crisis_loader: Callable[[], list[Crisis]] = load_crisis_sequence,
-                 persistence: SQLiteMissions | None = None):
+                 persistence: SQLiteMissions | None = None,
+                 campaign_loader: Callable[[], list[Scenario]] | None = None):
         self.persistence = persistence
         self._transaction_depth = 0
         self.clock = clock
         self.crisis_loader = crisis_loader
+        self.campaign_loader = campaign_loader
         self._missions: dict[str, Mission] = {}
 
     def initialize(self):
@@ -166,13 +170,21 @@ class MissionStore:
             raise MissionError("Start requires 2–4 players with every occupied seat connected.", 409)
         # Validate content before mutating the mission. Join order gives stable,
         # balanced assignment; reconnect never reruns assignment.
-        sequence = self.crisis_loader()
+        campaign = None
+        if self.campaign_loader is not None:
+            scenarios = self.campaign_loader()
+            validate_catalog(scenarios)
+            campaign = Campaign(seed=mission.token, scenarios=scenarios)
+            sequence = initial_sequence(campaign)
+        else:
+            sequence = self.crisis_loader()
         if not sequence or len({c.id for c in sequence}) != len(sequence):
             raise ValueError("Require a nonempty, nonrepeating authored crisis sequence")
         sequence = [c.model_copy(deep=True) for c in sequence]
         for index, role in enumerate(Role):
             mission.players[index % len(mission.players)].roles.append(role)
         mission.initial_metrics = mission.metrics.model_copy(deep=True)
+        mission.campaign = campaign
         mission.sequence = sequence
         mission.crisis = sequence[0]
         mission.phase = Phase.BRIEFING
@@ -328,6 +340,15 @@ class MissionStore:
             mission.consensus_score = consensus_score(mission.metrics)
             return True
         mission.crisis_index += 1
+        if mission.campaign is not None:
+            selected = select_crisis(mission.campaign, mission.crisis_index, mission.results)
+            # If a fallback was reserved later in this stage, swap its slot;
+            # never duplicate a crisis or rewrite already executed history.
+            reserved = next((i for i,c in enumerate(mission.sequence)
+                             if i > mission.crisis_index and c.id == selected.id), None)
+            if reserved is not None:
+                mission.sequence[reserved] = mission.sequence[mission.crisis_index]
+            mission.sequence[mission.crisis_index] = selected
         mission.crisis = mission.sequence[mission.crisis_index]
         mission.phase = Phase.BRIEFING
         mission.rounds = []
@@ -420,6 +441,9 @@ class MissionStore:
             return None
         breakdown = {reason: sum(r.decision.reason == reason for r in mission.results)
                      for reason in ("initial_plurality", "final_plurality", "ai_tie_break", "no_vote_ai_fallback")}
+        notable = sorted(mission.results,
+                         key=lambda r: (-sum(abs(v) for v in r.applied_deltas.model_dump().values()), r.crisis_number))[:3]
+        notable.sort(key=lambda r:r.crisis_number)
         return {
             "outcome": "victory" if mission.phase == Phase.COMPLETED else "defeat",
             "crises_completed": len(mission.results), "total_crises": len(mission.sequence),
@@ -428,6 +452,15 @@ class MissionStore:
             "consensus_windows": sum(r.consensus_window_occurred for r in mission.results),
             "final_vote_crises": sum(r.final_vote_occurred for r in mission.results),
             "resolution_breakdown": breakdown,
+            "narrative_outcome": (
+                ("The city survived all configured crises. " if mission.phase == Phase.COMPLETED else
+                 "The mission ended when " + ", ".join(key.replace("_", " ").title() for key in mission.collapsed_metrics) + " reached zero. ")
+                + (f'The final executed decision was {mission.results[-1].choice_title}. '
+                   + mission.results[-1].outcome if mission.results else 'No decisions were executed.')),
+            "notable_decisions": [
+                {"crisis_number": r.crisis_number, "crisis_title": r.crisis_title,
+                 "choice_title": r.choice_title, "outcome": r.outcome}
+                for r in notable],
         }
 
     @staticmethod

@@ -1,0 +1,50 @@
+{
+  "id": "care-workforce",
+  "title": "Staff Behind the Beds",
+  "briefing": "The temporary care wards opened earlier have beds available but too few experienced staff. Closing those clinics would fill the wards quickly while interrupting the services that keep many residents out of hospital. AI recommendation: Keep clinics open and limit admissions to staffed capacity. This prioritizes service resilience under the current constraints.",
+  "ai_recommendation_choice_id": "C",
+  "private_intelligence": {
+    "infrastructure": "Temporary wards use portable oxygen manifolds that need experienced technicians on every shift, not just general volunteers.",
+    "community": "Clinic closures interrupt chronic prescriptions; patients without digital access cannot easily find replacement appointments.",
+    "economy": "Agency staff are available at surge rates, and a full week contract would exhaust the flexible staffing reserve.",
+    "safety": "Supervised apprentices can support stable patients, but cannot replace clinical judgment when deterioration is rapid."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Concentrate Clinical Teams",
+      "description": "Move clinic staff to the wards for a fixed emergency rotation.",
+      "consequence": "The wards gain reliable coverage, but interrupted neighborhood care reduces trust and adds future service pressure.",
+      "metric_deltas": {
+        "infrastructure": 5,
+        "public_trust": -8,
+        "economy": 3,
+        "safety": 9
+      }
+    },
+    {
+      "id": "B",
+      "title": "Buy Targeted Surge Cover",
+      "description": "Hire specialists only for critical shifts and preserve clinic access.",
+      "consequence": "Targeted cover protects patients and local access, while premium rates consume reserves and stretch technical maintenance.",
+      "metric_deltas": {
+        "infrastructure": -3,
+        "public_trust": 6,
+        "economy": -9,
+        "safety": 6
+      }
+    },
+    {
+      "id": "C",
+      "title": "Reduce Ward Intake",
+      "description": "Keep clinics open and limit admissions to staffed capacity.",
+      "consequence": "Local services and staffing costs stabilize, but patients awaiting ward admission face longer delays and greater immediate risk.",
+      "metric_deltas": {
+        "infrastructure": 5,
+        "public_trust": 5,
+        "economy": 5,
+        "safety": -9
+      }
+    }
+  ]
+}

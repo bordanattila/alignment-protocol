@@ -175,7 +175,29 @@ class VoteIntent(BaseModel):
     choice_id: str = Field(min_length=1, max_length=128)
 
 
+class Prerequisite(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    crisis_id: str
+    choice_ids: list[Literal['A', 'B', 'C']] = Field(min_length=1, max_length=3)
+    context: AuthoredText = Field(min_length=20)
+
+
+class Scenario(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    crisis: Crisis
+    stage: int = Field(ge=1, le=4, strict=True)
+    category: Literal['infrastructure', 'public_trust', 'economy', 'safety', 'environment', 'ethics']
+    prerequisite: Prerequisite | None = None
+
+
+class Campaign(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    seed: str = Field(min_length=1, max_length=128)
+    scenarios: list[Scenario]
+
+
 class Mission(BaseModel):
+    campaign: Campaign | None = None
     token: str
     host_id: str
     phase: Phase = Phase.LOBBY

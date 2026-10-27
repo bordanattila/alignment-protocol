@@ -1,0 +1,50 @@
+{
+  "id": "market-cold-chain",
+  "title": "Cold Chain Crossroads",
+  "briefing": "A shared refrigeration hub is failing while medicines and fresh food wait in the same loading yard. Traders warn that losing food inventory could close neighborhood markets for weeks. AI recommendation: Give medicine and market groups alternating cooling periods. This prioritizes economic continuity under the current constraints.",
+  "ai_recommendation_choice_id": "B",
+  "private_intelligence": {
+    "infrastructure": "The backup plant can cool either the medicine vault or the market bays at safe temperature, not both simultaneously.",
+    "community": "Street vendors have no insured warehouse alternative; priority based only on invoice value would exclude their livelihood.",
+    "economy": "Short-term rented trucks can preserve food, but fuel and deposits exceed the market association's cash reserves.",
+    "safety": "Some medicines tolerate brief warming; others need continuous logging and cannot be safely judged from packaging labels."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Share Cooling with Rentals",
+      "description": "Fund rented food storage and restrict the hub to sensitive medical stock.",
+      "consequence": "Both services retain a viable route and traders regain confidence, while rentals and complex transfers consume reserves.",
+      "metric_deltas": {
+        "infrastructure": -5,
+        "public_trust": 6,
+        "economy": -9,
+        "safety": 6
+      }
+    },
+    {
+      "id": "B",
+      "title": "Rotate Access by Time",
+      "description": "Give medicine and market groups alternating cooling periods.",
+      "consequence": "Rotating access preserves commerce and spreads the burden, but extra cycling wears the plant and temperature-sensitive stock is exposed.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": 6,
+        "economy": 8,
+        "safety": -8
+      }
+    },
+    {
+      "id": "C",
+      "title": "Protect Logged Medicines",
+      "description": "Give verified cold-sensitive medicines first access to the backup hub.",
+      "consequence": "Critical treatments remain usable and equipment load stabilizes, but food losses and unequal priority damage market confidence.",
+      "metric_deltas": {
+        "infrastructure": 6,
+        "public_trust": -8,
+        "economy": -5,
+        "safety": 9
+      }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "substation-reckoning",
+  "title": "District 7 After Dark",
+  "briefing": "A neighborhood review follows the city's earlier concentrated residential outage. Residents report spoiled medicine and failed home equipment. Engineers need continued access to the same circuits, while a compensation fund cannot cover every reported loss. AI recommendation: Prioritize permanent repairs and compensate only verified critical losses. This prioritizes service resilience under the current constraints.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "Temporary bypasses can shorten another outage, but installing them uses the crews booked for long-term circuit replacement.",
+    "community": "Residents will allow crews through apartment blocks if repair access is separated from compensation eligibility checks.",
+    "economy": "A flat compensation payment is quick; case-by-case assessment is cheaper but would take weeks to process.",
+    "safety": "Some reported equipment failures require immediate inspection even when the household cannot provide a purchase receipt."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Finish the Circuit First",
+      "description": "Prioritize permanent repairs and compensate only verified critical losses.",
+      "consequence": "The circuit becomes more dependable, but narrow compensation deepens distrust among residents with undocumented losses.",
+      "metric_deltas": {
+        "infrastructure": 11,
+        "public_trust": -9,
+        "economy": 3,
+        "safety": -3
+      }
+    },
+    {
+      "id": "B",
+      "title": "Repair with Community Guarantees",
+      "description": "Fund bypasses, independent loss review and emergency equipment checks.",
+      "consequence": "Residents regain a voice and immediate checks reduce harm, while crews and funds move away from permanent renewal.",
+      "metric_deltas": {
+        "infrastructure": -5,
+        "public_trust": 9,
+        "economy": -8,
+        "safety": 6
+      }
+    },
+    {
+      "id": "C",
+      "title": "Pay Flat Emergency Grants",
+      "description": "Issue flat grants while running the existing repair schedule.",
+      "consequence": "Fast payments ease household hardship and support local trade, but unchanged outage exposure leaves unresolved equipment hazards.",
+      "metric_deltas": {
+        "infrastructure": -6,
+        "public_trust": 8,
+        "economy": -5,
+        "safety": -3
+      }
+    }
+  ]
+}

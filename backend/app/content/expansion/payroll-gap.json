@@ -1,0 +1,50 @@
+{
+  "id": "payroll-gap",
+  "title": "The Payroll Gap",
+  "briefing": "The municipal payment processor has delayed wages for sanitation and maintenance contractors. The city has one banking window to prevent walkouts without obscuring who bears the credit risk. AI recommendation: Borrow against next month receipts to pay all verified wages. This prioritizes public confidence under the current constraints.",
+  "ai_recommendation_choice_id": "A",
+  "private_intelligence": {
+    "infrastructure": "Deferred repair money is earmarked for worn drainage valves, not cosmetic upgrades; delay will reduce wet-weather capacity.",
+    "community": "Contract cleaners lack access to the union hardship fund, and another eligibility screen would miss many households.",
+    "economy": "The bridge lender requires a first claim on next month's receipts; supplier credit is less costly but unevenly available.",
+    "safety": "An interrupted sanitation round creates immediate exposure at care homes before street cleanliness becomes the main concern."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Bridge Every Payroll",
+      "description": "Borrow against next month receipts to pay all verified wages.",
+      "consequence": "Workers receive pay and essential rounds continue, but interest and committed future receipts narrow the city budget.",
+      "metric_deltas": {
+        "infrastructure": 2,
+        "public_trust": 5,
+        "economy": -6,
+        "safety": 2
+      }
+    },
+    {
+      "id": "B",
+      "title": "Offer Direct Wage Advances",
+      "description": "Make smaller direct advances and negotiate staggered invoices.",
+      "consequence": "Households gain a visible safety net while suppliers wait longer and some maintenance capacity is lost.",
+      "metric_deltas": {
+        "infrastructure": -3,
+        "public_trust": 5,
+        "economy": -3,
+        "safety": 3
+      }
+    },
+    {
+      "id": "C",
+      "title": "Protect Repair Funds",
+      "description": "Keep repair allocations intact and prioritize only critical payrolls.",
+      "consequence": "Repair capacity and cash are protected, but excluded contractors lose trust and sanitation coverage becomes uneven.",
+      "metric_deltas": {
+        "infrastructure": 5,
+        "public_trust": -6,
+        "economy": 3,
+        "safety": -4
+      }
+    }
+  ]
+}

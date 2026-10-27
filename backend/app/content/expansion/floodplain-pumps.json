@@ -1,0 +1,50 @@
+{
+  "id": "floodplain-pumps",
+  "title": "Beyond the Flood Line",
+  "briefing": "Floodwater is approaching both an industrial pumping station and a densely populated estate. Directing the same pumps toward homes would protect more people immediately but leave the wider network vulnerable. AI recommendation: Maintain smaller defenses at the estate and the station. This prioritizes public confidence under the current constraints.",
+  "ai_recommendation_choice_id": "B",
+  "private_intelligence": {
+    "infrastructure": "The station supports three downstream basins; once submerged, restarting it requires specialist parts unavailable locally.",
+    "community": "Estate residents have received evacuation orders twice without transport arriving, so another unsupported order may be ignored.",
+    "economy": "Industrial tenants can help fund defenses if they retain access to their yards during the operation.",
+    "safety": "A safe assisted evacuation takes longer than a car clearance model assumes, especially for residents using oxygen equipment."
+  },
+  "choices": [
+    {
+      "id": "A",
+      "title": "Protect Homes First",
+      "description": "Pump toward the estate and fund assisted relocation.",
+      "consequence": "Residents receive immediate protection and reliable help, while network damage and relocation costs reduce future capacity.",
+      "metric_deltas": {
+        "infrastructure": -10,
+        "public_trust": 10,
+        "economy": -10,
+        "safety": 12
+      }
+    },
+    {
+      "id": "B",
+      "title": "Split Pumps Across Both Sites",
+      "description": "Maintain smaller defenses at the estate and the station.",
+      "consequence": "Shared protection supports cooperation and some commerce, but neither site has a full margin if water rises further.",
+      "metric_deltas": {
+        "infrastructure": -8,
+        "public_trust": 8,
+        "economy": 8,
+        "safety": -10
+      }
+    },
+    {
+      "id": "C",
+      "title": "Defend the Pumping Station",
+      "description": "Protect the station and run a limited assisted evacuation.",
+      "consequence": "The drainage network retains capacity and firms keep operating, but constrained evacuation increases danger and resentment.",
+      "metric_deltas": {
+        "infrastructure": 14,
+        "public_trust": -12,
+        "economy": 6,
+        "safety": -10
+      }
+    }
+  ]
+}

@@ -139,5 +139,5 @@ def main():
 
 if __name__=='__main__':
     if '--serve' in sys.argv:
-        uvicorn.run(create_app(clock=lambda:time.time()*20),host='127.0.0.1',port=18769,log_level='warning')
+        uvicorn.run(create_app(clock=lambda:time.time()*20,crisis_loader=load_crisis_sequence),host='127.0.0.1',port=18769,log_level='warning')
     else: main()
