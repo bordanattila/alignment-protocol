@@ -1,5 +1,6 @@
 """Single-process mission cache; optional SQLite commits precede publication."""
 import secrets
+import hashlib
 import time
 from functools import wraps
 from collections.abc import Callable
@@ -9,7 +10,9 @@ from .persistence import SQLiteMissions, credential_digest
 from .voting import plurality
 from .crises import load_crisis_sequence
 from .campaign import Campaign, initial_sequence, select_crisis, validate_catalog
-from .domain import Scenario
+from .domain import Scenario, GenerationAttempt, CrisisAdmission
+from .generation.contract import AcceptedScenario
+from .generation.service import authored_selector
 from .callsigns import normalize_callsign, callsign_key
 from .consequences import apply_metric_deltas, collapsed_metrics, consensus_score
 
@@ -56,12 +59,14 @@ class MissionStore:
     def __init__(self, clock: Callable[[], float] = time.time,
                  crisis_loader: Callable[[], list[Crisis]] = load_crisis_sequence,
                  persistence: SQLiteMissions | None = None,
-                 campaign_loader: Callable[[], list[Scenario]] | None = None):
+                 campaign_loader: Callable[[], list[Scenario]] | None = None,
+                 generation_enabled: bool = False):
         self.persistence = persistence
         self._transaction_depth = 0
         self.clock = clock
         self.crisis_loader = crisis_loader
         self.campaign_loader = campaign_loader
+        self.generation_enabled = generation_enabled
         self._missions: dict[str, Mission] = {}
 
     def initialize(self):
@@ -71,6 +76,15 @@ class MissionStore:
             self._missions = self.persistence.load()
             for mission in self._missions.values():
                 for player in mission.players: player.connected = False
+                if mission.phase == Phase.PREPARING and mission.generation.status == 'pending':
+                    # An interrupted attempt is never replayed against a model.
+                    # Resolve through the same saved authored selector instead.
+                    try:
+                        crisis = authored_selector(mission.campaign, mission.generation.target_index, mission.results)()
+                        self.accept_generation(mission.token, mission.generation.id,
+                                               AcceptedScenario.from_crisis(crisis), 'authored_fallback')
+                    except (ValueError, TypeError):
+                        self.fail_generation(mission.token, mission.generation.id)
                 if mission.phase in (Phase.DISCUSSION, Phase.VOTING, Phase.CONSENSUS_WINDOW):
                     mission.recovery_phase = mission.phase
                     mission.recovery_deadline = mission.deadline
@@ -125,9 +139,13 @@ class MissionStore:
         return self._missions[token]
 
     @persisted
-    def create(self, callsign: str) -> tuple[Mission, Player]:
+    def create(self, callsign: str, mode: str = 'authored') -> tuple[Mission, Player]:
+        if mode not in ('authored', 'generated'):
+            raise MissionError('Choose a supported mission mode.', 422)
+        if mode == 'generated' and not self.generation_enabled:
+            raise MissionError('AI-generated missions are unavailable on this server.', 409, 'generation_unavailable')
         player = self._player(callsign)
-        mission = Mission(token=secrets.token_urlsafe(24), host_id=player.id, players=[player])
+        mission = Mission(token=secrets.token_urlsafe(24), host_id=player.id, players=[player], mode=mode)
         self._missions[mission.token] = mission
         return mission, player
 
@@ -180,11 +198,16 @@ class MissionStore:
             sequence = self.crisis_loader()
         if not sequence or len({c.id for c in sequence}) != len(sequence):
             raise ValueError("Require a nonempty, nonrepeating authored crisis sequence")
+        if mission.mode == 'generated' and campaign is None:
+            raise MissionError('Generated missions require the authored campaign fallback.', 409)
         sequence = [c.model_copy(deep=True) for c in sequence]
         for index, role in enumerate(Role):
             mission.players[index % len(mission.players)].roles.append(role)
         mission.initial_metrics = mission.metrics.model_copy(deep=True)
         mission.campaign = campaign
+        if mission.mode == 'generated':
+            self._prepare_generation(mission)
+            return
         mission.sequence = sequence
         mission.crisis = sequence[0]
         mission.phase = Phase.BRIEFING
@@ -335,9 +358,12 @@ class MissionStore:
         if not all(p.connected for p in mission.players):
             raise MissionError("Wait for every player to reconnect before continuing.", 409)
         mission.acknowledged_results.add(result_id)
-        if mission.crisis_index + 1 == len(mission.sequence):
+        if mission.crisis_index + 1 == (10 if mission.mode == 'generated' else len(mission.sequence)):
             mission.phase = Phase.COMPLETED
             mission.consensus_score = consensus_score(mission.metrics)
+            return True
+        if mission.mode == 'generated':
+            self._prepare_generation(mission)
             return True
         mission.crisis_index += 1
         if mission.campaign is not None:
@@ -357,6 +383,51 @@ class MissionStore:
         # Chat is mission-wide history; keep its retention/rate limits across
         # crises. Vote maps and local selection keys belong only to this crisis.
         return True
+
+    @staticmethod
+    def _prepare_generation(mission: Mission):
+        mission.generation = GenerationAttempt(id=secrets.token_urlsafe(24), target_index=len(mission.results))
+        mission.phase = Phase.PREPARING
+        mission.deadline = None
+        mission.rounds = []
+        mission.decision = None
+
+    @persisted
+    def accept_generation(self, token: str, attempt_id: str, snapshot: AcceptedScenario, source: str) -> bool:
+        mission = self.get(token)
+        attempt = mission.generation
+        if (mission.mode != 'generated' or mission.phase != Phase.PREPARING or attempt is None
+                or attempt.id != attempt_id or attempt.status != 'pending'
+                or attempt.target_index != len(mission.results) or len(mission.sequence) != attempt.target_index):
+            return False  # stale, cancelled or already admitted
+        crisis = snapshot.to_crisis()
+        if crisis.id in {c.id for c in mission.sequence}:
+            raise ValueError('Repeated accepted scenario')
+        record = CrisisAdmission(source=source, canonical_json=snapshot.canonical_json,
+                                content_hash=hashlib.sha256(snapshot.canonical_json.encode()).hexdigest())
+        mission.admissions.append(record)
+        mission.sequence.append(crisis)
+        mission.crisis_index = attempt.target_index
+        mission.crisis = crisis
+        mission.generation = None
+        mission.phase = Phase.BRIEFING
+        return True
+
+    @persisted
+    def fail_generation(self, token: str, attempt_id: str):
+        mission = self.get(token)
+        if mission.phase == Phase.PREPARING and mission.generation and mission.generation.id == attempt_id:
+            mission.generation.status = 'error'
+
+    @persisted
+    def retry_generation(self, token: str, credential: str):
+        mission = self.get(token)
+        self._host(token, credential)
+        if mission.phase != Phase.PREPARING or mission.generation.status != 'error':
+            raise MissionError('Crisis preparation is already in progress.', 409)
+        if not all(p.connected for p in mission.players):
+            raise MissionError('Wait for every player to reconnect before continuing.', 409)
+        self._prepare_generation(mission)
 
     @persisted
     def send_chat(self, token: str, credential: str, text: str):
@@ -387,10 +458,13 @@ class MissionStore:
         if viewer_id not in {p.id for p in mission.players}:
             raise MissionError("You are not a member of this mission.", 403)
         viewer = next(p for p in mission.players if p.id == viewer_id)
-        crisis = mission.crisis
+        crisis = None if mission.phase == Phase.PREPARING else mission.crisis
         # Explicit allowlist: never return credentials or future private engine state.
         return {
             "token": mission.token,
+            "mode": mission.mode,
+            "generation_status": (None if mission.generation is None else
+                                  'preparing' if mission.generation.status == 'pending' else 'unavailable'),
             "revision": mission.revision,
             "recovery": None if mission.recovery_phase is None else {"phase": mission.recovery_phase, "original_deadline": mission.recovery_deadline},
             "history": [r.model_dump(mode="json") for r in mission.results],
@@ -402,7 +476,7 @@ class MissionStore:
             "host_id": mission.host_id,
             "you": viewer_id,
             "crisis_number": mission.crisis_index + 1 if mission.crisis else 0,
-            "crisis_count": len(mission.sequence),
+            "crisis_count": 10 if mission.mode == 'generated' else len(mission.sequence),
             "result": (mission.results[-1].model_dump() if mission.results
                        and mission.results[-1].crisis_number == mission.crisis_index + 1 else None),
             "collapsed_metrics": list(mission.collapsed_metrics),
@@ -446,7 +520,7 @@ class MissionStore:
         notable.sort(key=lambda r:r.crisis_number)
         return {
             "outcome": "victory" if mission.phase == Phase.COMPLETED else "defeat",
-            "crises_completed": len(mission.results), "total_crises": len(mission.sequence),
+            "crises_completed": len(mission.results), "total_crises": 10 if mission.mode == 'generated' else len(mission.sequence),
             "final_metrics": mission.metrics.model_dump(),
             "consensus_score": consensus_score(mission.metrics),
             "consensus_windows": sum(r.consensus_window_occurred for r in mission.results),

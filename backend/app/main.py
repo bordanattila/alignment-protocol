@@ -13,15 +13,27 @@ from pydantic import ValidationError
 from starlette.websockets import WebSocketState
 
 from .connections import LobbyConnections, close_socket
-from .domain import JoinRequest, ChatIntent, VoteIntent, ContinueRequest, Crisis
+from .domain import JoinRequest, CreateMissionRequest, ChatIntent, VoteIntent, ContinueRequest, Crisis
 from .missions import MissionError, MissionStore
 from .persistence import SQLiteMissions, PersistenceError
 from .campaign import load_campaign_catalog
+from .generation.config import GenerationSettings, ConfigurationError
+from .generation.live import LiveGeneration
+from .generation.provider import ScenarioProvider
 
 
 def create_app(clock: Callable[[], float] | None = None,
                crisis_loader: Callable[[], list[Crisis]] | None = None,
-               database_path: str | Path | None = None) -> FastAPI:
+               database_path: str | Path | None = None,
+               generation_settings: GenerationSettings | None = None,
+               generation_provider: ScenarioProvider | None = None) -> FastAPI:
+    try:
+        settings = generation_settings if generation_settings is not None else GenerationSettings.from_env()
+    except ConfigurationError:
+        logging.getLogger(__name__).warning('Scenario generation unavailable: configuration')
+        settings = GenerationSettings()
+    available = settings.enabled and (generation_provider is not None or bool(
+        settings.endpoint and settings.model and (settings.api_key or not settings.require_api_key)))
     options = {}
     if clock is not None:
         options["clock"] = clock
@@ -31,14 +43,16 @@ def create_app(clock: Callable[[], float] | None = None,
         options["campaign_loader"] = load_campaign_catalog
     if database_path is not None:
         options["persistence"] = SQLiteMissions(database_path)
-    store = MissionStore(**options)
+    store = MissionStore(**options, generation_enabled=available)
     lock = asyncio.Lock()
     # Keep membership semantics, but isolate socket delivery from state mutation.
     connections = LobbyConnections(store, lock)
+    generation = LiveGeneration(store, lock, connections, settings, generation_provider)
 
     async def tick():
         changed = set()
         async with lock:
+            generation.launch_pending()
             for token in store.mission_tokens():
                 try:
                     if store.advance_due(token): changed.add(token)
@@ -69,6 +83,7 @@ def create_app(clock: Callable[[], float] | None = None,
             task.cancel()
             with suppress(asyncio.CancelledError):
                 await task
+            await generation.close()
             store.close()
 
     app = FastAPI(title="Consensus Engine", version="0.1.0", lifespan=lifespan)
@@ -76,6 +91,7 @@ def create_app(clock: Callable[[], float] | None = None,
     # Test hooks exercise the production scheduler path with a controlled clock.
     app.state.tick = tick
     app.state.lock = lock
+    app.state.generation = generation
 
     @app.exception_handler(PersistenceError)
     async def storage_error(_request: Request, _exc: PersistenceError):
@@ -90,10 +106,14 @@ def create_app(clock: Callable[[], float] | None = None,
     def health():
         return {"status": "ok", "milestone": "consequences-progression"}
 
+    @app.get('/api/capabilities')
+    def capabilities():
+        return {'generated_missions': available}
+
     @app.post("/api/missions", status_code=201)
-    async def create(body: JoinRequest):
+    async def create(body: CreateMissionRequest):
         async with lock:
-            mission, player = store.create(body.callsign)
+            mission, player = store.create(body.callsign, body.mode)
             return {"token": mission.token, "credential": player.credential}
 
     @app.post("/api/missions/{token}/join")
@@ -107,6 +127,7 @@ def create_app(clock: Callable[[], float] | None = None,
     async def start(token: str, x_mission_session: str = Header()):
         async with lock:
             store.start(token, x_mission_session)
+            generation.launch_pending()
         await connections.broadcast(token)
         return {"status": "started"}
 
@@ -121,8 +142,17 @@ def create_app(clock: Callable[[], float] | None = None,
     async def continue_mission(token: str, body: ContinueRequest, x_mission_session: str = Header()):
         async with lock:
             advanced = store.continue_mission(token, x_mission_session, body.result_id)
+            generation.launch_pending()
         await connections.broadcast(token)
         return {"advanced": advanced}
+
+    @app.post('/api/missions/{token}/retry-preparation')
+    async def retry_preparation(token: str, x_mission_session: str = Header()):
+        async with lock:
+            store.retry_generation(token, x_mission_session)
+            generation.launch_pending()
+        await connections.broadcast(token)
+        return {'status': 'preparing'}
 
     @app.websocket("/api/missions/{token}/ws")
     async def lobby(socket: WebSocket, token: str):

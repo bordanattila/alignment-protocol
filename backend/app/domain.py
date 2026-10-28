@@ -16,6 +16,7 @@ class Role(StrEnum):
 
 class Phase(StrEnum):
     LOBBY = "lobby"
+    PREPARING = "preparing"
     BRIEFING = "briefing"
     DISCUSSION = "discussion"
     VOTING = "voting"
@@ -79,6 +80,10 @@ Callsign = Annotated[str, StringConstraints(min_length=1, max_length=24), Before
 class JoinRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     callsign: Callsign
+
+
+class CreateMissionRequest(JoinRequest):
+    mode: Literal['authored', 'generated'] = 'authored'
 
 
 class Player(BaseModel):
@@ -196,7 +201,24 @@ class Campaign(BaseModel):
     scenarios: list[Scenario]
 
 
+class GenerationAttempt(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    id: str
+    target_index: int = Field(ge=0, le=9)
+    status: Literal['pending', 'error'] = 'pending'
+
+
+class CrisisAdmission(BaseModel):
+    model_config = ConfigDict(extra='forbid', frozen=True)
+    source: Literal['generated', 'authored_fallback']
+    canonical_json: str
+    content_hash: str
+
+
 class Mission(BaseModel):
+    mode: Literal['authored', 'generated'] = 'authored'
+    generation: GenerationAttempt | None = None
+    admissions: list[CrisisAdmission] = Field(default_factory=list)
     campaign: Campaign | None = None
     token: str
     host_id: str

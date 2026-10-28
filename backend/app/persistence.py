@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 import sqlite3
 
-from .domain import Mission, Phase, Role
+from .domain import Mission, Phase, Role, Crisis
 from .callsigns import callsign_key
 from .campaign import validate_catalog, STAGES
 
@@ -111,13 +111,46 @@ class SQLiteMissions:
         return canonical(state)
 
     @staticmethod
+    def validate_generated(mission: Mission):
+        if mission.mode == 'authored':
+            if mission.admissions or mission.generation or mission.phase == Phase.PREPARING:
+                raise ValueError('Authored generation invariant')
+            return
+        if mission.phase == Phase.LOBBY:
+            if mission.sequence or mission.admissions or mission.generation:
+                raise ValueError('Generated lobby invariant')
+            return
+        if mission.campaign is None or len(mission.admissions) != len(mission.sequence) or len(mission.sequence) > 10:
+            raise ValueError('Generated admission invariant')
+        if len({c.id for c in mission.sequence}) != len(mission.sequence):
+            raise ValueError('Generated uniqueness invariant')
+        for crisis, record in zip(mission.sequence, mission.admissions):
+            if (hashlib.sha256(record.canonical_json.encode()).hexdigest() != record.content_hash
+                    or Crisis.model_validate_json(record.canonical_json) != crisis):
+                raise ValueError('Accepted snapshot invariant')
+        if mission.phase == Phase.PREPARING:
+            attempt = mission.generation
+            if (attempt is None or attempt.target_index != len(mission.results)
+                    or len(mission.sequence) != len(mission.results) or attempt.target_index >= 10
+                    or mission.crisis_index != max(0, attempt.target_index - 1)
+                    or mission.deadline is not None or mission.rounds or mission.decision):
+                raise ValueError('Generation attempt invariant')
+        elif mission.generation is not None or not mission.sequence:
+            raise ValueError('Unexpected generation attempt')
+        if mission.phase == Phase.COMPLETED and len(mission.results) != 10:
+            raise ValueError('Generated completion invariant')
+
+    @staticmethod
     def validate(mission: Mission):
+        SQLiteMissions.validate_generated(mission)
         if mission.campaign is not None:
             validate_catalog(mission.campaign.scenarios)
-            if len(mission.sequence) != 10 or len({c.id for c in mission.sequence}) != 10:
+            if mission.mode == 'authored' and (len(mission.sequence) != 10 or len({c.id for c in mission.sequence}) != 10):
                 raise ValueError('Campaign length/uniqueness invariant')
             catalog = {s.crisis.id:s for s in mission.campaign.scenarios}
             for index,crisis in enumerate(mission.sequence):
+                if mission.mode == 'generated':
+                    if mission.admissions[index].source == 'generated': continue
                 if crisis.id not in catalog or catalog[crisis.id].stage != STAGES[index]:
                     raise ValueError('Campaign stage invariant')
                 dependency = catalog[crisis.id].prerequisite
@@ -141,7 +174,9 @@ class SQLiteMissions:
         if [r.crisis_number for r in mission.results] != list(range(1, len(mission.results)+1)):
             raise ValueError('Ledger order')
         if mission.phase != Phase.LOBBY:
-            if not mission.sequence or not 0 <= mission.crisis_index < len(mission.sequence) or mission.initial_metrics is None:
+            empty_preparation = mission.mode == 'generated' and mission.phase == Phase.PREPARING and not mission.sequence
+            if ((not empty_preparation and (not mission.sequence or not 0 <= mission.crisis_index < len(mission.sequence)))
+                    or mission.initial_metrics is None):
                 raise ValueError('Sequence invariant')
             roles = [role for p in players for role in p.roles]
             if len(roles) != 4 or set(roles) != set(Role):
@@ -172,7 +207,8 @@ class SQLiteMissions:
         if effective_phase == Phase.CONSENSUS_WINDOW and (len(mission.rounds) != 1 or mission.rounds[0].totals is None):
             raise ValueError("Consensus invariant")
         if mission.sequence:
-            expected = mission.crisis_index + (1 if mission.phase in (Phase.DECISION_LOCKED, Phase.COMPLETED, Phase.FAILED) else 0)
+            expected = (len(mission.sequence) if mission.phase == Phase.PREPARING else
+                        mission.crisis_index + (1 if mission.phase in (Phase.DECISION_LOCKED, Phase.COMPLETED, Phase.FAILED) else 0))
             if len(mission.results) != expected:
                 raise ValueError("Current crisis ledger invariant")
         if any(set(r.votes)-set(r.eligible) or set(r.eligible)-ids for r in mission.rounds):
@@ -185,9 +221,11 @@ class SQLiteMissions:
                 if not isinstance(payload, str) or not isinstance(token, str) or version != 1 or hashlib.sha256(payload.encode()).hexdigest() != checksum:
                     raise ValueError('Record format/checksum')
                 raw = json.loads(payload)
-                # The only optional v1 aggregate extension is campaign metadata.
-                # Old payloads/ledger hashes remain valid and unchanged.
+                # Additive aggregate extensions; finalized result hashes stay unchanged.
                 if isinstance(raw, dict) and 'campaign' not in raw: raw['campaign'] = None
+                if isinstance(raw, dict):
+                    for key, default in (('mode', 'authored'), ('generation', None), ('admissions', [])):
+                        raw.setdefault(key, default)
                 if not isinstance(raw, dict) or set(raw) != set(Mission.model_fields)-{'crisis'}:
                     raise ValueError('Record fields do not match format version')
                 sequence = raw.get('sequence', [])
@@ -204,10 +242,19 @@ class SQLiteMissions:
         return missions
 
     def save(self, mission: Mission):
+        self.validate_generated(mission)
         payload = self.payload(mission)
         checksum = hashlib.sha256(payload.encode()).hexdigest()
         try:
             with self.connection:
+                previous = self.connection.execute('SELECT payload FROM missions WHERE token=?', (mission.token,)).fetchone()
+                if previous:
+                    old = json.loads(previous[0])
+                    prior = old.get('admissions', [])
+                    if (old.get('mode', 'authored') != mission.mode
+                            or mission.model_dump(mode='json')['admissions'][:len(prior)] != prior
+                            or len(mission.admissions) < len(prior)):
+                        raise PersistenceError('Accepted mission mode and crises cannot be changed or removed.')
                 existing = self.connection.execute('SELECT result_id,record_hash FROM resolutions WHERE mission_token=?', (mission.token,)).fetchall()
                 records = {r.id:hashlib.sha256(canonical(r.model_dump(mode='json')).encode()).hexdigest() for r in mission.results}
                 if any(records.get(key) != record for key,record in existing):

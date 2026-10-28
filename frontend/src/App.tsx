@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { clearSession, restoreSession, saveSession } from './session';
 import { CrisisBriefing } from './CrisisBriefing';
 import { RoleBadge } from './RoleBadge';
@@ -6,9 +6,9 @@ import { ActiveGameplay, ChatPanel, ResponseOptions, phaseLabel } from './Gamepl
 import { MissionReview } from './MissionReview';
 import { ConnectionNotice, PlayerPresence } from './MissionPresence';
 import { useLobby } from './useLobby';
-import { MissionEntryRequest } from './missionEntry';
+import { MissionEntryRequest, generatedMissionsAvailable } from './missionEntry';
 import { MissionEntryForm } from './MissionEntryForm';
-import type { Session } from './types';
+import type { Session, MissionMode } from './types';
 
 const inviteToken = new URLSearchParams(location.search).get('mission');
 const metricNames: Record<string, string> = {
@@ -18,6 +18,14 @@ const metricNames: Record<string, string> = {
 export default function App() {
   const [session, setSession] = useState<Session | null>(() => restoreSession(inviteToken));
   const [callsign, setCallsign] = useState('');
+  const [mode, setMode] = useState<MissionMode>('authored');
+  const [generatedAvailable, setGeneratedAvailable] = useState(false);
+  useEffect(() => {
+    if (session || inviteToken) return;
+    let active = true;
+    void generatedMissionsAvailable().then(available => { if (active) setGeneratedAvailable(available); });
+    return () => { active = false; };
+  }, [session]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
@@ -34,7 +42,7 @@ export default function App() {
       // Verify storage is usable before allocating a seat.
       localStorage.setItem('consensus.storage-check', 'ok');
       localStorage.removeItem('consensus.storage-check');
-      const result = await entryRequest.current.submit(inviteToken, callsign);
+      const result = await entryRequest.current.submit(inviteToken, callsign, mode);
       if (!result) return;
       saveSession(result);
       history.replaceState(null, '', `?mission=${encodeURIComponent(result.token)}`);
@@ -44,7 +52,7 @@ export default function App() {
     } finally { setBusy(false); }
   }
 
-  async function missionAction(action: 'start' | 'discussion' | 'continue') {
+  async function missionAction(action: 'start' | 'discussion' | 'continue' | 'retry-preparation') {
     if (!session || !connected) return;
     setBusy(true);
     setError('');
@@ -82,8 +90,8 @@ export default function App() {
     {session && <ConnectionNotice status={status} connected={connected} />}
     {mission && <PlayerPresence mission={mission} connected={connected} />}
     {activeMission ? <section className="mission-header" aria-label="Current mission">
-      <p className="eyebrow">Crisis {mission.crisis_number.toString().padStart(2, '0')} / {mission.crisis_count} <span>· {phaseLabel(mission)}</span></p>
-      <h1>{mission.crisis?.title}</h1>
+      <p className="eyebrow">{mission.phase === 'preparing' ? 'Mission preparation' : `Crisis ${mission.crisis_number.toString().padStart(2, '0')} / ${mission.crisis_count}`} <span>· {phaseLabel(mission)}</span></p>
+      <h1>{mission.crisis?.title ?? 'Preparing next crisis'}</h1>
     </section> : <section className="intro">
       <p className="eyebrow">Civic coordination network</p>
       <h1>Intelligence proposes.<br /><em>Humanity decides.</em></h1>
@@ -95,17 +103,25 @@ export default function App() {
       <div><p className="eyebrow">{inviteToken ? 'Mission invitation' : 'Assemble your team'}</p>
         <h2>{inviteToken ? 'Join the mission' : 'Open a mission'}</h2>
         <p>Bring 2–4 people into a shared operations room. No account required.</p></div>
-      <MissionEntryForm callsign={callsign} busy={busy} error={error} joining={Boolean(inviteToken)} onCallsign={setCallsign} onSubmit={enter} />
+      <MissionEntryForm callsign={callsign} busy={busy} error={error} joining={Boolean(inviteToken)} onCallsign={setCallsign} onSubmit={enter}
+        mode={mode} onMode={setMode} generatedAvailable={generatedAvailable} />
     </section> : <section className="lobby-grid">
       <div className="panel">
         <div className="panel-heading"><div><p className="eyebrow">Operations room</p><h2>{mission?.phase === 'lobby' || !mission ? 'Mission lobby' : phaseLabel(mission)}</h2></div></div>
         {mission ? <>
-          <p>{mission.phase === 'lobby' ? `${mission.players.length} of 4 seats occupied · Invite your team to join.` : ({ reconnect_wait: 'Mission restored after server interruption. Waiting for every player to reconnect before the next mandatory phase. Saved votes and deadlines are preserved.', briefing: 'Review the public briefing and your private intelligence together.', discussion: 'Share your information in the team chat above.', voting: 'Submit your private vote in the active voting panel above.', consensus_window: 'Discuss your choices in the live chat above before final voting begins.', decision_locked: 'The decision and civilization impact are recorded above. Review the result with your team.', failed: 'The civilization has collapsed. Review the final outcome above.', completed: 'The mission is complete. Review your final score and civilization outcome.' }[mission.phase])}</p>
+          <p>{mission.phase === 'lobby' ? `${mission.players.length} of 4 seats occupied · Invite your team to join.` : ({ preparing: '', reconnect_wait: 'Mission restored after server interruption. Waiting for every player to reconnect before the next mandatory phase. Saved votes and deadlines are preserved.', briefing: 'Review the public briefing and your private intelligence together.', discussion: 'Share your information in the team chat above.', voting: 'Submit your private vote in the active voting panel above.', consensus_window: 'Discuss your choices in the live chat above before final voting begins.', decision_locked: 'The decision and civilization impact are recorded above. Review the result with your team.', failed: 'The civilization has collapsed. Review the final outcome above.', completed: 'The mission is complete. Review your final score and civilization outcome.' }[mission.phase])}</p>
           {mission.phase === 'lobby' && (mission.you === mission.host_id ? <>
             <button disabled={busy || !connected || mission.players.length < 2 || mission.players.some(player => !player.connected)} onClick={() => missionAction('start')}>Start Mission</button>
             <p>Start with 2–4 players. Every occupied seat must be connected.</p>
           </> : <p>Waiting for the host to start the mission.</p>)}
           {mission.phase === 'briefing' && (mission.you === mission.host_id ? <button disabled={busy || !connected || mission.players.some(player => !player.connected)} onClick={() => missionAction('discussion')}>Begin discussion</button> : <p>Read your briefing while the host prepares discussion.</p>)}
+          {mission.phase === 'preparing' && <div role="status" aria-live="polite">
+            {mission.generation_status === 'unavailable' ? <>
+              <p>Crisis preparation is temporarily unavailable. The host can retry when every player is connected.</p>
+              {mission.you === mission.host_id && <button disabled={busy || !connected || mission.players.some(player => !player.connected)}
+                onClick={() => missionAction('retry-preparation')}>Retry preparation</button>}
+            </> : <p>Preparing next crisis. Your mission progress is saved.</p>}
+          </div>}
           {mission.phase === 'discussion' && <p role="status">Compare your information with the team in mission chat before the discussion deadline.</p>}
           {mission.phase === 'lobby' && <ul className="players">{mission.players.map(player => <li key={player.id}>
             <div><strong>{player.callsign}</strong><small>{player.id === mission.you ? 'You' : 'Teammate'}{player.id === mission.host_id ? ' · Host' : ''}</small><div className="role-badges">{player.roles.map(role => <RoleBadge key={role} role={role} />)}</div></div>

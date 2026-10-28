@@ -13,7 +13,7 @@ def build_context(mission: Mission) -> GenerationContext:
     if mission.crisis is not None and mission.crisis.id not in used:
         used.append(mission.crisis.id)
     return GenerationContext(
-        current_crisis_number=mission.crisis_index + 1,
+        current_crisis_number=(mission.generation.target_index if mission.generation else mission.crisis_index) + 1,
         metrics=FrozenMetrics(**mission.metrics.model_dump()),
         history=history, used_scenario_ids=tuple(used),
     )

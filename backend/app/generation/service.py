@@ -1,4 +1,4 @@
-"""Explicit proposal acceptance and existing authored selection fallback; no live hook."""
+"""Explicit proposal acceptance and existing authored selection fallback."""
 import asyncio
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field

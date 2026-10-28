@@ -2,14 +2,17 @@ export type Role = 'infrastructure' | 'community' | 'economy' | 'safety';
 export type Metric = 'infrastructure' | 'public_trust' | 'economy' | 'safety';
 export type Civilization = Record<Metric, number>;
 export interface Session { token: string; credential: string }
+export type MissionMode = 'authored' | 'generated';
 export interface LobbyState {
+  mode?: MissionMode;
+  generation_status?: 'preparing' | 'unavailable' | null;
   revision?: number;
   recovery?: {phase: 'discussion' | 'voting' | 'consensus_window'; original_deadline: number | null} | null;
   history?: CrisisResult[];
   metrics_timeline?: MetricSnapshot[];
   summary?: MissionSummary | null;
   token: string;
-  phase: 'reconnect_wait' | 'lobby' | 'briefing' | 'discussion' | 'voting' | 'consensus_window' | 'decision_locked' | 'failed' | 'completed';
+  phase: 'preparing' | 'reconnect_wait' | 'lobby' | 'briefing' | 'discussion' | 'voting' | 'consensus_window' | 'decision_locked' | 'failed' | 'completed';
   crisis_number: number;
   crisis_count: number;
   result: CrisisResult | null;

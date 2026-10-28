@@ -12,7 +12,7 @@ import campaign7 from '../../backend/app/content/credit-under-strain.json';
 import campaign8 from '../../backend/app/content/a-fair-share.json';
 import campaign9 from '../../backend/app/content/the-last-coordination.json';
 import { MissionEntryForm } from '../src/MissionEntryForm';
-import { MissionEntryRequest, duplicateCallsignMessage } from '../src/missionEntry';
+import { MissionEntryRequest, duplicateCallsignMessage, generatedMissionsAvailable } from '../src/missionEntry';
 import { FinalConsensusScore } from '../src/ConsequenceOutcome';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -56,6 +56,56 @@ function assertActiveBeforeReferences(html: string) {
 
 function textarea(html: string) { return html.match(/<textarea[^>]*>/)![0]; }
 function fieldset(html: string) { return html.match(/<fieldset[^>]*>/)![0]; }
+
+test('creation defaults to authored and generated choice respects server availability', () => {
+  const props = {callsign:'Host',busy:false,error:'',joining:false,onCallsign:()=>{},onSubmit:()=>{}};
+  const disabled = renderToStaticMarkup(<MissionEntryForm {...props} />);
+  assert.match(disabled, /value="authored" selected=""/);
+  assert.match(disabled, /value="generated" disabled=""/);
+  assert.match(disabled, /label for="mission-mode"/);
+  assert.match(disabled, /aria-describedby="mission-mode-description"/);
+  assert.match(disabled, /unavailable on this server/);
+  const enabled = renderToStaticMarkup(<MissionEntryForm {...props} generatedAvailable mode="generated" />);
+  assert.match(enabled, /value="generated" selected=""/);
+  assert.match(enabled, /Crises adapt to previous decisions, with authored fallback/);
+  assert.ok(!renderToStaticMarkup(<MissionEntryForm {...props} joining />).includes('mission-mode'));
+});
+
+test('creation sends selected mode and invitations never override the mission mode', async () => {
+  const original=globalThis.fetch;const bodies:any[]=[];
+  globalThis.fetch=async (_url,options)=>{bodies.push(JSON.parse(options!.body as string));return {ok:true,json:async()=>({token:'test',credential:'saved'})} as Response;};
+  try {
+    const request=new MissionEntryRequest();
+    await request.submit(null,'Host');await request.submit(null,'Host','generated');await request.submit('test','Guest','generated');
+    assert.deepEqual(bodies,[{callsign:'Host',mode:'authored'},{callsign:'Host',mode:'generated'},{callsign:'Guest'}]);
+  } finally {globalThis.fetch=original;}
+});
+
+test('capability lookup requires explicit server true and fails closed on unavailable API', async () => {
+  const original=globalThis.fetch;
+  try {
+    for(const value of [true,false,'true',null]) {
+      globalThis.fetch=async()=>({ok:true,json:async()=>({generated_missions:value})}) as Response;
+      assert.equal(await generatedMissionsAvailable(),value===true);
+    }
+    globalThis.fetch=async()=>{throw Error('offline');};assert.equal(await generatedMissionsAvailable(),false);
+    globalThis.fetch=async()=>({ok:false}) as Response;assert.equal(await generatedMissionsAvailable(),false);
+  } finally {globalThis.fetch=original;}
+});
+
+test('preparation snapshots announce progress without interactive votes or provider details', () => {
+  const mission=state('preparing');mission.crisis=null;mission.voting=null;mission.closed_rounds=[];mission.deadline=null;
+  mission.generation_status='preparing';mission.mode='generated';
+  const html=render(mission);
+  assert.match(html,/role="status" aria-live="polite"/);
+  assert.match(html,/Preparing next crisis. Your mission progress is saved/);
+  assert.ok(!html.includes('<fieldset') && !html.includes('Begin discussion'));
+  assert.ok(!html.includes('CONSENSUS_LLM') && !html.includes('prompt') && !html.includes('authored_fallback'));
+  mission.generation_status='unavailable';assert.match(render(mission),/Retry preparation/);
+  mission.you='p1';assert.ok(!render(mission).includes('Retry preparation'));
+  mission.you='p0';mission.players[1].connected=false;
+  assert.match(render(mission),/<button disabled="">Retry preparation/);
+});
 
 test('discussion puts the enabled composer and countdown above reference information', () => {
   const mission = state('discussion'); mission.voting = null; mission.closed_rounds = [];

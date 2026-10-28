@@ -137,7 +137,7 @@ These tools simulate production rules offline; they do not change live missions.
 
 ## Standalone scenario generation foundation
 
-Milestone 9.1 adds a backend-only, disabled-by-default proposal pipeline. Live missions continue to use the authored catalog, even when the developer harness is enabled. No UI or persistence changes are required.
+Milestone 9.1 adds a disabled-by-default proposal pipeline and standalone developer harness. Milestone 9.2 connects it to explicitly selected generated missions; authored missions retain their existing selector and remain the default.
 
 ```sh
 .venv/bin/python -m app.generation.cli --mode disabled
@@ -148,3 +148,16 @@ Milestone 9.1 adds a backend-only, disabled-by-default proposal pipeline. Live m
 ```
 
 These commands need no credentials. Optional remote inference requires explicit `--mode live`, `CONSENSUS_LLM_ENABLED=true`, and operator-supplied endpoint/model settings. Keep credentials in the backend environment; [generation.env.example](backend/generation.env.example) lists settings without loading them automatically. See [Milestone 9.1 foundation](docs/MILESTONE_9_1_LLM_FOUNDATION.md) for the contract, privacy boundary, fallback behavior, exact verification results, and provider compatibility limits.
+
+## Optional live generated missions
+
+Export `CONSENSUS_LLM_ENABLED=true` and your operator-selected full endpoint, model, and required credential into the backend environment before starting `app.main:app`. Local unauthenticated loopback servers may use `CONSENSUS_LLM_REQUIRE_API_KEY=false`. No provider values belong in the frontend environment.
+
+The creation form defaults to **Authored Mission**. **AI-Generated Mission** becomes available when `/api/capabilities` reports backend readiness. Generated missions prepare one validated crisis at a time from committed public decisions and current metrics. Provider failures use the existing deterministic authored selector. Accepted content is persisted before briefing; reconnects never regenerate it. Restarting an interrupted preparation admits authored fallback instead of repeating inference. Play still requires every reserved seat to reconnect before starting discussion or advancing a result.
+
+```sh
+.venv/bin/python -m pytest backend/tests/test_live_generation.py -q
+.venv/bin/python backend/tests/smoke_live_generation.py
+```
+
+The smoke uses a fake provider, three real WebSocket clients, a temporary database, and a killed/restarted backend. It needs no model or credential. See [Milestone 9.2 live generation](docs/MILESTONE_9_2_LIVE_GENERATION.md) for concurrency, persistence, recovery policy, configuration, verification and manual acceptance.

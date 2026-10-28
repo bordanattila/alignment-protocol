@@ -39,6 +39,19 @@ function fixture() {
 const snapshot=(revision:number,extra:Partial<LobbyState>={})=>({token:'mission',revision,phase:'discussion',chat:[],voting:null,...extra} as LobbyState);
 function ready(f:ReturnType<typeof fixture>,revision=1){const socket=f.sockets.at(-1)!;socket.open();socket.message(snapshot(revision));return socket;}
 
+test('reconnect during preparation restores authoritative status and then the same ready crisis',()=>{
+  const f=fixture();f.connection.start();const first=f.sockets[0];first.open();
+  first.message(snapshot(1,{phase:'preparing',mode:'generated',generation_status:'preparing',crisis:null}));
+  first.disconnect();f.next();const second=f.sockets.at(-1)!;second.open();
+  second.message(snapshot(2,{phase:'preparing',mode:'generated',generation_status:'preparing',crisis:null}));
+  assert.equal(f.statuses.at(-1),'Reconnected');assert.equal(f.frames.at(-1)!.phase,'preparing');
+  assert.deepEqual(second.sent,[{type:'authenticate',credential:'saved-secret'}]);
+  const crisis={id:'generated-stable',title:'Civic pressure',briefing:'Public briefing',ai_recommendation_choice_id:'A',choices:[]} as LobbyState['crisis'];
+  second.message(snapshot(3,{phase:'briefing',generation_status:null,crisis}));
+  assert.equal(f.frames.at(-1)!.crisis!.id,'generated-stable');
+  assert.equal(second.sent.length,1);f.connection.stop();
+});
+
 test('OPEN authenticates with the saved credential but gameplay waits for snapshot',()=>{
   const f=fixture();f.connection.start();const socket=f.sockets[0];socket.open();
   assert.deepEqual(socket.sent,[{type:'authenticate',credential:'saved-secret'}]);

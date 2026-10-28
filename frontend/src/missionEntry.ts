@@ -1,4 +1,11 @@
-import type { Session } from './types';
+import type { Session, MissionMode } from './types';
+
+export async function generatedMissionsAvailable(): Promise<boolean> {
+  try {
+    const response = await fetch('/api/capabilities');
+    return response.ok && (await response.json()).generated_missions === true;
+  } catch { return false; }
+}
 
 export const duplicateCallsignMessage = 'That callsign is already taken in this mission. Choose another.';
 
@@ -7,12 +14,13 @@ export const duplicateCallsignMessage = 'That callsign is already taken in this 
 export class MissionEntryRequest {
   pending = false;
 
-  async submit(token: string | null, callsign: string): Promise<Session | null> {
+  async submit(token: string | null, callsign: string, mode: MissionMode = 'authored'): Promise<Session | null> {
     if (this.pending) return null;
     this.pending = true;
     try {
       const response = await fetch(token ? `/api/missions/${encodeURIComponent(token)}/join` : '/api/missions', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ callsign }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(token ? { callsign } : { callsign, mode }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.code === 'callsign_taken' ? duplicateCallsignMessage
