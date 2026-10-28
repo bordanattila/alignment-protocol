@@ -134,3 +134,17 @@ node --experimental-websocket frontend/tests/smokeReconnection.mjs
 ```
 
 These tools simulate production rules offline; they do not change live missions. A seed plus the same choices reproduces scenario selection, consequences and final metrics. See [Milestone 8 gameplay expansion](docs/MILESTONE_8_GAMEPLAY_EXPANSION.md) for inventory, prerequisites, compatibility, exact validation results and manual acceptance.
+
+## Standalone scenario generation foundation
+
+Milestone 9.1 adds a backend-only, disabled-by-default proposal pipeline. Live missions continue to use the authored catalog, even when the developer harness is enabled. No UI or persistence changes are required.
+
+```sh
+.venv/bin/python -m app.generation.cli --mode disabled
+.venv/bin/python -m app.generation.cli --mode fake
+.venv/bin/python -m app.generation.cli --mode failure
+.venv/bin/python -m app.generation.cli --schema
+.venv/bin/python -m pytest backend/tests/test_generation_contract.py backend/tests/test_generation_provider.py backend/tests/test_generation_integration.py -q
+```
+
+These commands need no credentials. Optional remote inference requires explicit `--mode live`, `CONSENSUS_LLM_ENABLED=true`, and operator-supplied endpoint/model settings. Keep credentials in the backend environment; [generation.env.example](backend/generation.env.example) lists settings without loading them automatically. See [Milestone 9.1 foundation](docs/MILESTONE_9_1_LLM_FOUNDATION.md) for the contract, privacy boundary, fallback behavior, exact verification results, and provider compatibility limits.
