@@ -324,7 +324,7 @@ def test_accepted_snapshot_and_mode_cannot_be_rewritten_in_storage(tmp_path):
         content=canonical(crisis.model_dump(mode='json'))
         mission.admissions[0]=mission.admissions[0].model_copy(update={'canonical_json':content,'content_hash':hashlib.sha256(content.encode()).hexdigest()})
         with pytest.raises(PersistenceError):store.bump_revision(mission.token)
-        mission.mode='authored';mission.admissions=[]
+        mission.mode='authored';mission.admissions=[];mission.generation_diagnostics=[]
         with pytest.raises(PersistenceError):store.bump_revision(mission.token)
         await live.close();store.close()
     asyncio.run(exercise())

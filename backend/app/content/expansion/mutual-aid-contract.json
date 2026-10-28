@@ -1,7 +1,7 @@
 {
   "id": "mutual-aid-contract",
   "title": "The Mutual Aid Price",
-  "briefing": "A neighboring region offers mobile generators and repair crews, but asks for fuel and equipment in return. Both cities are under strain. AI recommendation: Swap fuel and equipment for immediate generators and crews. This prioritizes service resilience under the current constraints.",
+  "briefing": "A neighboring region offers mobile generators and repair crews, but asks for fuel and equipment in return. Both cities are under strain.",
   "ai_recommendation_choice_id": "C",
   "private_intelligence": {
     "infrastructure": "The incoming generators fit the substations, but their maintenance software requires support from the lending region.",

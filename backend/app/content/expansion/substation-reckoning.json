@@ -1,7 +1,7 @@
 {
   "id": "substation-reckoning",
   "title": "District 7 After Dark",
-  "briefing": "A neighborhood review follows the city's earlier concentrated residential outage. Residents report spoiled medicine and failed home equipment. Engineers need continued access to the same circuits, while a compensation fund cannot cover every reported loss. AI recommendation: Prioritize permanent repairs and compensate only verified critical losses. This prioritizes service resilience under the current constraints.",
+  "briefing": "A neighborhood review follows the city's earlier concentrated residential outage. Residents report spoiled medicine and failed home equipment. Engineers need continued access to the same circuits, while a compensation fund cannot cover every reported loss.",
   "ai_recommendation_choice_id": "A",
   "private_intelligence": {
     "infrastructure": "Temporary bypasses can shorten another outage, but installing them uses the crews booked for long-term circuit replacement.",

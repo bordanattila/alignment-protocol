@@ -5,6 +5,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StringConstraints, model_validator
 
 from .callsigns import normalize_callsign
+from .generation.errors import FailureCategory
 
 
 class Role(StrEnum):
@@ -215,10 +216,26 @@ class CrisisAdmission(BaseModel):
     content_hash: str
 
 
+class GenerationDiagnostic(BaseModel):
+    model_config = ConfigDict(extra='forbid', frozen=True)
+    crisis_number: int = Field(ge=1, le=10, strict=True)
+    source: Literal['generated', 'authored_fallback'] | None
+    category: FailureCategory | Literal['success', 'restart_recovery', 'internal_state', 'canceled']
+    duration_seconds: float = Field(ge=0, allow_inf_nan=False, strict=True)
+    http_status: int | None = Field(default=None, ge=100, le=599, strict=True)
+
+    @model_validator(mode='after')
+    def consistent_outcome(self):
+        if (self.category == 'success') != (self.source == 'generated'):
+            raise ValueError('Diagnostic success must match generated source')
+        return self
+
+
 class Mission(BaseModel):
     mode: Literal['authored', 'generated'] = 'authored'
     generation: GenerationAttempt | None = None
     admissions: list[CrisisAdmission] = Field(default_factory=list)
+    generation_diagnostics: list[GenerationDiagnostic] = Field(default_factory=list, max_length=10)
     campaign: Campaign | None = None
     token: str
     host_id: str

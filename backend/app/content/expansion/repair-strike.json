@@ -1,7 +1,7 @@
 {
   "id": "repair-strike",
   "title": "The Repair Mandate",
-  "briefing": "Maintenance crews are refusing overtime after a near miss on a rushed repair. The city can negotiate safer schedules, outsource urgent work, or compel a short emergency rotation before another service failure. AI recommendation: Require a short emergency shift for the lift-station repair. This prioritizes service resilience under the current constraints.",
+  "briefing": "Maintenance crews are refusing overtime after a near miss on a rushed repair. The city can negotiate safer schedules, outsource urgent work, or compel a short emergency rotation before another service failure.",
   "ai_recommendation_choice_id": "A",
   "private_intelligence": {
     "infrastructure": "Two damaged conduits can wait a day; the third feeds a sewage lift station and has no tested bypass.",

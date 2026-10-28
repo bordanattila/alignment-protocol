@@ -1,7 +1,7 @@
 {
   "id": "freight-debt",
   "title": "The Cost of Priority",
-  "briefing": "The priority freight corridor chosen earlier has kept lifeline deliveries moving, but ordinary traders now face missed contracts and mounting fees. AI recommendation: Maintain the corridor until all critical inventories meet the target. This prioritizes service resilience under the current constraints.",
+  "briefing": "The priority freight corridor chosen earlier has kept lifeline deliveries moving, but ordinary traders now face missed contracts and mounting fees.",
   "ai_recommendation_choice_id": "C",
   "private_intelligence": {
     "infrastructure": "Opening general traffic at peak hours would delay filter deliveries needed to keep water plants operating.",

@@ -1,7 +1,7 @@
 {
   "id": "cooling-access",
   "title": "A Place to Cool Down",
-  "briefing": "Cooling halls are near capacity during a second hot afternoon. The city must choose how to distribute staff, electricity and access before the overnight heat peak. AI recommendation: Staff the central halls and provide scheduled transport. This prioritizes immediate safety under the current constraints.",
+  "briefing": "Cooling halls are near capacity during a second hot afternoon. The city must choose how to distribute staff, electricity and access before the overnight heat peak.",
   "ai_recommendation_choice_id": "B",
   "private_intelligence": {
     "infrastructure": "Central halls have efficient chillers; small sites need portable units that compete with pump stations for power.",

@@ -112,8 +112,20 @@ class SQLiteMissions:
 
     @staticmethod
     def validate_generated(mission: Mission):
+        diagnostics = mission.generation_diagnostics
+        numbers = [r.crisis_number for r in diagnostics]
+        if numbers != sorted(set(numbers)):
+            raise ValueError('Generation diagnostic order/uniqueness invariant')
+        for record in diagnostics:
+            if record.crisis_number <= len(mission.admissions):
+                admission = mission.admissions[record.crisis_number - 1]
+                if record.source != admission.source or (record.category == 'success') != (admission.source == 'generated'):
+                    raise ValueError('Diagnostic admission invariant')
+            elif (mission.phase != Phase.PREPARING or mission.generation is None
+                  or record.crisis_number != mission.generation.target_index + 1 or record.source is not None):
+                raise ValueError('Diagnostic preparation invariant')
         if mission.mode == 'authored':
-            if mission.admissions or mission.generation or mission.phase == Phase.PREPARING:
+            if mission.admissions or mission.generation or diagnostics or mission.phase == Phase.PREPARING:
                 raise ValueError('Authored generation invariant')
             return
         if mission.phase == Phase.LOBBY:
@@ -224,7 +236,7 @@ class SQLiteMissions:
                 # Additive aggregate extensions; finalized result hashes stay unchanged.
                 if isinstance(raw, dict) and 'campaign' not in raw: raw['campaign'] = None
                 if isinstance(raw, dict):
-                    for key, default in (('mode', 'authored'), ('generation', None), ('admissions', [])):
+                    for key, default in (('mode', 'authored'), ('generation', None), ('admissions', []), ('generation_diagnostics', [])):
                         raw.setdefault(key, default)
                 if not isinstance(raw, dict) or set(raw) != set(Mission.model_fields)-{'crisis'}:
                     raise ValueError('Record fields do not match format version')
@@ -251,6 +263,10 @@ class SQLiteMissions:
                 if previous:
                     old = json.loads(previous[0])
                     prior = old.get('admissions', [])
+                    current_diagnostics = {r['crisis_number']:r for r in mission.model_dump(mode='json')['generation_diagnostics']}
+                    if any(r['crisis_number'] <= len(prior) and current_diagnostics.get(r['crisis_number']) != r
+                           for r in old.get('generation_diagnostics', [])):
+                        raise PersistenceError('Finalized generation diagnostics cannot be changed or removed.')
                     if (old.get('mode', 'authored') != mission.mode
                             or mission.model_dump(mode='json')['admissions'][:len(prior)] != prior
                             or len(mission.admissions) < len(prior)):

@@ -3,6 +3,7 @@ import asyncio
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 import logging
+import time
 from typing import Literal
 
 from ..campaign import select_crisis, validate_catalog
@@ -20,6 +21,8 @@ class GenerationOutcome:
     source: Literal['generated', 'authored'] | None = None
     failure: FailureCategory | None = None
     fallback_failure: Literal['missing_selector', 'invalid_state'] | None = None
+    duration_seconds: float = 0.0
+    http_status: int | None = None
 
 
 def authored_selector(campaign: Campaign, index: int, results: Sequence[CrisisResult]) -> Callable[[], Crisis]:
@@ -43,6 +46,18 @@ class GenerationService:
         self.fallback = fallback
 
     async def generate(self, request: GenerationRequest) -> GenerationOutcome:
+        started = time.perf_counter()
+        http_status = None
+
+        def finish(**fields):
+            outcome = GenerationOutcome(**fields, duration_seconds=round(time.perf_counter() - started, 3), http_status=http_status)
+            log = logger.warning if outcome.failure else logger.info
+            log('generation_result mode=generated crisis=%d source=%s success=%s failure=%s http_status=%s duration_seconds=%.3f',
+                request.context.current_crisis_number, 'authored_fallback' if outcome.source == 'authored' else outcome.source or 'none',
+                outcome.source == 'generated', outcome.failure.value if outcome.failure else 'none',
+                outcome.http_status, outcome.duration_seconds)
+            return outcome
+
         failure = FailureCategory.DISABLED
         if self.settings.enabled:
             try:
@@ -54,23 +69,25 @@ class GenerationService:
                     response = await provider.generate(request)
                 if not isinstance(response, ProviderResponse):
                     raise GenerationError(FailureCategory.UNSUPPORTED_RESPONSE)
+                status = response.http_status
+                http_status = status if type(status) is int and 100 <= status <= 599 else None
                 accepted = accept_proposal(response.content, request.context)
                 if self.settings.api_key and self.settings.api_key.get_secret_value() in accepted.canonical_json:
                     raise GenerationError(FailureCategory.INVALID_SCHEMA)
-                return GenerationOutcome(snapshot=accepted, source='generated')
+                return finish(snapshot=accepted, source='generated')
             except TimeoutError:
                 failure = FailureCategory.TIMEOUT
             except GenerationError as exc:
                 failure = exc.category
+                if exc.http_status is not None: http_status = exc.http_status
             except Exception:
                 failure = FailureCategory.UNEXPECTED
         # Never log provider exceptions, HTTP bodies, configuration, or context.
-        logger.warning('Scenario generation fallback: %s', failure.value)
         if self.fallback is None:
-            return GenerationOutcome(failure=failure, fallback_failure='missing_selector')
+            return finish(failure=failure, fallback_failure='missing_selector')
         try:
             snapshot = AcceptedScenario.from_crisis(self.fallback())
-            return GenerationOutcome(snapshot=snapshot, source='authored', failure=failure)
+            return finish(snapshot=snapshot, source='authored', failure=failure)
         except Exception:
             logger.warning('Scenario generation fallback unavailable: invalid_state')
-            return GenerationOutcome(failure=failure, fallback_failure='invalid_state')
+            return finish(failure=failure, fallback_failure='invalid_state')

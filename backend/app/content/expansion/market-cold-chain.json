@@ -1,7 +1,7 @@
 {
   "id": "market-cold-chain",
   "title": "Cold Chain Crossroads",
-  "briefing": "A shared refrigeration hub is failing while medicines and fresh food wait in the same loading yard. Traders warn that losing food inventory could close neighborhood markets for weeks. AI recommendation: Give medicine and market groups alternating cooling periods. This prioritizes economic continuity under the current constraints.",
+  "briefing": "A shared refrigeration hub is failing while medicines and fresh food wait in the same loading yard. Traders warn that losing food inventory could close neighborhood markets for weeks.",
   "ai_recommendation_choice_id": "B",
   "private_intelligence": {
     "infrastructure": "The backup plant can cool either the medicine vault or the market bays at safe temperature, not both simultaneously.",

@@ -1,7 +1,7 @@
 {
   "id": "data-consent",
   "title": "Consent Under Pressure",
-  "briefing": "An emergency welfare service can identify isolated residents by linking utility use with health records. The city must weigh speed against consent, false positives and the ability to revoke access after the emergency. AI recommendation: Grant a time-limited citywide linkage with audit logging. This prioritizes immediate safety under the current constraints.",
+  "briefing": "An emergency welfare service can identify isolated residents by linking utility use with health records. The city must weigh speed against consent, false positives and the ability to revoke access after the emergency.",
   "ai_recommendation_choice_id": "C",
   "private_intelligence": {
     "infrastructure": "The shared identity service has no tested bulk-revocation tool; temporary access could last longer than planned.",

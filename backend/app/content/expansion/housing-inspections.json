@@ -1,7 +1,7 @@
 {
   "id": "housing-inspections",
   "title": "Cracks in the Register",
-  "briefing": "An inspection model flags hundreds of apartment blocks as unsafe after heavy rain. Inspectors can visit only a fraction tonight. AI recommendation: Send inspectors to the highest digitally scored buildings first. This prioritizes service resilience under the current constraints.",
+  "briefing": "An inspection model flags hundreds of apartment blocks as unsafe after heavy rain. Inspectors can visit only a fraction tonight.",
   "ai_recommendation_choice_id": "B",
   "private_intelligence": {
     "infrastructure": "Digital records accurately identify roof loading, but miss basement conversions and later changes to drainage.",

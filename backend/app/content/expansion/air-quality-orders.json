@@ -1,7 +1,7 @@
 {
   "id": "air-quality-orders",
   "title": "The Air We Share",
-  "briefing": "A stagnant weather system is trapping particulate pollution over homes and industrial yards. Small workshops contribute less individually but sit closer to housing, making a simple volume-based order contentious. AI recommendation: Temporarily halt the largest sources and protect repair exemptions. This prioritizes immediate safety under the current constraints.",
+  "briefing": "A stagnant weather system is trapping particulate pollution over homes and industrial yards. Small workshops contribute less individually but sit closer to housing, making a simple volume-based order contentious.",
   "ai_recommendation_choice_id": "A",
   "private_intelligence": {
     "infrastructure": "Factory filtration can be improved within a day, but rushing installation may require interrupting water-treatment supply lines.",

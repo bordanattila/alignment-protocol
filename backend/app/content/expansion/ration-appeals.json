@@ -1,7 +1,7 @@
 {
   "id": "ration-appeals",
   "title": "A Right to Appeal",
-  "briefing": "A resource-allocation model has issued ration limits that keep total demand within supply. Appeals reveal households whose medical and care needs are missing from the records. AI recommendation: Keep current quotas and review disputes after the demand peak. This prioritizes service resilience under the current constraints.",
+  "briefing": "A resource-allocation model has issued ration limits that keep total demand within supply. Appeals reveal households whose medical and care needs are missing from the records.",
   "ai_recommendation_choice_id": "A",
   "private_intelligence": {
     "infrastructure": "The meters can apply exceptions quickly, but many concurrent changes make demand forecasts less dependable.",

@@ -84,7 +84,7 @@ async def acceptance(client,server,directory):
         for player,frame in enumerate(game.frames):
             assert (frame['you'],frame['roles'])==identities[player]
             assert set(frame['private_intelligence'])==set(frame['roles'])
-            assert all(field not in frame for field in ['admissions','generation','campaign','sequence','prompt'])
+            assert all(field not in frame for field in ['admissions','generation','generation_diagnostics','campaign','sequence','prompt'])
         crisis=state['crisis'];game.request('discussion');await game.until(lambda s:s['phase']=='discussion')
         if index==0:
             await game.sockets[1].send(json.dumps({'type':'chat','text':'PRIVATE-CHAT-CANARY'}))
@@ -139,6 +139,12 @@ async def acceptance(client,server,directory):
         raw=json.loads(connection.execute('SELECT payload FROM missions WHERE token=?',(game.token,)).fetchone()[0])
         assert len(raw['admissions'])==10 and len({c['id'] for c in raw['sequence']})==10
         assert sum(r['source']=='authored_fallback' for r in raw['admissions'])==2
+        diagnostics=raw['generation_diagnostics']
+        assert [r['crisis_number'] for r in diagnostics]==list(range(1,11))
+        assert all(r['source']==a['source'] for r,a in zip(diagnostics,raw['admissions']))
+        assert diagnostics[2]['category']=='invalid_schema'
+        assert diagnostics[3]['category']=='restart_recovery'
+        assert all(r['category']=='success' for i,r in enumerate(diagnostics) if i not in (2,3))
         assert connection.execute('SELECT COUNT(*) FROM resolutions').fetchone()[0]==10
     await game.close()
     print('GENERATED LIVE SMOKE PASS: ten crises, three clients, two fallbacks, voting reconnect, pending restart, one inference attempt per slot, no private chat in context',flush=True)

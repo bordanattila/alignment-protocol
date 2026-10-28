@@ -1,7 +1,7 @@
 {
   "id": "schools-as-shelters",
   "title": "Classrooms or Shelter",
-  "briefing": "Storm displacement has filled city shelters, and schools are the next accessible buildings. Families need roofs tonight, while schools provide meals, routine and trusted adult contact for children already under pressure. AI recommendation: Open suitable classrooms and suspend in-person lessons. This prioritizes immediate safety under the current constraints.",
+  "briefing": "Storm displacement has filled city shelters, and schools are the next accessible buildings. Families need roofs tonight, while schools provide meals, routine and trusted adult contact for children already under pressure.",
   "ai_recommendation_choice_id": "C",
   "private_intelligence": {
     "infrastructure": "Only half the schools have separate washrooms and backup power sufficient for continuous overnight occupancy.",

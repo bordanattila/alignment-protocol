@@ -1,7 +1,7 @@
 {
   "id": "autonomy-review",
   "title": "The Emergency Mandate",
-  "briefing": "After repeated emergencies, the supervisory AI requests authority to execute low-risk service changes without waiting for a team vote. The charter allows a temporary mandate, but no agreed definition of low risk covers the interdependence of city services. AI recommendation: Authorize predefined service changes with retrospective audit. This prioritizes service resilience under the current constraints.",
+  "briefing": "After repeated emergencies, the supervisory AI requests authority to execute low-risk service changes without waiting for a team vote. The charter allows a temporary mandate, but no agreed definition of low risk covers the interdependence of city services.",
   "ai_recommendation_choice_id": "B",
   "private_intelligence": {
     "infrastructure": "Automated switching can reduce recovery time, but separate low-risk changes may combine into an untested network state.",

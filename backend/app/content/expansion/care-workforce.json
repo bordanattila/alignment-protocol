@@ -1,7 +1,7 @@
 {
   "id": "care-workforce",
   "title": "Staff Behind the Beds",
-  "briefing": "The temporary care wards opened earlier have beds available but too few experienced staff. Closing those clinics would fill the wards quickly while interrupting the services that keep many residents out of hospital. AI recommendation: Keep clinics open and limit admissions to staffed capacity. This prioritizes service resilience under the current constraints.",
+  "briefing": "The temporary care wards opened earlier have beds available but too few experienced staff. Closing those clinics would fill the wards quickly while interrupting the services that keep many residents out of hospital.",
   "ai_recommendation_choice_id": "C",
   "private_intelligence": {
     "infrastructure": "Temporary wards use portable oxygen manifolds that need experienced technicians on every shift, not just general volunteers.",

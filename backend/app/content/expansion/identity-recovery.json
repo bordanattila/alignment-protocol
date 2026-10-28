@@ -1,7 +1,7 @@
 {
   "id": "identity-recovery",
   "title": "Who Can Restore Access?",
-  "briefing": "Earlier service isolation has removed compromised credentials but locked some residents out of benefits and permits. Community groups warn that the same checks exclude people whose records were lost. AI recommendation: Restore only accounts that pass the clean digital checks. This prioritizes service resilience under the current constraints.",
+  "briefing": "Earlier service isolation has removed compromised credentials but locked some residents out of benefits and permits. Community groups warn that the same checks exclude people whose records were lost.",
   "ai_recommendation_choice_id": "A",
   "private_intelligence": {
     "infrastructure": "A clean credential directory is ready, but importing old account links would reintroduce the pathway used by the intrusion.",

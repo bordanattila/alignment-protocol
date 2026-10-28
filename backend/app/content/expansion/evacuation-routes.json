@@ -1,7 +1,7 @@
 {
   "id": "evacuation-routes",
   "title": "One Bridge, Two Queues",
-  "briefing": "Smoke from an industrial fire is approaching a low-lying neighborhood. A single bridge supports both evacuation traffic and incoming suppression vehicles. AI recommendation: Protect an inbound responder lane and meter outbound traffic. This prioritizes immediate safety under the current constraints.",
+  "briefing": "Smoke from an industrial fire is approaching a low-lying neighborhood. A single bridge supports both evacuation traffic and incoming suppression vehicles.",
   "ai_recommendation_choice_id": "B",
   "private_intelligence": {
     "infrastructure": "The bridge can sustain two light lanes, but heavy engines require alternating access to avoid stressing temporary joints.",

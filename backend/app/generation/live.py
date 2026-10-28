@@ -1,6 +1,7 @@
 """Single-owner preparation tasks; capture/admit under lock, inference outside it."""
 import asyncio
 import logging
+import time
 from collections.abc import Callable
 from contextlib import suppress
 from typing import TYPE_CHECKING
@@ -10,7 +11,7 @@ from .context import build_context
 from .contract import GenerationRequest
 from .provider import ScenarioProvider
 from .service import GenerationOutcome, GenerationService, authored_selector
-from ..domain import Crisis, Phase
+from ..domain import Crisis, Phase, GenerationDiagnostic
 from ..persistence import PersistenceError
 
 if TYPE_CHECKING:
@@ -50,7 +51,8 @@ class LiveGeneration:
                 request = GenerationRequest(context=build_context(mission))
                 fallback = authored_selector(mission.campaign, attempt.target_index, mission.results)
             except (ValueError, TypeError, AttributeError):
-                self.store.fail_generation(token, attempt.id)
+                self.store.fail_generation(token, attempt.id, GenerationDiagnostic(
+                    crisis_number=attempt.target_index + 1, source=None, category='internal_state', duration_seconds=0.0))
                 self.connections.pending.add(token)
                 logger.error('Crisis preparation unavailable: internal_state')
                 continue
@@ -59,17 +61,29 @@ class LiveGeneration:
 
     async def _run(self, key: tuple[str, str], request: GenerationRequest, fallback: Callable[[], Crisis]):
         token, attempt_id = key
+        started = time.perf_counter()
         try:
             outcome = self.completed.get(key)
             if outcome is None:
                 outcome = await GenerationService(self.settings, self.provider, fallback).generate(request)
                 self.completed[key] = outcome
             async with self.lock:
+                source = ('generated' if outcome.source == 'generated' else 'authored_fallback') if outcome.snapshot else None
+                diagnostic = GenerationDiagnostic(
+                    crisis_number=request.context.current_crisis_number, source=source,
+                    category=outcome.failure or 'success', duration_seconds=outcome.duration_seconds,
+                    http_status=outcome.http_status)
                 if outcome.snapshot is None:
-                    self.store.fail_generation(token, attempt_id)
+                    self.store.fail_generation(token, attempt_id, diagnostic)
                 else:
-                    self.store.accept_generation(token, attempt_id, outcome.snapshot,
-                                                 'generated' if outcome.source == 'generated' else 'authored_fallback')
+                    admitted = self.store.accept_generation(token, attempt_id, outcome.snapshot, source, diagnostic)
+                    if admitted:
+                        # Uvicorn's INFO logger makes success visible with the
+                        # standard server command, without configuring root logging.
+                        logging.getLogger('uvicorn.error').info(
+                            'crisis_admitted mode=generated crisis=%d source=%s success=%s failure=%s http_status=%s duration_seconds=%.3f',
+                            request.context.current_crisis_number, source, outcome.source == 'generated',
+                            outcome.failure.value if outcome.failure else 'none', outcome.http_status, outcome.duration_seconds)
                 self.publishing.add(key)
             self.completed.pop(key, None)
             await self.connections.broadcast(token)
@@ -77,6 +91,13 @@ class LiveGeneration:
             logger.error('Crisis preparation waiting for storage recovery.')
         except asyncio.CancelledError:
             self.completed.pop(key, None)
+            try:
+                async with self.lock:
+                    self.store.interrupt_generation(token, attempt_id, GenerationDiagnostic(
+                        crisis_number=request.context.current_crisis_number, source=None, category='canceled',
+                        duration_seconds=round(time.perf_counter() - started, 3)))
+            except PersistenceError:
+                logger.error('Crisis preparation cancellation waiting for storage recovery.')
             raise
         except Exception:
             # A broken context/selector/admission has an explicit host-retry path.
@@ -85,7 +106,9 @@ class LiveGeneration:
             self.completed.pop(key, None)
             try:
                 async with self.lock:
-                    self.store.fail_generation(token, attempt_id)
+                    self.store.fail_generation(token, attempt_id, GenerationDiagnostic(
+                        crisis_number=request.context.current_crisis_number, source=None, category='internal_state',
+                        duration_seconds=round(time.perf_counter() - started, 3)))
                 await self.connections.broadcast(token)
             except PersistenceError:
                 logger.error('Crisis preparation waiting for storage recovery.')

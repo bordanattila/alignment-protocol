@@ -161,3 +161,13 @@ The creation form defaults to **Authored Mission**. **AI-Generated Mission** bec
 ```
 
 The smoke uses a fake provider, three real WebSocket clients, a temporary database, and a killed/restarted backend. It needs no model or credential. See [Milestone 9.2 live generation](docs/MILESTONE_9_2_LIVE_GENERATION.md) for concurrency, persistence, recovery policy, configuration, verification and manual acceptance.
+
+If generated missions keep serving authored content, inspect the backend `generation_result` / `crisis_admitted` records for source, sanitized failure, HTTP status and duration. Capability availability checks configuration completeness; it does not verify API billing or model access. See the [live generation investigation](docs/MILESTONE_9_2_LIVE_GENERATION_INVESTIGATION.md) for the verified model/quota failures and an explicitly opt-in, two-request provider smoke. Fix API access/quota before retrying; accepted crises are never regenerated.
+
+New preparation outcomes also persist five sanitized fields in the existing private mission aggregate: crisis number, source, category, duration and provider HTTP status. They are excluded from gameplay snapshots. A local read-only developer command inspects them without acquiring the backend ownership lock or contacting a provider:
+
+```sh
+.venv/bin/python -m app.generation.inspect_diagnostics --database backend/data/consensus-engine.sqlite3 --mission-index 1
+```
+
+Use your actual database path; `1` selects the most recently created mission, `2` the previous mission. Old missions without records return `[]`; historical causes are not inferred. No SQL migration is needed. See [Crisis 2 fallback diagnostics](docs/MILESTONE_9_2_CRISIS_2_DIAGNOSTICS.md) for the investigation, category semantics, compatibility and offline verification.

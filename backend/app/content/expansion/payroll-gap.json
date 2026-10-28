@@ -1,7 +1,7 @@
 {
   "id": "payroll-gap",
   "title": "The Payroll Gap",
-  "briefing": "The municipal payment processor has delayed wages for sanitation and maintenance contractors. The city has one banking window to prevent walkouts without obscuring who bears the credit risk. AI recommendation: Borrow against next month receipts to pay all verified wages. This prioritizes public confidence under the current constraints.",
+  "briefing": "The municipal payment processor has delayed wages for sanitation and maintenance contractors. The city has one banking window to prevent walkouts without obscuring who bears the credit risk.",
   "ai_recommendation_choice_id": "A",
   "private_intelligence": {
     "infrastructure": "Deferred repair money is earmarked for worn drainage valves, not cosmetic upgrades; delay will reduce wet-weather capacity.",

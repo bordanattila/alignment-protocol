@@ -1,6 +1,7 @@
 """Single-process mission cache; optional SQLite commits precede publication."""
 import secrets
 import hashlib
+import logging
 import time
 from functools import wraps
 from collections.abc import Callable
@@ -10,7 +11,7 @@ from .persistence import SQLiteMissions, credential_digest
 from .voting import plurality
 from .crises import load_crisis_sequence
 from .campaign import Campaign, initial_sequence, select_crisis, validate_catalog
-from .domain import Scenario, GenerationAttempt, CrisisAdmission
+from .domain import Scenario, GenerationAttempt, CrisisAdmission, GenerationDiagnostic
 from .generation.contract import AcceptedScenario
 from .generation.service import authored_selector
 from .callsigns import normalize_callsign, callsign_key
@@ -82,9 +83,17 @@ class MissionStore:
                     try:
                         crisis = authored_selector(mission.campaign, mission.generation.target_index, mission.results)()
                         self.accept_generation(mission.token, mission.generation.id,
-                                               AcceptedScenario.from_crisis(crisis), 'authored_fallback')
+                                               AcceptedScenario.from_crisis(crisis), 'authored_fallback',
+                                               GenerationDiagnostic(crisis_number=mission.generation.target_index + 1,
+                                                                    source='authored_fallback', category='restart_recovery',
+                                                                    duration_seconds=0.0))
+                        logging.getLogger('uvicorn.error').info(
+                            'crisis_admitted mode=generated crisis=%d source=authored_fallback success=False failure=restart_recovery http_status=None duration_seconds=0.000',
+                            mission.crisis_index + 1)
                     except (ValueError, TypeError):
-                        self.fail_generation(mission.token, mission.generation.id)
+                        self.fail_generation(mission.token, mission.generation.id,
+                                             GenerationDiagnostic(crisis_number=mission.generation.target_index + 1,
+                                                                  source=None, category='internal_state', duration_seconds=0.0))
                 if mission.phase in (Phase.DISCUSSION, Phase.VOTING, Phase.CONSENSUS_WINDOW):
                     mission.recovery_phase = mission.phase
                     mission.recovery_deadline = mission.deadline
@@ -393,7 +402,8 @@ class MissionStore:
         mission.decision = None
 
     @persisted
-    def accept_generation(self, token: str, attempt_id: str, snapshot: AcceptedScenario, source: str) -> bool:
+    def accept_generation(self, token: str, attempt_id: str, snapshot: AcceptedScenario, source: str,
+                          diagnostic: GenerationDiagnostic | None = None) -> bool:
         mission = self.get(token)
         attempt = mission.generation
         if (mission.mode != 'generated' or mission.phase != Phase.PREPARING or attempt is None
@@ -405,6 +415,9 @@ class MissionStore:
             raise ValueError('Repeated accepted scenario')
         record = CrisisAdmission(source=source, canonical_json=snapshot.canonical_json,
                                 content_hash=hashlib.sha256(snapshot.canonical_json.encode()).hexdigest())
+        if diagnostic is not None:
+            if diagnostic.source != source: raise ValueError('Diagnostic source must match admission')
+            self._record_diagnostic(mission, diagnostic)
         mission.admissions.append(record)
         mission.sequence.append(crisis)
         mission.crisis_index = attempt.target_index
@@ -414,10 +427,27 @@ class MissionStore:
         return True
 
     @persisted
-    def fail_generation(self, token: str, attempt_id: str):
+    def fail_generation(self, token: str, attempt_id: str, diagnostic: GenerationDiagnostic | None = None):
         mission = self.get(token)
         if mission.phase == Phase.PREPARING and mission.generation and mission.generation.id == attempt_id:
+            if diagnostic is not None: self._record_diagnostic(mission, diagnostic)
             mission.generation.status = 'error'
+
+    @staticmethod
+    def _record_diagnostic(mission: Mission, diagnostic: GenerationDiagnostic):
+        if diagnostic.crisis_number != mission.generation.target_index + 1:
+            raise ValueError('Diagnostic must match preparation target')
+        mission.generation_diagnostics = [r for r in mission.generation_diagnostics if r.crisis_number != diagnostic.crisis_number]
+        mission.generation_diagnostics.append(diagnostic)
+
+    @persisted
+    def interrupt_generation(self, token: str, attempt_id: str, diagnostic: GenerationDiagnostic):
+        mission = self.get(token)
+        if (mission.phase == Phase.PREPARING and mission.generation and mission.generation.id == attempt_id
+                and mission.generation.status == 'pending'):
+            # Keep pending status: restart still selects authored fallback rather
+            # than leaving an interrupted task in the host-retry error phase.
+            self._record_diagnostic(mission, diagnostic)
 
     @persisted
     def retry_generation(self, token: str, credential: str):

@@ -1,6 +1,5 @@
 """Versioned untrusted proposals reuse canonical Crisis/Choice/MetricDeltas."""
 from dataclasses import dataclass, field
-from enum import StrEnum
 import hashlib
 import json
 from typing import Annotated, Literal
@@ -9,6 +8,7 @@ from pydantic import ConfigDict, Field, StringConstraints, ValidationError, mode
 from pydantic import BaseModel
 
 from ..domain import Choice, Crisis, Metrics, MetricDeltas, Role
+from .errors import FailureCategory
 
 VERSION = '1.0'
 MIN_EFFECT, MAX_EFFECT = -24, 18  # Observed extrema of the 30 authored crises.
@@ -22,24 +22,10 @@ Effect = Annotated[int, Field(strict=True, ge=MIN_EFFECT, le=MAX_EFFECT)]
 Identifier = Annotated[str, StringConstraints(pattern=r'^[a-z0-9]+(?:-[a-z0-9]+)*$', max_length=128)]
 
 
-class FailureCategory(StrEnum):
-    DISABLED = 'disabled'
-    CONFIGURATION = 'configuration'
-    TIMEOUT = 'timeout'
-    UNAVAILABLE = 'unavailable'
-    AUTHENTICATION = 'authentication'
-    RATE_LIMITED = 'rate_limited'
-    UNSUPPORTED_RESPONSE = 'unsupported_response'
-    INVALID_JSON = 'invalid_json'
-    INVALID_SCHEMA = 'invalid_schema'
-    INVALID_CONTINUITY = 'invalid_continuity'
-    REFUSAL = 'refusal'
-    UNEXPECTED = 'unexpected'
-
-
 class GenerationError(Exception):
-    def __init__(self, category: FailureCategory):
+    def __init__(self, category: FailureCategory, http_status: int | None = None):
         self.category = FailureCategory(category)
+        self.http_status = http_status if type(http_status) is int and 100 <= http_status <= 599 else None
         super().__init__(self.category.value)
 
 
@@ -162,10 +148,12 @@ class CrisisProposal(BaseModel):
     model_config = ConfigDict(extra='forbid', strict=True)
     schema_version: Literal['1.0']
     crisis: ProposedCrisis
-    continuity_references: list[ContinuityReference] = Field(default_factory=list, max_length=3)
+    continuity_references: list[ContinuityReference] = Field(
+        default_factory=list, max_length=3,
+        description='Optional links to executed decisions in context.history. Use [] for no links, including a standalone opening crisis. Never invent prior decisions.')
 
 
-def proposal_schema() -> dict:
+def proposal_schema(context: GenerationContext | None = None) -> dict:
     """Strict structured-output schema, using the same Pydantic contract."""
     schema = CrisisProposal.model_json_schema()
     def visit(node):
@@ -188,6 +176,23 @@ def proposal_schema() -> dict:
                     }
             for child in node.values(): visit(child)
     visit(schema)
+    if context is not None:
+        references = schema['properties']['continuity_references']
+        allowed = sorted({(r.crisis_number, r.choice_id) for r in context.history})
+        references['maxItems'] = len(allowed)
+        if not allowed:
+            references['description'] = ('There are no executed decisions in the authoritative history. '
+                                         'Return [] and write a standalone crisis without prior player actions.')
+        else:
+            # Each branch binds the number AND executed choice together. Separate
+            # enums would incorrectly permit cross-pairing historical decisions.
+            references['items'] = {'anyOf': [
+                {'type': 'object', 'additionalProperties': False,
+                 'properties': {'crisis_number': {'type': 'integer', 'enum': [number]},
+                                'choice_id': {'type': 'string', 'enum': [choice]}},
+                 'required': ['crisis_number', 'choice_id']}
+                for number, choice in allowed
+            ]}
     return schema
 
 

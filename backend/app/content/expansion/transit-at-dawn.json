@@ -1,7 +1,7 @@
 {
   "id": "transit-at-dawn",
   "title": "Transit at Dawn",
-  "briefing": "A cracked junction has closed the city rail interchange just before the morning shift. Replacement buses can cover workers or hospital routes, but not both at full frequency. AI recommendation: Reserve replacement buses for registered essential workers. This prioritizes immediate safety under the current constraints.",
+  "briefing": "A cracked junction has closed the city rail interchange just before the morning shift. Replacement buses can cover workers or hospital routes, but not both at full frequency.",
   "ai_recommendation_choice_id": "A",
   "private_intelligence": {
     "infrastructure": "The bypass can carry half the usual trains, but running it continuously postpones the only safe repair window.",

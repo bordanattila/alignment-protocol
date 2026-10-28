@@ -1,7 +1,7 @@
 {
   "id": "bottled-water-waste",
   "title": "The Delivery Backlog",
-  "briefing": "The earlier bottled-water delivery strategy has left distribution depots full of empty containers and tanker queues. Essential deliveries continue, but a cleanup contract would displace the vehicles and funds that brought emergency supply into the neighborhoods. AI recommendation: Hire an emergency collection fleet and keep sealed-water deliveries. This prioritizes immediate safety under the current constraints.",
+  "briefing": "The earlier bottled-water delivery strategy has left distribution depots full of empty containers and tanker queues. Essential deliveries continue, but a cleanup contract would displace the vehicles and funds that brought emergency supply into the neighborhoods.",
   "ai_recommendation_choice_id": "B",
   "private_intelligence": {
     "infrastructure": "Refill stations need pressure tests before use; opening all of them today would risk contaminating clean hoses.",

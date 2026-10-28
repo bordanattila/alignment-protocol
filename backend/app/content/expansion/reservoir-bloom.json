@@ -1,7 +1,7 @@
 {
   "id": "reservoir-bloom",
   "title": "Bloom at the Intake",
-  "briefing": "A warm reservoir has developed an algal bloom near a drinking-water intake. Laboratory confirmation will arrive after the next pumping cycle. AI recommendation: Stop reservoir distribution until sampling is complete. This prioritizes public confidence under the current constraints.",
+  "briefing": "A warm reservoir has developed an algal bloom near a drinking-water intake. Laboratory confirmation will arrive after the next pumping cycle.",
   "ai_recommendation_choice_id": "C",
   "private_intelligence": {
     "infrastructure": "The deep intake is clean in the last sample, but its older pumps cannot sustain normal pressure at every elevation.",

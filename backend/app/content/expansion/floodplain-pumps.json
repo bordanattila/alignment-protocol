@@ -1,7 +1,7 @@
 {
   "id": "floodplain-pumps",
   "title": "Beyond the Flood Line",
-  "briefing": "Floodwater is approaching both an industrial pumping station and a densely populated estate. Directing the same pumps toward homes would protect more people immediately but leave the wider network vulnerable. AI recommendation: Maintain smaller defenses at the estate and the station. This prioritizes public confidence under the current constraints.",
+  "briefing": "Floodwater is approaching both an industrial pumping station and a densely populated estate. Directing the same pumps toward homes would protect more people immediately but leave the wider network vulnerable.",
   "ai_recommendation_choice_id": "B",
   "private_intelligence": {
     "infrastructure": "The station supports three downstream basins; once submerged, restarting it requires specialist parts unavailable locally.",
