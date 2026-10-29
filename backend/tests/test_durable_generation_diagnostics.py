@@ -19,7 +19,7 @@ from test_live_generation import setup, launch, settle, ProgressiveProvider
 from test_persistence import ready, voting, votes
 
 
-FIELDS={'crisis_number','source','category','duration_seconds','http_status'}
+FIELDS={'crisis_number','source','category','duration_seconds','http_status','measurement'}
 
 
 @pytest.mark.parametrize('failure,category,source',[
@@ -181,7 +181,7 @@ def test_diagnostic_model_forbids_payloads_and_invalid_metadata():
         with pytest.raises(ValidationError):GenerationDiagnostic(**(base|update))
 
 
-def test_developer_inspection_is_read_only_and_prints_only_five_fields(tmp_path):
+def test_developer_inspection_is_read_only_and_prints_only_bounded_fields(tmp_path):
     async def run():
         path=tmp_path/'inspection.sqlite3';store,mission,credentials,clock,live=setup(path)
         await launch(live);await settle(live)

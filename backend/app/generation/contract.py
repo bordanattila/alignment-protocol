@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 from ..domain import Choice, Crisis, Metrics, MetricDeltas, Role
 from .errors import FailureCategory
+from .measurement import TokenUsage
 
 VERSION = '1.0'
 MIN_EFFECT, MAX_EFFECT = -24, 18  # Observed extrema of the 30 authored crises.
@@ -23,10 +24,20 @@ Identifier = Annotated[str, StringConstraints(pattern=r'^[a-z0-9]+(?:-[a-z0-9]+)
 
 
 class GenerationError(Exception):
-    def __init__(self, category: FailureCategory, http_status: int | None = None):
+    def __init__(self, category: FailureCategory, http_status: int | None = None, *,
+                 usage: TokenUsage | None = None, provider_attempted: bool | None = None, detail: str | None = None):
         self.category = FailureCategory(category)
         self.http_status = http_status if type(http_status) is int and 100 <= http_status <= 599 else None
+        self.usage = usage if isinstance(usage, TokenUsage) else None
+        self.provider_attempted = provider_attempted if type(provider_attempted) is bool else None
+        self.detail = detail if detail in ('repeated_title','repeated_content','duplicate_choice_text','identical_effects') else None
         super().__init__(self.category.value)
+
+
+class ObjectiveRepetition(ValueError):
+    def __init__(self, code):
+        self.code = code
+        super().__init__('Repeated options')
 
 
 def strict_json(text: str | bytes):
@@ -157,11 +168,11 @@ class ProposedCrisis(Crisis):
     @model_validator(mode='after')
     def strategic_options(self):
         if len({c.title.casefold() for c in self.choices}) != 3 or len({c.description.casefold() for c in self.choices}) != 3:
-            raise ValueError('Options must be distinct')
+            raise ObjectiveRepetition('duplicate_choice_text')
         if len(set(self.private_intelligence.values())) != 4:
             raise ValueError('Intelligence must be role-specific')
         if len({tuple(c.metric_deltas.model_dump().values()) for c in self.choices}) != 3:
-            raise ValueError('Options must have different strategic effects')
+            raise ObjectiveRepetition('identical_effects')
         texts = [self.title, self.briefing, *self.private_intelligence.values()]
         texts.extend(text for choice in self.choices for text in (choice.title, choice.description, choice.consequence))
         if any((ord(char) < 32 and char not in '\n\t') or ord(char) == 127 for text in texts for char in text):
@@ -274,14 +285,18 @@ def accept_proposal(content: str, context: GenerationContext) -> AcceptedScenari
         data = proposal.crisis.model_dump(mode='json', exclude={'id'})
         if context.narrative_memory and ' '.join(data['title'].casefold().split()) in {
                 ' '.join(t.casefold().split()) for t in context.narrative_memory.used_titles}:
-            raise ValueError('Repeated crisis title')
+            raise GenerationError(FailureCategory.INVALID_SCHEMA, detail='repeated_title')
         data['choices'].sort(key=lambda choice:choice['id'])
         material = {'schema_version': VERSION, 'crisis': data,
                     'continuity_references': [r.model_dump() for r in references]}
         identifier = 'generated-' + hashlib.sha256(canonical(material).encode()).hexdigest()
         if identifier in context.used_scenario_ids:
-            raise ValueError('Previously used content')
+            raise GenerationError(FailureCategory.INVALID_SCHEMA, detail='repeated_content')
         crisis = Crisis.model_validate({**data, 'id': identifier})
         return AcceptedScenario.from_crisis(crisis, references)
-    except (ValidationError, ValueError, TypeError, RecursionError):
+    except ValidationError as exc:
+        detail = next((e['ctx']['error'].code for e in exc.errors(include_input=False, include_url=False)
+                       if isinstance(e.get('ctx',{}).get('error'), ObjectiveRepetition)), None)
+        raise GenerationError(FailureCategory.INVALID_SCHEMA, detail=detail) from None
+    except (ValueError, TypeError, RecursionError):
         raise GenerationError(FailureCategory.INVALID_SCHEMA) from None

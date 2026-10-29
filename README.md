@@ -189,3 +189,21 @@ Endgame diagnostics use the same local inspection mechanism:
 ```
 
 The smoke uses fake inference, temporary SQLite databases and three real WebSocket clients. It exercises a ten-crisis mixed-source campaign, pending-story reconnect, accepted-story restart, interrupted-story restart fallback and provider failure. See [Milestone 9.3](docs/MILESTONE_9_3_ADAPTIVE_NARRATIVE.md) for contracts, compatibility, exact results, limitations and manual acceptance.
+
+## Offline LLM evaluation
+
+The evaluation command makes no network requests, reads no API credentials, and has no live-provider mode:
+
+```sh
+.venv/bin/python -m app.generation.evaluation --output /tmp/consensus-evaluation.json --review-template /tmp/consensus-review.json
+```
+
+It exercises six synthetic histories and production crisis/endgame validation with success, malformed output, unsupported references, exact repetition, failures, timeouts and disabled cases. Results clearly label scripted timings and token counts as synthetic. Human scores remain blank; supported references are measured separately from meaningful narrative continuity.
+
+New private diagnostics optionally include typed stage timings, reported token usage, configured model and reference counts. Legacy diagnostics remain readable; unknown measurements are never backfilled. To summarize an explicitly selected existing mission read-only:
+
+```sh
+.venv/bin/python -m app.generation.evaluation --database /absolute/private/mission.sqlite3 --mission-index 1 --output /tmp/mission-evaluation.json
+```
+
+Cost estimates require an operator-supplied pricing JSON mapping model names to `input_per_million` and `output_per_million`. Add `--pricing /path/to/pricing.json --missions 3`. No prices are assumed, and missing usage stays unknown even when authored fallback was used. Production records summarize final outcomes per crisis, not every historical retry. See [Milestone 9.4](docs/MILESTONE_9_4_LLM_EVALUATION.md) for rate denominators, the rubric, baseline evidence, cost assumptions and the unexecuted six-request real-provider protocol.

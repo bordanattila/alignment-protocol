@@ -11,6 +11,7 @@ from ..persistence import PersistenceError
 from .contract import GenerationError, FailureCategory
 from .endgame import build_endgame_request, accept_endgame
 from .provider import ChatCompletionsProvider, ProviderResponse
+from .measurement import GenerationTrace
 
 logger = logging.getLogger(__name__)
 
@@ -21,24 +22,26 @@ class StoryOutcome:
     diagnostic: EndgameDiagnostic | None = None
 
 
-async def generate_conclusion(settings, provider, request) -> StoryOutcome:
-    started=time.perf_counter();status=None;narrative=None;category=FailureCategory.DISABLED
+async def generate_conclusion(settings, provider, request, clock=time.perf_counter) -> StoryOutcome:
+    started=clock();status=None;narrative=None;category=FailureCategory.DISABLED
+    trace=GenerationTrace(settings,'endgame',bool(request.context.history),clock)
     if settings.enabled:
         try:
             adapter=provider if provider is not None else ChatCompletionsProvider(settings)
             async with asyncio.timeout(settings.timeout_seconds):
-                response=await adapter.generate(request)
+                response=await trace.call(adapter,request)
             if not isinstance(response,ProviderResponse):raise GenerationError(FailureCategory.UNSUPPORTED_RESPONSE)
             status=response.http_status if type(response.http_status) is int and 100<=response.http_status<=599 else None
-            narrative=accept_endgame(response.content,request.context)
+            narrative=trace.validate(lambda: accept_endgame(response.content,request.context))
             if settings.api_key and settings.api_key.get_secret_value() in narrative.model_dump_json():
                 raise GenerationError(FailureCategory.INVALID_SCHEMA)
             category='success'
+            trace.reference_count=len({n for section in (narrative.journey,narrative.cost,narrative.standing) for n in section.references})
         except TimeoutError:category=FailureCategory.TIMEOUT;narrative=None
         except GenerationError as exc:category=exc.category;status=exc.http_status or status;narrative=None
         except Exception:category=FailureCategory.UNEXPECTED;narrative=None
     diagnostic=EndgameDiagnostic(source='generated' if narrative else 'deterministic_fallback', category=category,
-        duration_seconds=round(time.perf_counter()-started,3),http_status=status)
+        duration_seconds=round(clock()-started,6),http_status=status,measurement=trace.measurement())
     return StoryOutcome(narrative,diagnostic)
 
 

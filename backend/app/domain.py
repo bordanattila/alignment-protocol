@@ -6,6 +6,7 @@ from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StringConstr
 
 from .callsigns import normalize_callsign
 from .generation.errors import FailureCategory
+from .generation.measurement import MeasuredDiagnostic
 from .narrative_models import ConclusionState
 
 
@@ -217,7 +218,7 @@ class CrisisAdmission(BaseModel):
     content_hash: str
 
 
-class GenerationDiagnostic(BaseModel):
+class GenerationDiagnostic(MeasuredDiagnostic):
     model_config = ConfigDict(extra='forbid', frozen=True)
     crisis_number: int = Field(ge=1, le=10, strict=True)
     source: Literal['generated', 'authored_fallback'] | None

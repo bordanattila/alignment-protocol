@@ -72,7 +72,7 @@ class LiveGeneration:
                 diagnostic = GenerationDiagnostic(
                     crisis_number=request.context.current_crisis_number, source=source,
                     category=outcome.failure or 'success', duration_seconds=outcome.duration_seconds,
-                    http_status=outcome.http_status)
+                    http_status=outcome.http_status, measurement=outcome.measurement)
                 if outcome.snapshot is None:
                     self.store.fail_generation(token, attempt_id, diagnostic)
                 else:

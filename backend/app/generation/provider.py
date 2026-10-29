@@ -9,6 +9,7 @@ import httpx
 from .config import GenerationSettings
 from .contract import FailureCategory, GenerationError, GenerationRequest, GenerationContext, proposal_schema, strict_json, reference_history
 from .endgame import EndgameRequest, endgame_schema, INSTRUCTIONS as ENDGAME_INSTRUCTIONS
+from .measurement import TokenUsage, extract_usage
 
 MAX_RESPONSE_BYTES = 131072
 MAX_ERROR_BYTES = 16384
@@ -98,6 +99,7 @@ def continuity_instructions(context: GenerationContext) -> str:
 class ProviderResponse:
     content: str = field(repr=False)
     http_status: int | None = field(default=None, repr=False)
+    usage: TokenUsage | None = None
 
 
 class ScenarioProvider(Protocol):
@@ -111,9 +113,9 @@ class ChatCompletionsProvider:
 
     async def generate(self, request: GenerationRequest | EndgameRequest) -> ProviderResponse:
         settings = self.settings
-        if not settings.enabled: raise GenerationError(FailureCategory.DISABLED)
+        if not settings.enabled: raise GenerationError(FailureCategory.DISABLED, provider_attempted=False)
         if not settings.endpoint or not settings.model or (settings.require_api_key and not settings.api_key):
-            raise GenerationError(FailureCategory.CONFIGURATION)
+            raise GenerationError(FailureCategory.CONFIGURATION, provider_attempted=False)
         try:
             async with asyncio.timeout(settings.timeout_seconds):
                 if self.client is not None:
@@ -160,19 +162,21 @@ class ChatCompletionsProvider:
                 body.extend(chunk)
                 if len(body) > MAX_RESPONSE_BYTES:
                     raise GenerationError(FailureCategory.UNSUPPORTED_RESPONSE, 200)
+        usage = None
         try:
             data = strict_json(bytes(body))
+            usage = extract_usage(data.get('usage')) if isinstance(data,dict) else None
             choices = data['choices']
             if not isinstance(choices, list) or len(choices) != 1:
                 raise ValueError('Unsupported choices')
             choice = choices[0]
             message = choice['message']
             if message.get('refusal'):
-                raise GenerationError(FailureCategory.REFUSAL, 200)
+                raise GenerationError(FailureCategory.REFUSAL, 200, usage=usage)
             if (choice.get('finish_reason') != 'stop' or message.get('role') != 'assistant'
                     or message.get('tool_calls') or message.get('function_call')
                     or not isinstance(message.get('content'), str)):
                 raise ValueError('Unsupported message')
-            return ProviderResponse(message['content'], http_status=200)
+            return ProviderResponse(message['content'], http_status=200, usage=usage)
         except (ValueError, TypeError, KeyError, AttributeError, RecursionError, UnicodeError):
-            raise GenerationError(FailureCategory.UNSUPPORTED_RESPONSE, 200) from None
+            raise GenerationError(FailureCategory.UNSUPPORTED_RESPONSE, 200, usage=usage) from None

@@ -2,6 +2,7 @@
 from typing import Annotated, Literal
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StringConstraints, model_validator
 from .generation.errors import FailureCategory
+from .generation.measurement import MeasuredDiagnostic
 
 StoryText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=40, max_length=900)]
 
@@ -22,7 +23,7 @@ class EndgameNarrative(BaseModel):
     standing: StorySection
 
 
-class EndgameDiagnostic(BaseModel):
+class EndgameDiagnostic(MeasuredDiagnostic):
     model_config = ConfigDict(extra='forbid', frozen=True)
     operation: Literal['endgame'] = 'endgame'
     source: Literal['generated', 'deterministic_fallback']
