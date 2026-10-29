@@ -375,7 +375,7 @@ def test_live_context_excludes_chat_names_tokens_roles_credentials_and_private_r
         assert all(value not in text for value in ['PRIVATE-NAME-CANARY','PRIVATE-CHAT-CANARY',mission.token,*credentials])
         assert all(p.id not in text for p in mission.players)
         assert all(secret not in text for s in load_campaign_catalog() for secret in s.crisis.private_intelligence.values())
-        assert set(json.loads(text)['context'])=={'current_crisis_number','metrics','history','used_scenario_ids'}
+        assert set(json.loads(text)['context'])=={'current_crisis_number','metrics','history','used_scenario_ids','narrative_memory'}
         await live.close()
     asyncio.run(exercise())
 

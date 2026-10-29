@@ -16,6 +16,8 @@ from .generation.contract import AcceptedScenario
 from .generation.service import authored_selector
 from .callsigns import normalize_callsign, callsign_key
 from .consequences import apply_metric_deltas, collapsed_metrics, consensus_score
+from .narrative_models import ConclusionState, EndgameDiagnostic, EndgameNarrative
+from .generation.endgame import basis_hash, build_endgame_request, validate_narrative
 
 
 class MissionError(Exception):
@@ -77,6 +79,9 @@ class MissionStore:
             self._missions = self.persistence.load()
             for mission in self._missions.values():
                 for player in mission.players: player.connected = False
+                if mission.conclusion and mission.conclusion.status == 'pending':
+                    self.finish_conclusion(mission.token, mission.conclusion.id, mission.conclusion.basis_hash,
+                        None, EndgameDiagnostic(source='deterministic_fallback', category='restart_recovery', duration_seconds=0.0))
                 if mission.phase == Phase.PREPARING and mission.generation.status == 'pending':
                     # An interrupted attempt is never replayed against a model.
                     # Resolve through the same saved authored selector instead.
@@ -351,6 +356,7 @@ class MissionStore:
         mission.collapsed_metrics = collapsed_metrics(after)
         if mission.collapsed_metrics:
             mission.phase = Phase.FAILED
+            self._prepare_conclusion(mission)
         # decision_locked is now the durable, synchronized consequence/result
         # phase. Host acknowledgement advances, so no result is replaced unseen.
         return result
@@ -370,6 +376,7 @@ class MissionStore:
         if mission.crisis_index + 1 == (10 if mission.mode == 'generated' else len(mission.sequence)):
             mission.phase = Phase.COMPLETED
             mission.consensus_score = consensus_score(mission.metrics)
+            self._prepare_conclusion(mission)
             return True
         if mission.mode == 'generated':
             self._prepare_generation(mission)
@@ -391,6 +398,25 @@ class MissionStore:
         mission.deadline = None
         # Chat is mission-wide history; keep its retention/rate limits across
         # crises. Vote maps and local selection keys belong only to this crisis.
+        return True
+
+    @staticmethod
+    def _prepare_conclusion(mission: Mission):
+        if mission.mode == 'generated' and mission.conclusion is None:
+            mission.conclusion = ConclusionState(id=secrets.token_urlsafe(24), basis_hash=basis_hash(mission))
+
+    @persisted
+    def finish_conclusion(self, token: str, attempt_id: str, expected_basis: str,
+                          narrative: EndgameNarrative | None, diagnostic: EndgameDiagnostic) -> bool:
+        mission = self.get(token)
+        pending = mission.conclusion
+        if (mission.mode != 'generated' or mission.phase not in (Phase.COMPLETED, Phase.FAILED)
+                or pending is None or pending.status != 'pending' or pending.id != attempt_id
+                or pending.basis_hash != expected_basis or basis_hash(mission) != expected_basis):
+            return False
+        if narrative is not None: validate_narrative(narrative, build_endgame_request(mission).context)
+        mission.conclusion = ConclusionState(id=pending.id, basis_hash=expected_basis,
+            status='generated' if narrative is not None else 'fallback', narrative=narrative, diagnostic=diagnostic)
         return True
 
     @staticmethod
@@ -550,6 +576,7 @@ class MissionStore:
         notable.sort(key=lambda r:r.crisis_number)
         return {
             "outcome": "victory" if mission.phase == Phase.COMPLETED else "defeat",
+            **({"conclusion": MissionStore._conclusion_projection(mission)} if mission.conclusion else {}),
             "crises_completed": len(mission.results), "total_crises": 10 if mission.mode == 'generated' else len(mission.sequence),
             "final_metrics": mission.metrics.model_dump(),
             "consensus_score": consensus_score(mission.metrics),
@@ -566,6 +593,20 @@ class MissionStore:
                  "choice_title": r.choice_title, "outcome": r.outcome}
                 for r in notable],
         }
+
+    @staticmethod
+    def _conclusion_projection(mission: Mission) -> dict:
+        state = mission.conclusion
+        projected = {'status': state.status, 'sections': []}
+        if state.narrative:
+            for key, title in (('journey', "The Civilization’s Journey"), ('cost', 'The Cost of Survival'), ('standing', 'Where the City Stands')):
+                section = getattr(state.narrative, key)
+                sources = [r for r in mission.results if r.crisis_number in section.references]
+                projected['sections'].append({'key':key, 'title':title, 'text':section.text,
+                    'references':[{'crisis_number':r.crisis_number, 'crisis_id':r.crisis_id,
+                                   'choice_id':r.decision.choice_id, 'crisis_title':r.crisis_title,
+                                   'choice_title':r.choice_title, 'outcome':r.outcome} for r in sources]})
+        return projected
 
     @staticmethod
     def _normalize_callsign(callsign: str) -> str:

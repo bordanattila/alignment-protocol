@@ -49,6 +49,10 @@ class FrozenMetrics(Metrics):
     model_config = ConfigDict(extra='forbid', frozen=True, strict=True)
 
 
+class FrozenDeltas(MetricDeltas):
+    model_config = ConfigDict(extra='forbid', frozen=True, strict=True)
+
+
 class DecisionContext(BaseModel):
     model_config = ConfigDict(extra='forbid', frozen=True, strict=True)
     crisis_number: int = Field(ge=1, le=10)
@@ -57,6 +61,34 @@ class DecisionContext(BaseModel):
     choice_id: Literal['A', 'B', 'C']
     choice_title: Title
     consequence: str = Field(min_length=1, max_length=600)
+    applied_deltas: FrozenDeltas | None = None
+
+
+class EstablishedEvent(BaseModel):
+    model_config = ConfigDict(extra='forbid', frozen=True, strict=True)
+    crisis_id: Identifier
+    crisis_number: int = Field(ge=1, le=10)
+    situation: str = Field(max_length=300)
+
+
+class MetricPressure(BaseModel):
+    model_config = ConfigDict(extra='forbid', frozen=True, strict=True)
+    metric: Literal['infrastructure', 'public_trust', 'economy', 'safety']
+    current_value: int = Field(ge=0, le=100)
+    change_since_start: int
+    contributing_decisions: tuple[int, ...] = Field(max_length=3)
+
+
+class NarrativeMemory(BaseModel):
+    model_config = ConfigDict(extra='forbid', frozen=True, strict=True)
+    significant_earlier_decisions: tuple[DecisionContext, ...] = Field(max_length=2)
+    established_events: tuple[EstablishedEvent, ...] = Field(max_length=3)
+    # Metric deficits are recorded open pressures, never predictions of new events.
+    open_pressures: tuple[MetricPressure, ...] = Field(max_length=4)
+    recurring_costs: tuple[MetricPressure, ...] = Field(max_length=4)
+    strengths: tuple[str, ...] = Field(max_length=4)
+    weaknesses: tuple[str, ...] = Field(max_length=4)
+    used_titles: tuple[str, ...] = Field(max_length=10)
 
 
 class GenerationContext(BaseModel):
@@ -65,6 +97,12 @@ class GenerationContext(BaseModel):
     metrics: FrozenMetrics
     history: tuple[DecisionContext, ...] = Field(max_length=3)
     used_scenario_ids: tuple[Identifier, ...] = Field(max_length=10)
+    narrative_memory: NarrativeMemory | None = None
+
+
+def reference_history(context: GenerationContext) -> tuple[DecisionContext, ...]:
+    earlier = context.narrative_memory.significant_earlier_decisions if context.narrative_memory else ()
+    return earlier + context.history
 
 
 class GenerationRequest(BaseModel):
@@ -122,6 +160,8 @@ class ProposedCrisis(Crisis):
             raise ValueError('Options must be distinct')
         if len(set(self.private_intelligence.values())) != 4:
             raise ValueError('Intelligence must be role-specific')
+        if len({tuple(c.metric_deltas.model_dump().values()) for c in self.choices}) != 3:
+            raise ValueError('Options must have different strategic effects')
         texts = [self.title, self.briefing, *self.private_intelligence.values()]
         texts.extend(text for choice in self.choices for text in (choice.title, choice.description, choice.consequence))
         if any((ord(char) < 32 and char not in '\n\t') or ord(char) == 127 for text in texts for char in text):
@@ -150,7 +190,7 @@ class CrisisProposal(BaseModel):
     crisis: ProposedCrisis
     continuity_references: list[ContinuityReference] = Field(
         default_factory=list, max_length=3,
-        description='Optional links to executed decisions in context.history. Use [] for no links, including a standalone opening crisis. Never invent prior decisions.')
+        description='Optional links to executed decisions in context.history or narrative_memory.significant_earlier_decisions. Use [] for no links, including a standalone opening crisis. Never invent prior decisions.')
 
 
 def proposal_schema(context: GenerationContext | None = None) -> dict:
@@ -178,8 +218,8 @@ def proposal_schema(context: GenerationContext | None = None) -> dict:
     visit(schema)
     if context is not None:
         references = schema['properties']['continuity_references']
-        allowed = sorted({(r.crisis_number, r.choice_id) for r in context.history})
-        references['maxItems'] = len(allowed)
+        allowed = sorted({(r.crisis_number, r.choice_id) for r in reference_history(context)})
+        references['maxItems'] = min(3, len(allowed))
         if not allowed:
             references['description'] = ('There are no executed decisions in the authoritative history. '
                                          'Return [] and write a standalone crisis without prior player actions.')
@@ -226,12 +266,15 @@ def accept_proposal(content: str, context: GenerationContext) -> AcceptedScenari
         raise GenerationError(FailureCategory.INVALID_JSON) from None
     try:
         proposal = CrisisProposal.model_validate_json(json.dumps(parsed))
-        known = {(r.crisis_number, r.choice_id) for r in context.history}
+        known = {(r.crisis_number, r.choice_id) for r in reference_history(context)}
         references = sorted(proposal.continuity_references, key=lambda r:(r.crisis_number, r.choice_id))
         keys = [(r.crisis_number, r.choice_id) for r in references]
         if len(set(keys)) != len(keys) or any(key not in known for key in keys):
             raise GenerationError(FailureCategory.INVALID_CONTINUITY)
         data = proposal.crisis.model_dump(mode='json', exclude={'id'})
+        if context.narrative_memory and ' '.join(data['title'].casefold().split()) in {
+                ' '.join(t.casefold().split()) for t in context.narrative_memory.used_titles}:
+            raise ValueError('Repeated crisis title')
         data['choices'].sort(key=lambda choice:choice['id'])
         material = {'schema_version': VERSION, 'crisis': data,
                     'continuity_references': [r.model_dump() for r in references]}

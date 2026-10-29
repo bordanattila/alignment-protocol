@@ -6,6 +6,7 @@ from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, StringConstr
 
 from .callsigns import normalize_callsign
 from .generation.errors import FailureCategory
+from .narrative_models import ConclusionState
 
 
 class Role(StrEnum):
@@ -232,6 +233,7 @@ class GenerationDiagnostic(BaseModel):
 
 
 class Mission(BaseModel):
+    conclusion: ConclusionState | None = None
     mode: Literal['authored', 'generated'] = 'authored'
     generation: GenerationAttempt | None = None
     admissions: list[CrisisAdmission] = Field(default_factory=list)

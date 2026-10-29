@@ -173,7 +173,7 @@ def test_context_uses_public_history_only_without_mutating_or_serializing_a_miss
     assert result.metrics.model_dump()==mission.metrics.model_dump() and result.current_crisis_number==5
     assert [r.crisis_number for r in result.history]==[2,3,4]
     assert len(result.used_scenario_ids)==5 and mission.model_dump_json()==before
-    assert set(json.loads(text))=={'current_crisis_number','metrics','history','used_scenario_ids'}
+    assert set(json.loads(text))=={'current_crisis_number','metrics','history','used_scenario_ids','narrative_memory'}
     with pytest.raises(ValidationError):result.metrics.safety=0
     assert mission.metrics.safety!=0
 

@@ -171,3 +171,21 @@ New preparation outcomes also persist five sanitized fields in the existing priv
 ```
 
 Use your actual database path; `1` selects the most recently created mission, `2` the previous mission. Old missions without records return `[]`; historical causes are not inferred. No SQL migration is needed. See [Crisis 2 fallback diagnostics](docs/MILESTONE_9_2_CRISIS_2_DIAGNOSTICS.md) for the investigation, category semantics, compatibility and offline verification.
+
+## Adaptive narrative and generated mission endings
+
+Generated crises also receive bounded narrative memory derived from executed public decisions: recent outcomes and actual metric changes, up to two significant earlier decisions, established public situations and recorded metric pressures. Explicit references remain strictly validated; independent crises are still allowed. This does not add a second mission history or change consequences.
+
+New generated missions reaching victory or defeat can receive a three-section AI interpretation of the full mission. Completion is immediate. The existing deterministic ending remains visible while the one bounded asynchronous request runs and whenever generation fails. Accepted stories persist once; refresh/reconnect never regenerates them. Restart during a pending request selects deterministic fallback. Previously completed missions and authored missions keep their existing ending behavior.
+
+The review labels generated prose as interpretation and renders statistics and expandable recorded sources from authoritative records. It does not treat free-form prose as verified game facts. The existing provider settings and adapter serve both operations; no extra service or credential is required. A generated mission may make one additional provider request after its outcome is finalized when generation is enabled.
+
+Endgame diagnostics use the same local inspection mechanism:
+
+```sh
+.venv/bin/python -m app.generation.inspect_diagnostics --database backend/data/consensus-engine.sqlite3 --operation endgame
+.venv/bin/python -m pytest backend/tests/test_adaptive_narrative.py -q
+.venv/bin/python backend/tests/smoke_adaptive_narrative.py
+```
+
+The smoke uses fake inference, temporary SQLite databases and three real WebSocket clients. It exercises a ten-crisis mixed-source campaign, pending-story reconnect, accepted-story restart, interrupted-story restart fallback and provider failure. See [Milestone 9.3](docs/MILESTONE_9_3_ADAPTIVE_NARRATIVE.md) for contracts, compatibility, exact results, limitations and manual acceptance.

@@ -127,8 +127,19 @@ export function MissionReview({ mission }: { mission: LobbyState }) {
       {summary.outcome === 'defeat' && <p>The mission ended in defeat. Collapsed metrics: {mission.collapsed_metrics.map(key=>metrics.find(m=>m.key===key)?.name ?? key).join(', ')}. The score does not indicate survival.</p>}
       <dl className="review-final-metrics">{metrics.map(m=><div key={m.key}><dt>{m.name}</dt><dd>{summary.final_metrics[m.key]} / 100</dd></div>)}</dl>
     </section>
-    {summary.narrative_outcome && <section className="panel" aria-label="Mission narrative outcome">
-      <h2>The city after your decisions</h2><p className="outcome-narrative">{summary.narrative_outcome}</p>
+    {summary.narrative_outcome && <section className="panel review-narrative" aria-label="Mission narrative outcome">
+      <h2>The city after your decisions</h2>
+      {summary.conclusion?.status === 'generated' ? <>
+        <p className="narrative-attribution">AI-generated interpretation. Statistics and recorded decisions are shown separately.</p>
+        {summary.conclusion.sections.map(section => <section key={section.key} aria-label={section.title}>
+          <h3>{section.title}</h3><p className="outcome-narrative">{section.text}</p>
+          <details><summary>Recorded basis</summary><ul>{section.references.map(reference => <li key={reference.crisis_number}>
+            <strong>Crisis {reference.crisis_number} — {reference.crisis_title}: {reference.choice_title}</strong>
+            <p>{reference.outcome}</p>
+          </li>)}</ul></details>
+        </section>)}
+      </> : <p className="outcome-narrative">{summary.narrative_outcome}</p>}
+      {summary.conclusion?.status === 'pending' && <p role="status">Your mission story is being prepared. The recorded ending is available now.</p>}
     </section>}
     {!!summary.notable_decisions?.length && <section className="panel" aria-label="Notable decisions">
       <h2>Notable decisions</h2><p>The largest total applied metric movements, shown in crisis order.</p>

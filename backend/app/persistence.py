@@ -112,6 +112,15 @@ class SQLiteMissions:
 
     @staticmethod
     def validate_generated(mission: Mission):
+        if mission.conclusion is not None:
+            from .generation.endgame import basis_hash, build_endgame_request, validate_narrative
+            if (mission.mode != 'generated' or mission.phase not in (Phase.COMPLETED, Phase.FAILED)
+                    or mission.conclusion.basis_hash != basis_hash(mission)):
+                raise ValueError('Conclusion outcome invariant')
+            if mission.conclusion.narrative:
+                from .generation.contract import GenerationError
+                try: validate_narrative(mission.conclusion.narrative, build_endgame_request(mission).context)
+                except GenerationError: raise ValueError('Conclusion reference invariant') from None
         diagnostics = mission.generation_diagnostics
         numbers = [r.crisis_number for r in diagnostics]
         if numbers != sorted(set(numbers)):
@@ -236,7 +245,7 @@ class SQLiteMissions:
                 # Additive aggregate extensions; finalized result hashes stay unchanged.
                 if isinstance(raw, dict) and 'campaign' not in raw: raw['campaign'] = None
                 if isinstance(raw, dict):
-                    for key, default in (('mode', 'authored'), ('generation', None), ('admissions', []), ('generation_diagnostics', [])):
+                    for key, default in (('mode', 'authored'), ('generation', None), ('admissions', []), ('generation_diagnostics', []), ('conclusion', None)):
                         raw.setdefault(key, default)
                 if not isinstance(raw, dict) or set(raw) != set(Mission.model_fields)-{'crisis'}:
                     raise ValueError('Record fields do not match format version')
@@ -263,6 +272,9 @@ class SQLiteMissions:
                 if previous:
                     old = json.loads(previous[0])
                     prior = old.get('admissions', [])
+                    old_story = old.get('conclusion')
+                    if old_story and old_story['status'] != 'pending' and mission.model_dump(mode='json')['conclusion'] != old_story:
+                        raise PersistenceError('Finalized conclusion cannot be changed or removed.')
                     current_diagnostics = {r['crisis_number']:r for r in mission.model_dump(mode='json')['generation_diagnostics']}
                     if any(r['crisis_number'] <= len(prior) and current_diagnostics.get(r['crisis_number']) != r
                            for r in old.get('generation_diagnostics', [])):

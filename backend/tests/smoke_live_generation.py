@@ -16,6 +16,7 @@ from app.consequences import apply_metric_deltas
 from app.domain import Metrics, MetricDeltas
 from app.generation.config import GenerationSettings
 from app.generation.provider import ProviderResponse
+from app.generation.endgame import EndgameRequest
 from app.main import create_app
 from test_live_generation import ProgressiveProvider
 from smoke_milestone7 import Server, Game, PORT, receive
@@ -26,6 +27,9 @@ class FixtureProvider(ProgressiveProvider):
         super().__init__();self.directory=directory
 
     async def generate(self,request):
+        if isinstance(request,EndgameRequest):
+            from test_adaptive_narrative import story
+            return ProviderResponse(json.dumps(story(request)),200)
         # Test-only synthetic request journal: never writes credentials/chat/players.
         with (self.directory/'requests.jsonl').open('a') as stream:
             stream.write(request.model_dump_json()+'\n')
@@ -37,8 +41,9 @@ class FixtureProvider(ProgressiveProvider):
 
 
 class GeneratedServer(Server):
+    script=__file__
     def start(self,client):
-        self.process=subprocess.Popen([sys.executable,__file__,'--serve',str(self.db),str(self.clock)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        self.process=subprocess.Popen([sys.executable,self.script,'--serve',str(self.db),str(self.clock)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         for _ in range(100):
             if self.process.poll() is not None:raise RuntimeError('Generated fixture server exited')
             try:
@@ -148,6 +153,7 @@ async def acceptance(client,server,directory):
         assert connection.execute('SELECT COUNT(*) FROM resolutions').fetchone()[0]==10
     await game.close()
     print('GENERATED LIVE SMOKE PASS: ten crises, three clients, two fallbacks, voting reconnect, pending restart, one inference attempt per slot, no private chat in context',flush=True)
+    return game
 
 
 def main():

@@ -97,7 +97,7 @@ def test_adapter_posts_structured_request_without_private_context_or_key_in_prom
         if authenticate:assert request.headers['Authorization']=='Bearer '+SECRET
         else:assert 'Authorization' not in request.headers
         ctx=json.loads(payload['messages'][1]['content'])['context']
-        assert set(ctx)=={'current_crisis_number','metrics','history','used_scenario_ids'}
+        assert set(ctx)=={'current_crisis_number','metrics','history','used_scenario_ids','narrative_memory'}
         return httpx.Response(200,json=wire())
     config=settings(response_format=format,api_key=SecretStr(SECRET) if authenticate else None)
     outcome=exercise(handler,config)

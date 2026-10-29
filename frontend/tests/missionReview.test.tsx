@@ -256,3 +256,66 @@ test('expanded real-process campaign review matches its authoritative captured h
     assert.ok(html.includes(record.choice_title));
   }
 });
+
+function narrativeFixture(status: 'pending'|'generated'|'fallback', defeat=false): LobbyState {
+  const mission=fixture(defeat);
+  mission.summary!.narrative_outcome=defeat?'The recorded city collapsed after its executed decision.':'The recorded city survived its executed decisions.';
+  mission.summary!.conclusion={status,sections:status==='generated'?[
+    {key:'journey',title:'The Civilization’s Journey',text:'The team balanced shared service with the burden of keeping the city running.',references:[{crisis_number:1,crisis_id:'grid-under-pressure',choice_id:'B',crisis_title:'Grid Under Pressure',choice_title:'Distribute the Burden',outcome:'Rotating outages spread the burden.'}]},
+    {key:'cost',title:'The Cost of Survival',text:'The city’s final balance reflects the recorded costs accepted along the way.',references:[]},
+    {key:'standing',title:'Where the City Stands',text:'A civic future shaped by the decisions recorded in this mission.',references:[]},
+  ]:[]};
+  return mission;
+}
+
+test('pending endgame retains deterministic ending and verified statistics without blocking review',()=>{
+  const html=renderApp(narrativeFixture('pending'));
+  assert.ok(html.includes('The recorded city survived its executed decisions.'));
+  assert.ok(html.includes('role="status"') && html.includes('mission story is being prepared'));
+  for(const label of ['Civilization Survived','Metric progression','Decision history','69.25 / 100']) assert.ok(html.includes(label),label);
+  assert.ok(!html.includes('AI-generated interpretation'));
+});
+
+test('generated endgame sections show labeled interpretation and server supplied recorded basis',()=>{
+  const html=renderApp(narrativeFixture('generated'));
+  for(const label of ['The Civilization’s Journey','The Cost of Survival','Where the City Stands','AI-generated interpretation.','<summary>Recorded basis</summary>','Distribute the Burden']) assert.ok(html.includes(label),label);
+  assert.ok(!html.includes('The recorded city survived its executed decisions.'));
+  assert.equal((html.match(/aria-label="Mission narrative outcome"/g)||[]).length,1);
+  assert.equal((html.match(/Final Consensus Score:/g)||[]).length,1);
+});
+
+test('fallback keeps deterministic defeat and does not reveal provider diagnostics or loading state',()=>{
+  const html=renderApp(narrativeFixture('fallback',true));
+  assert.ok(html.includes('Civilization Collapsed') && html.includes('The recorded city collapsed'));
+  assert.ok(!html.includes('mission story is being prepared') && !html.includes('AI-generated interpretation'));
+  for(const text of ['duration_seconds','http_status','basis_hash','PRIVATE REPORT']) assert.ok(!html.includes(text),text);
+});
+
+test('pending to generated snapshot retains unchanged history charts and verified result',()=>{
+  const pending=narrativeFixture('pending');
+  const generated=narrativeFixture('generated');
+  assert.deepEqual(pending.history,generated.history);
+  assert.deepEqual(pending.metrics_timeline,generated.metrics_timeline);
+  for(const mission of [pending,generated]){
+    const html=renderApp(mission);
+    assert.equal((html.match(/<polyline/g)||[]).length,4);
+    assert.ok(html.includes('69.25 / 100') && html.includes('Crisis 1 — Grid Under Pressure'));
+  }
+});
+
+test('reconnected generated review displays the same accepted sections and original defeat statistics',()=>{
+  const mission=narrativeFixture('generated',true);
+  const accepted=renderApp(mission);
+  const restored=renderApp(JSON.parse(JSON.stringify(mission)));
+  assert.equal(restored,accepted);
+  assert.ok(restored.includes('53.5 / 100') && restored.includes('Civilization Collapsed'));
+});
+
+test('generated prose is escaped and remains outside authoritative statistical markup',()=>{
+  const mission=narrativeFixture('generated');
+  mission.summary!.conclusion!.sections[0].text='<script>changeMetrics(100)</script> An untrusted narrative interpretation.';
+  const html=renderApp(mission);
+  assert.ok(!html.includes('<script>') && html.includes('&lt;script&gt;'));
+  assert.ok(html.indexOf('review-final-metrics')<html.indexOf('&lt;script&gt;'));
+  assert.ok(!html.includes('<textarea') && !html.includes('Submit private vote'));
+});

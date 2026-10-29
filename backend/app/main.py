@@ -19,6 +19,7 @@ from .persistence import SQLiteMissions, PersistenceError
 from .campaign import load_campaign_catalog
 from .generation.config import GenerationSettings, ConfigurationError
 from .generation.live import LiveGeneration
+from .generation.conclusion_live import LiveConclusions
 from .generation.provider import ScenarioProvider
 
 
@@ -48,6 +49,7 @@ def create_app(clock: Callable[[], float] | None = None,
     # Keep membership semantics, but isolate socket delivery from state mutation.
     connections = LobbyConnections(store, lock)
     generation = LiveGeneration(store, lock, connections, settings, generation_provider)
+    conclusions = LiveConclusions(store, lock, connections, settings, generation_provider)
 
     async def tick():
         changed = set()
@@ -58,6 +60,7 @@ def create_app(clock: Callable[[], float] | None = None,
                     if store.advance_due(token): changed.add(token)
                 except PersistenceError:
                     logging.getLogger(__name__).error("Mission storage unavailable; timer will retry.")
+            conclusions.launch_pending()
         for token in changed | set(connections.pending):
             try:
                 await connections.broadcast(token, retry_only=token not in changed)
@@ -84,6 +87,7 @@ def create_app(clock: Callable[[], float] | None = None,
             with suppress(asyncio.CancelledError):
                 await task
             await generation.close()
+            await conclusions.close()
             store.close()
 
     app = FastAPI(title="Consensus Engine", version="0.1.0", lifespan=lifespan)
@@ -92,6 +96,7 @@ def create_app(clock: Callable[[], float] | None = None,
     app.state.tick = tick
     app.state.lock = lock
     app.state.generation = generation
+    app.state.conclusions = conclusions
 
     @app.exception_handler(PersistenceError)
     async def storage_error(_request: Request, _exc: PersistenceError):
@@ -143,6 +148,7 @@ def create_app(clock: Callable[[], float] | None = None,
         async with lock:
             advanced = store.continue_mission(token, x_mission_session, body.result_id)
             generation.launch_pending()
+            conclusions.launch_pending()
         await connections.broadcast(token)
         return {"advanced": advanced}
 
@@ -206,6 +212,7 @@ def create_app(clock: Callable[[], float] | None = None,
                             store.send_chat(token, credential, intent.text)
                         else:
                             store.vote(token, credential, intent.round_id, intent.choice_id)
+                        conclusions.launch_pending()
                     except MissionError as exc:
                         error = exc.message
                 # A late rejected intent may itself have advanced an expired phase.
