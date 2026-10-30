@@ -1,0 +1,50 @@
+[
+  {
+    "attempt": 1,
+    "case_id": "crisis-fresh",
+    "known_estimated_cost_usd": "0.0011966",
+    "operation": "crisis",
+    "projected_total_before_dispatch_usd": "0.0106",
+    "status": "completed-or-fallback"
+  },
+  {
+    "attempt": 2,
+    "case_id": "crisis-infrastructure",
+    "known_estimated_cost_usd": "0.0013326",
+    "operation": "crisis",
+    "projected_total_before_dispatch_usd": "0.0102966",
+    "status": "completed-or-fallback"
+  },
+  {
+    "attempt": 3,
+    "case_id": "crisis-trust",
+    "known_estimated_cost_usd": "0.0011796",
+    "operation": "crisis",
+    "projected_total_before_dispatch_usd": "0.0101292",
+    "status": "completed-or-fallback"
+  },
+  {
+    "attempt": 4,
+    "case_id": "crisis-interconnected",
+    "known_estimated_cost_usd": "0.0010866",
+    "operation": "crisis",
+    "projected_total_before_dispatch_usd": "0.0098088",
+    "status": "completed-or-fallback"
+  },
+  {
+    "attempt": 5,
+    "case_id": "endgame-victory",
+    "known_estimated_cost_usd": "0.0006243",
+    "operation": "endgame",
+    "projected_total_before_dispatch_usd": "0.0093954",
+    "status": "completed-or-fallback"
+  },
+  {
+    "attempt": 6,
+    "case_id": "endgame-defeat",
+    "known_estimated_cost_usd": "0.0005426",
+    "operation": "endgame",
+    "projected_total_before_dispatch_usd": "0.0077197",
+    "status": "completed-or-fallback"
+  }
+]

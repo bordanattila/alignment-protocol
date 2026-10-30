@@ -198,6 +198,8 @@ The evaluation command makes no network requests, reads no API credentials, and 
 .venv/bin/python -m app.generation.evaluation --output /tmp/consensus-evaluation.json --review-template /tmp/consensus-review.json
 ```
 
+Add `--continuity-cases` for ten Stage B contrasts, including supported links, independent events and valid citations attached to superficial/contradictory prose. Structural acceptance remains separate from human semantic review. The default 29-case baseline is unchanged. See [Stage B continuity and audits](docs/MILESTONE_9_5_STAGE_B_CONTINUITY.md) for the prompt correction, review guide, latency evidence and recommendation visibility findings.
+
 It exercises six synthetic histories and production crisis/endgame validation with success, malformed output, unsupported references, exact repetition, failures, timeouts and disabled cases. Results clearly label scripted timings and token counts as synthetic. Human scores remain blank; supported references are measured separately from meaningful narrative continuity.
 
 New private diagnostics optionally include typed stage timings, reported token usage, configured model and reference counts. Legacy diagnostics remain readable; unknown measurements are never backfilled. To summarize an explicitly selected existing mission read-only:

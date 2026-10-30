@@ -1,0 +1,148 @@
+{
+  "anchors": {
+    "clarity": {
+      "1": "Situation and decision are incomprehensible",
+      "2": "Major ambiguities impede choice",
+      "3": "Understandable with minor gaps",
+      "4": "Clear constraints and choices",
+      "5": "Immediately clear, concise and well contextualized"
+    },
+    "consequence_coherence": {
+      "1": "Outcomes contradict choices or recorded facts",
+      "2": "Major causal gaps",
+      "3": "Mostly coherent with minor gaps",
+      "4": "Clear causal costs and benefits",
+      "5": "Precise causal outcomes consistent with established facts"
+    },
+    "distinctiveness": {
+      "1": "Essentially repeats an earlier crisis",
+      "2": "Mostly a renamed repeat",
+      "3": "Some novelty but familiar structure",
+      "4": "Clearly different pressure or tradeoff",
+      "5": "Fresh challenge that develops the mission without repetition"
+    },
+    "engagement": {
+      "1": "Confusing or uninteresting",
+      "2": "Little reason to discuss",
+      "3": "Adequate civic stakes",
+      "4": "Engaging stakes and productive disagreement",
+      "5": "Memorable stakes and sustained cooperative deliberation"
+    },
+    "historical_continuity": {
+      "1": "Invents or contradicts completed decisions",
+      "2": "Superficial or misleading linkage",
+      "3": "Valid but standalone or weakly connected",
+      "4": "Meaningful use of an actual decision and consequence",
+      "5": "Strong coherent development of actual decisions without forced sequels"
+    },
+    "metric_relevance": {
+      "1": "Contradicts current conditions",
+      "2": "Mostly ignores current strengths and costs",
+      "3": "Some relevant pressures",
+      "4": "Choices reflect current strengths and weaknesses",
+      "5": "Specific and coherent use of actual metric trajectory"
+    },
+    "plausibility": {
+      "1": "Incompatible with civic setting or known events",
+      "2": "Major unexplained leaps",
+      "3": "Mostly plausible with some gaps",
+      "4": "Credible constraints and mechanisms",
+      "5": "Convincing civic situation grounded in established events"
+    },
+    "role_relevance": {
+      "1": "Roles irrelevant or private information leaked publicly",
+      "2": "Mostly redundant intelligence",
+      "3": "Some useful differences",
+      "4": "Each role contributes useful distinct perspective",
+      "5": "Distinct role perspectives materially change strategic assessment without leakage"
+    },
+    "tradeoffs": {
+      "1": "One obvious or identical choice",
+      "2": "Weak or cosmetic differences",
+      "3": "Real gains and costs with uneven options",
+      "4": "Three credible strategically distinct options",
+      "5": "Three compelling competing strategies with no obvious universal answer"
+    }
+  },
+  "cases": [
+    {
+      "case_id": "crisis-fresh",
+      "continuity_classification": null,
+      "notes": "",
+      "review_status": "not_reviewed",
+      "scores": {
+        "clarity": null,
+        "consequence_coherence": null,
+        "distinctiveness": null,
+        "engagement": null,
+        "historical_continuity": null,
+        "metric_relevance": null,
+        "plausibility": null,
+        "role_relevance": null,
+        "tradeoffs": null
+      }
+    },
+    {
+      "case_id": "crisis-infrastructure",
+      "continuity_classification": null,
+      "notes": "",
+      "review_status": "not_reviewed",
+      "scores": {
+        "clarity": null,
+        "consequence_coherence": null,
+        "distinctiveness": null,
+        "engagement": null,
+        "historical_continuity": null,
+        "metric_relevance": null,
+        "plausibility": null,
+        "role_relevance": null,
+        "tradeoffs": null
+      }
+    },
+    {
+      "case_id": "crisis-trust",
+      "continuity_classification": null,
+      "notes": "",
+      "review_status": "not_reviewed",
+      "scores": {
+        "clarity": null,
+        "consequence_coherence": null,
+        "distinctiveness": null,
+        "engagement": null,
+        "historical_continuity": null,
+        "metric_relevance": null,
+        "plausibility": null,
+        "role_relevance": null,
+        "tradeoffs": null
+      }
+    },
+    {
+      "case_id": "crisis-interconnected",
+      "continuity_classification": null,
+      "notes": "",
+      "review_status": "not_reviewed",
+      "scores": {
+        "clarity": null,
+        "consequence_coherence": null,
+        "distinctiveness": null,
+        "engagement": null,
+        "historical_continuity": null,
+        "metric_relevance": null,
+        "plausibility": null,
+        "role_relevance": null,
+        "tradeoffs": null
+      }
+    }
+  ],
+  "continuity_classification_options": [
+    "not_applicable_opening",
+    "absent",
+    "superficial",
+    "meaningful",
+    "contradictory"
+  ],
+  "guidance": "Compare each accepted output with the matching Stage A output and actual authoritative decisions/outcomes. Cite specific supporting or contradictory text. A valid identifier alone is not meaningful continuity. Leave unavailable scores null; do not rate private role relevance from public-only evidence.",
+  "instructions": "Human judgments, not verified properties. Review in game against public history. Do not copy private intelligence, chat, identities, credentials or provider errors into notes.",
+  "status": "awaiting_real_provider_outputs_and_human_review",
+  "version": "review-1.0"
+}

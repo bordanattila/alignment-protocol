@@ -1,0 +1,114 @@
+[
+  {
+    "case_id": "crisis-fresh",
+    "diagnostic": {
+      "category": "success",
+      "crisis_number": 1,
+      "duration_seconds": 32.14234,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": false,
+        "model": "gpt-6-luna",
+        "operation": "crisis",
+        "provider_attempted": true,
+        "provider_seconds": 32.141843,
+        "reference_count": 0,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 2086,
+          "output_tokens": 2050,
+          "total_tokens": 4136
+        },
+        "validation_seconds": 0.000392,
+        "version": 1
+      },
+      "source": "generated"
+    }
+  },
+  {
+    "case_id": "crisis-infrastructure",
+    "diagnostic": {
+      "category": "success",
+      "crisis_number": 5,
+      "duration_seconds": 28.300592,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": true,
+        "model": "gpt-6-luna",
+        "operation": "crisis",
+        "provider_attempted": true,
+        "provider_seconds": 28.300156,
+        "reference_count": 2,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 3311,
+          "output_tokens": 2390,
+          "total_tokens": 5701
+        },
+        "validation_seconds": 0.00039,
+        "version": 1
+      },
+      "source": "generated"
+    }
+  },
+  {
+    "case_id": "crisis-trust",
+    "diagnostic": {
+      "category": "success",
+      "crisis_number": 5,
+      "duration_seconds": 23.566773,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": true,
+        "model": "gpt-6-luna",
+        "operation": "crisis",
+        "provider_attempted": true,
+        "provider_seconds": 23.56639,
+        "reference_count": 1,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 3351,
+          "output_tokens": 1904,
+          "total_tokens": 5255
+        },
+        "validation_seconds": 0.000345,
+        "version": 1
+      },
+      "source": "generated"
+    }
+  },
+  {
+    "case_id": "crisis-interconnected",
+    "diagnostic": {
+      "category": "success",
+      "crisis_number": 4,
+      "duration_seconds": 20.568565,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": true,
+        "model": "gpt-6-luna",
+        "operation": "crisis",
+        "provider_attempted": true,
+        "provider_seconds": 20.568149,
+        "reference_count": 2,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 3051,
+          "output_tokens": 1625,
+          "total_tokens": 4676
+        },
+        "validation_seconds": 0.000372,
+        "version": 1
+      },
+      "source": "generated"
+    }
+  }
+]

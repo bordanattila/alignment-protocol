@@ -1,0 +1,485 @@
+[
+  {
+    "authoritative_history": [],
+    "case_id": "crisis-fresh",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 70,
+      "infrastructure": 70,
+      "public_trust": 70,
+      "safety": 70
+    },
+    "operation": "crisis",
+    "public_content": {
+      "ai_recommendation_choice_id": "B",
+      "briefing": "At 06:20, a sensor in the municipal water network flagged an unusual chemical reading in one pressure zone. The alert is not yet confirmed by laboratory samples, which are being tested now. The suspected zone supplies several residential blocks and local businesses; the rest of the network has not raised the same warning. Residents are sharing screenshots of the alert, while the utility says the cause could be either contamination or a sensor calibration fault. The city must decide what precautions to take while results are pending.",
+      "choices": [
+        {
+          "description": "Tell all residents to boil tap water for drinking and food preparation until testing is complete, and open public water distribution points.",
+          "id": "A",
+          "title": "Issue a citywide boil-water advisory"
+        },
+        {
+          "description": "Close the suspected feed to the affected pressure zone, supply it from reserve tanks where possible, and publish frequent updates while independent tests proceed.",
+          "id": "B",
+          "title": "Isolate the flagged zone and switch to reserve supply"
+        },
+        {
+          "description": "Keep normal service in place while accelerating independent testing and posting the status of the investigation on a public dashboard.",
+          "id": "C",
+          "title": "Wait for laboratory confirmation"
+        }
+      ],
+      "id": "generated-6cd5f41985e365f9ab6c774b0a6964e417f7cd5c73919b78a029cb7cc1aee4d8",
+      "title": "An Unverified Water Alert"
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": []
+  },
+  {
+    "authoritative_history": [
+      {
+        "after": {
+          "economy": 67,
+          "infrastructure": 60,
+          "public_trust": 74,
+          "safety": 66
+        },
+        "applied_deltas": {
+          "economy": -3,
+          "infrastructure": -10,
+          "public_trust": 4,
+          "safety": -4
+        },
+        "before": {
+          "economy": 70,
+          "infrastructure": 70,
+          "public_trust": 70,
+          "safety": 70
+        },
+        "briefing": "EXTREME HEAT EVENT — Record temperatures have pushed the electrical grid to 96% capacity. Engineers predict a major cascading failure within two hours if demand is not reduced.",
+        "choice_id": "C",
+        "choice_title": "Preserve Service",
+        "crisis_id": "grid-under-pressure",
+        "crisis_number": 1,
+        "outcome": "Service continues, but reserve generation and uncertain conservation leave the grid exposed.",
+        "title": "Grid Under Pressure"
+      },
+      {
+        "after": {
+          "economy": 59,
+          "infrastructure": 52,
+          "public_trust": 80,
+          "safety": 76
+        },
+        "applied_deltas": {
+          "economy": -8,
+          "infrastructure": -8,
+          "public_trust": 6,
+          "safety": 10
+        },
+        "before": {
+          "economy": 67,
+          "infrastructure": 60,
+          "public_trust": 74,
+          "safety": 66
+        },
+        "briefing": "Heat-stressed pumps have lost pressure near the eastern water-treatment loop. Samples indicate possible contamination, but laboratory confirmation is still hours away. Households, food processors and emergency clinics share the network. Decide how much service to interrupt while engineers contain the exposure.",
+        "choice_id": "B",
+        "choice_title": "Isolate and Deliver",
+        "crisis_id": "waterline-alert",
+        "crisis_number": 2,
+        "outcome": "Targeted delivery earns public confidence and protects exposed residents. Most commerce continues, but distribution costs rise and uneven pressure damages older equipment.",
+        "title": "Waterline Alert"
+      },
+      {
+        "after": {
+          "economy": 39,
+          "infrastructure": 40,
+          "public_trust": 84,
+          "safety": 92
+        },
+        "applied_deltas": {
+          "economy": -20,
+          "infrastructure": -12,
+          "public_trust": 4,
+          "safety": 16
+        },
+        "before": {
+          "economy": 59,
+          "infrastructure": 52,
+          "public_trust": 80,
+          "safety": 76
+        },
+        "briefing": "Heat-related illness and the water alert have filled the regional hospitals. A new intake surge is expected overnight. Beds, staff, transport and backup equipment cannot all be expanded at once. The team must decide where to concentrate the next shift’s care capacity.",
+        "choice_id": "A",
+        "choice_title": "Open Temporary Care Wards",
+        "crisis_id": "care-at-capacity",
+        "crisis_number": 3,
+        "outcome": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves.",
+        "title": "Care at Capacity"
+      },
+      {
+        "after": {
+          "economy": 53,
+          "infrastructure": 30,
+          "public_trust": 70,
+          "safety": 82
+        },
+        "applied_deltas": {
+          "economy": 14,
+          "infrastructure": -10,
+          "public_trust": -14,
+          "safety": -10
+        },
+        "before": {
+          "economy": 39,
+          "infrastructure": 40,
+          "public_trust": 84,
+          "safety": 92
+        },
+        "briefing": "Emergency purchasing and disrupted deliveries have left warehouses unevenly stocked. Clinics need filters, repair crews need components, and shops need food. A limited freight corridor can reopen, but fuel, loading crews and bridge capacity cannot serve every destination today.",
+        "choice_id": "B",
+        "choice_title": "Auction Freight Access",
+        "crisis_id": "essential-corridor",
+        "crisis_number": 4,
+        "outcome": "Slot revenue and resumed trade improve finances. Uninspected routes deteriorate, poorer districts lose out, and uneven access increases both safety risks and public resentment.",
+        "title": "The Essential Corridor"
+      }
+    ],
+    "case_id": "crisis-infrastructure",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 53,
+      "infrastructure": 30,
+      "public_trust": 70,
+      "safety": 82
+    },
+    "operation": "crisis",
+    "public_content": {
+      "ai_recommendation_choice_id": "B",
+      "briefing": "A land-records software update has produced duplicate property-tax notices for some addresses and missing notices for others. Automated payments are due in two days; the city cannot yet tell how many accounts are affected. A full manual recheck would divert scarce staff: the temporary care wards strained essential systems and depleted reserves, while the freight-access auction left residents wary of remedies that treat districts unequally. The city must choose how to correct the bills without compounding errors or undermining its ability to fund services.",
+      "choices": [
+        {
+          "description": "Suspend automated payments and late fees citywide, then reissue every notice after a full manual review, even for accounts that appear correct.",
+          "id": "A",
+          "title": "Pause All Collections"
+        },
+        {
+          "description": "Bring in an independent auditor, collect only on accounts confirmed against source records, and pause payments and penalties on every disputed or unmatched account.",
+          "id": "B",
+          "title": "Audit and Bill Verified Accounts"
+        },
+        {
+          "description": "Have the vendor apply an emergency software patch, continue scheduled collections for accounts the patch marks as valid, and review disputed cases after the deadline.",
+          "id": "C",
+          "title": "Patch and Keep Billing"
+        }
+      ],
+      "id": "generated-88226e67267c4f6dd14a5a01dbc4a0e6f83cb6d072da1a372eff5750236a8baa",
+      "title": "The Double-Billed City"
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": [
+      {
+        "choice_id": "A",
+        "crisis_number": 3
+      },
+      {
+        "choice_id": "B",
+        "crisis_number": 4
+      }
+    ]
+  },
+  {
+    "authoritative_history": [
+      {
+        "after": {
+          "economy": 72,
+          "infrastructure": 78,
+          "public_trust": 62,
+          "safety": 64
+        },
+        "applied_deltas": {
+          "economy": 2,
+          "infrastructure": 8,
+          "public_trust": -8,
+          "safety": -6
+        },
+        "before": {
+          "economy": 70,
+          "infrastructure": 70,
+          "public_trust": 70,
+          "safety": 70
+        },
+        "briefing": "EXTREME HEAT EVENT — Record temperatures have pushed the electrical grid to 96% capacity. Engineers predict a major cascading failure within two hours if demand is not reduced.",
+        "choice_id": "A",
+        "choice_title": "Follow the AI Recommendation",
+        "crisis_id": "grid-under-pressure",
+        "crisis_number": 1,
+        "outcome": "The grid stabilizes, but prolonged residential outages strain vulnerable residents and hospital backup power.",
+        "title": "Grid Under Pressure"
+      },
+      {
+        "after": {
+          "economy": 80,
+          "infrastructure": 75,
+          "public_trust": 50,
+          "safety": 48
+        },
+        "applied_deltas": {
+          "economy": 8,
+          "infrastructure": -3,
+          "public_trust": -12,
+          "safety": -16
+        },
+        "before": {
+          "economy": 72,
+          "infrastructure": 78,
+          "public_trust": 62,
+          "safety": 64
+        },
+        "briefing": "Heat-stressed pumps have lost pressure near the eastern water-treatment loop. Samples indicate possible contamination, but laboratory confirmation is still hours away. Households, food processors and emergency clinics share the network. Decide how much service to interrupt while engineers contain the exposure.",
+        "choice_id": "C",
+        "choice_title": "Keep Supply with a Boil Advisory",
+        "crisis_id": "waterline-alert",
+        "crisis_number": 2,
+        "outcome": "Businesses retain working supply, but uncertain compliance permits further illness. The delayed response damages confidence, and stressed pumps continue to deteriorate.",
+        "title": "Waterline Alert"
+      },
+      {
+        "after": {
+          "economy": 86,
+          "infrastructure": 79,
+          "public_trust": 40,
+          "safety": 36
+        },
+        "applied_deltas": {
+          "economy": 6,
+          "infrastructure": 4,
+          "public_trust": -10,
+          "safety": -12
+        },
+        "before": {
+          "economy": 80,
+          "infrastructure": 75,
+          "public_trust": 50,
+          "safety": 48
+        },
+        "briefing": "Heat-related illness and the water alert have filled the regional hospitals. A new intake surge is expected overnight. Beds, staff, transport and backup equipment cannot all be expanded at once. The team must decide where to concentrate the next shift’s care capacity.",
+        "choice_id": "B",
+        "choice_title": "Transfer to Regional Partners",
+        "crisis_id": "care-at-capacity",
+        "crisis_number": 3,
+        "outcome": "Local utility repairs and reimbursement strengthen systems and finances. Lengthy transfers delay treatment and distress families, increasing health risks and mistrust.",
+        "title": "Care at Capacity"
+      },
+      {
+        "after": {
+          "economy": 100,
+          "infrastructure": 69,
+          "public_trust": 26,
+          "safety": 26
+        },
+        "applied_deltas": {
+          "economy": 14,
+          "infrastructure": -10,
+          "public_trust": -14,
+          "safety": -10
+        },
+        "before": {
+          "economy": 86,
+          "infrastructure": 79,
+          "public_trust": 40,
+          "safety": 36
+        },
+        "briefing": "Emergency purchasing and disrupted deliveries have left warehouses unevenly stocked. Clinics need filters, repair crews need components, and shops need food. A limited freight corridor can reopen, but fuel, loading crews and bridge capacity cannot serve every destination today.",
+        "choice_id": "B",
+        "choice_title": "Auction Freight Access",
+        "crisis_id": "essential-corridor",
+        "crisis_number": 4,
+        "outcome": "Slot revenue and resumed trade improve finances. Uninspected routes deteriorate, poorer districts lose out, and uneven access increases both safety risks and public resentment.",
+        "title": "The Essential Corridor"
+      }
+    ],
+    "case_id": "crisis-trust",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 100,
+      "infrastructure": 69,
+      "public_trust": 26,
+      "safety": 26
+    },
+    "operation": "crisis",
+    "public_content": {
+      "ai_recommendation_choice_id": "B",
+      "briefing": "A major freight bridge is vibrating outside its usual pattern during a busy delivery period. Engineers have not confirmed whether this indicates a structural fault, and the next detailed inspection will take hours. Closing the span could divert essential deliveries through slower streets; keeping it open risks worsening damage if heavy loads continue. The executed freight-access auction (crisis 4, choice B) left some reopened routes uninspected and deteriorating, and officials cannot confirm whether this bridge received a full inspection. Residents and businesses need a clear account of what is known while crews assess the span.",
+      "choices": [
+        {
+          "description": "Stop all bridge traffic, bring in inspection crews, and arrange accessible shuttles and clearly marked freight diversions while the structure is examined.",
+          "id": "A",
+          "title": "Close the span for a full inspection"
+        },
+        {
+          "description": "Use alternating one-way traffic, exclude the heaviest loads, and station engineers and safety crews on site while they conduct an expedited inspection.",
+          "id": "B",
+          "title": "Restrict the bridge to supervised single-lane flow"
+        },
+        {
+          "description": "Leave the bridge open at its usual capacity and rely on remote sensors and drone imaging to watch for changes while avoiding an immediate freight interruption.",
+          "id": "C",
+          "title": "Keep normal traffic moving during remote scans"
+        }
+      ],
+      "id": "generated-0b64c661b72afc5a7a427521c485197483554c1b0bc1695070553e60584438ed",
+      "title": "A Bridge Begins to Hum"
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": [
+      {
+        "choice_id": "B",
+        "crisis_number": 4
+      }
+    ]
+  },
+  {
+    "authoritative_history": [
+      {
+        "after": {
+          "economy": 72,
+          "infrastructure": 78,
+          "public_trust": 62,
+          "safety": 64
+        },
+        "applied_deltas": {
+          "economy": 2,
+          "infrastructure": 8,
+          "public_trust": -8,
+          "safety": -6
+        },
+        "before": {
+          "economy": 70,
+          "infrastructure": 70,
+          "public_trust": 70,
+          "safety": 70
+        },
+        "briefing": "EXTREME HEAT EVENT — Record temperatures have pushed the electrical grid to 96% capacity. Engineers predict a major cascading failure within two hours if demand is not reduced.",
+        "choice_id": "A",
+        "choice_title": "Follow the AI Recommendation",
+        "crisis_id": "grid-under-pressure",
+        "crisis_number": 1,
+        "outcome": "The grid stabilizes, but prolonged residential outages strain vulnerable residents and hospital backup power.",
+        "title": "Grid Under Pressure"
+      },
+      {
+        "after": {
+          "economy": 64,
+          "infrastructure": 70,
+          "public_trust": 68,
+          "safety": 74
+        },
+        "applied_deltas": {
+          "economy": -8,
+          "infrastructure": -8,
+          "public_trust": 6,
+          "safety": 10
+        },
+        "before": {
+          "economy": 72,
+          "infrastructure": 78,
+          "public_trust": 62,
+          "safety": 64
+        },
+        "briefing": "Heat-stressed pumps have lost pressure near the eastern water-treatment loop. Samples indicate possible contamination, but laboratory confirmation is still hours away. Households, food processors and emergency clinics share the network. Decide how much service to interrupt while engineers contain the exposure.",
+        "choice_id": "B",
+        "choice_title": "Isolate and Deliver",
+        "crisis_id": "waterline-alert",
+        "crisis_number": 2,
+        "outcome": "Targeted delivery earns public confidence and protects exposed residents. Most commerce continues, but distribution costs rise and uneven pressure damages older equipment.",
+        "title": "Waterline Alert"
+      },
+      {
+        "after": {
+          "economy": 44,
+          "infrastructure": 58,
+          "public_trust": 72,
+          "safety": 90
+        },
+        "applied_deltas": {
+          "economy": -20,
+          "infrastructure": -12,
+          "public_trust": 4,
+          "safety": 16
+        },
+        "before": {
+          "economy": 64,
+          "infrastructure": 70,
+          "public_trust": 68,
+          "safety": 74
+        },
+        "briefing": "Heat-related illness and the water alert have filled the regional hospitals. A new intake surge is expected overnight. Beds, staff, transport and backup equipment cannot all be expanded at once. The team must decide where to concentrate the next shift’s care capacity.",
+        "choice_id": "A",
+        "choice_title": "Open Temporary Care Wards",
+        "crisis_id": "care-at-capacity",
+        "crisis_number": 3,
+        "outcome": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves.",
+        "title": "Care at Capacity"
+      }
+    ],
+    "case_id": "crisis-interconnected",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 44,
+      "infrastructure": 58,
+      "public_trust": 72,
+      "safety": 90
+    },
+    "operation": "crisis",
+    "public_content": {
+      "ai_recommendation_choice_id": "B",
+      "briefing": "A routine inspection has uncovered a critical fracture in a central freight viaduct above a densely used district. Engineers cannot certify the span for normal traffic, and they need a decision before the next scheduled freight crossing. The response is constrained by earlier outcomes: the waterline response damaged older equipment (crisis 2, choice B), while converting utilities for temporary care wards strained essential systems and depleted reserves (crisis 3, choice A). Those constraints make a full rebuild difficult to fund and a prolonged closure costly, but the immediate structural risk is specific to this newly discovered fracture.",
+      "choices": [
+        {
+          "description": "Immediately close the viaduct to all traffic and begin a full bearing and deck replacement, using emergency procurement and a broad freight detour.",
+          "id": "A",
+          "title": "Close the span and replace it"
+        },
+        {
+          "description": "Close the viaduct to heavy freight, install modular shoring during overnight work windows, and require repeated independent inspections before gradually reopening limited traffic.",
+          "id": "B",
+          "title": "Shore it in stages"
+        },
+        {
+          "description": "Allow only escorted, low-load vehicles across during supervised windows while scheduling repairs around continued freight service and routing other traffic through nearby streets.",
+          "id": "C",
+          "title": "Keep a restricted crossing open"
+        }
+      ],
+      "id": "generated-fa107f3ab535e33cd22475132c7f46b339797824464c8445fc62f8ec0da90bfe",
+      "title": "The Freight Viaduct Fracture"
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": [
+      {
+        "choice_id": "B",
+        "crisis_number": 2
+      },
+      {
+        "choice_id": "A",
+        "crisis_number": 3
+      }
+    ]
+  }
+]

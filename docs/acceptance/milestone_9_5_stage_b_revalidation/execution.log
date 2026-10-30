@@ -1,0 +1,9 @@
+{"event": "dispatch", "attempt": 1, "case_id": "crisis-fresh", "operation": "crisis", "status": "attempted", "projected_total_before_dispatch_usd": "0.0060"}
+{"event": "outcome", "case_id": "crisis-fresh", "source": "generated", "category": "success", "seconds": 32.14234, "usage": {"input_tokens": 2086, "output_tokens": 2050, "total_tokens": 4136}, "known_estimated_cumulative_cost_usd": "0.0012336", "schema_issues": []}
+{"event": "dispatch", "attempt": 2, "case_id": "crisis-infrastructure", "operation": "crisis", "status": "attempted", "projected_total_before_dispatch_usd": "0.0057336"}
+{"event": "outcome", "case_id": "crisis-infrastructure", "source": "generated", "category": "success", "seconds": 28.300592, "usage": {"input_tokens": 3311, "output_tokens": 2390, "total_tokens": 5701}, "known_estimated_cumulative_cost_usd": "0.0027597", "schema_issues": []}
+{"event": "dispatch", "attempt": 3, "case_id": "crisis-trust", "operation": "crisis", "status": "attempted", "projected_total_before_dispatch_usd": "0.0058119"}
+{"event": "outcome", "case_id": "crisis-trust", "source": "generated", "category": "success", "seconds": 23.566773, "usage": {"input_tokens": 3351, "output_tokens": 1904, "total_tokens": 5255}, "known_estimated_cumulative_cost_usd": "0.0040468", "schema_issues": []}
+{"event": "dispatch", "attempt": 4, "case_id": "crisis-interconnected", "operation": "crisis", "status": "attempted", "projected_total_before_dispatch_usd": "0.0055729"}
+{"event": "outcome", "case_id": "crisis-interconnected", "source": "generated", "category": "success", "seconds": 20.568565, "usage": {"input_tokens": 3051, "output_tokens": 1625, "total_tokens": 4676}, "known_estimated_cumulative_cost_usd": "0.0051644", "schema_issues": []}
+{"event": "batch_finished", "live": true, "attempts": 4, "folder": "/tmp/ce95b-revalidation-live", "known_estimated_cost_usd": "0.0051644", "unknown_billing_reserve_usd": "0"}

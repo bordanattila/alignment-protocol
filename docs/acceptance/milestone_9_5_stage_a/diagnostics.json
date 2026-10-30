@@ -1,0 +1,170 @@
+[
+  {
+    "case_id": "crisis-fresh",
+    "diagnostic": {
+      "category": "success",
+      "crisis_number": 1,
+      "duration_seconds": 29.722707,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": false,
+        "model": "gpt-6-luna",
+        "operation": "crisis",
+        "provider_attempted": true,
+        "provider_seconds": 29.722232,
+        "reference_count": 0,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 2086,
+          "output_tokens": 1976,
+          "total_tokens": 4062
+        },
+        "validation_seconds": 0.000372,
+        "version": 1
+      },
+      "source": "generated"
+    }
+  },
+  {
+    "case_id": "crisis-infrastructure",
+    "diagnostic": {
+      "category": "success",
+      "crisis_number": 5,
+      "duration_seconds": 27.820954,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": true,
+        "model": "gpt-6-luna",
+        "operation": "crisis",
+        "provider_attempted": true,
+        "provider_seconds": 27.820314,
+        "reference_count": 0,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 3271,
+          "output_tokens": 2011,
+          "total_tokens": 5282
+        },
+        "validation_seconds": 0.000581,
+        "version": 1
+      },
+      "source": "generated"
+    }
+  },
+  {
+    "case_id": "crisis-trust",
+    "diagnostic": {
+      "category": "success",
+      "crisis_number": 5,
+      "duration_seconds": 22.056361,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": true,
+        "model": "gpt-6-luna",
+        "operation": "crisis",
+        "provider_attempted": true,
+        "provider_seconds": 22.055914,
+        "reference_count": 0,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 3311,
+          "output_tokens": 1697,
+          "total_tokens": 5008
+        },
+        "validation_seconds": 0.000407,
+        "version": 1
+      },
+      "source": "generated"
+    }
+  },
+  {
+    "case_id": "crisis-interconnected",
+    "diagnostic": {
+      "category": "success",
+      "crisis_number": 4,
+      "duration_seconds": 20.73748,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": true,
+        "model": "gpt-6-luna",
+        "operation": "crisis",
+        "provider_attempted": true,
+        "provider_seconds": 20.737118,
+        "reference_count": 0,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 3011,
+          "output_tokens": 1571,
+          "total_tokens": 4582
+        },
+        "validation_seconds": 0.000325,
+        "version": 1
+      },
+      "source": "generated"
+    }
+  },
+  {
+    "case_id": "endgame-victory",
+    "diagnostic": {
+      "category": "success",
+      "duration_seconds": 10.207252,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": true,
+        "model": "gpt-6-luna",
+        "operation": "endgame",
+        "provider_attempted": true,
+        "provider_seconds": 10.207024,
+        "reference_count": 7,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 2363,
+          "output_tokens": 776,
+          "total_tokens": 3139
+        },
+        "validation_seconds": 0.000161,
+        "version": 1
+      },
+      "operation": "endgame",
+      "source": "generated"
+    }
+  },
+  {
+    "case_id": "endgame-defeat",
+    "diagnostic": {
+      "category": "success",
+      "duration_seconds": 11.301872,
+      "http_status": 200,
+      "measurement": {
+        "availability_seconds": null,
+        "fallback_seconds": null,
+        "history_available": true,
+        "model": "gpt-6-luna",
+        "operation": "endgame",
+        "provider_attempted": true,
+        "provider_seconds": 11.301509,
+        "reference_count": 4,
+        "rejection_detail": null,
+        "usage": {
+          "input_tokens": 1561,
+          "output_tokens": 773,
+          "total_tokens": 2334
+        },
+        "validation_seconds": 0.000293,
+        "version": 1
+      },
+      "operation": "endgame",
+      "source": "generated"
+    }
+  }
+]

@@ -1,0 +1,1177 @@
+[
+  {
+    "authoritative_history": [],
+    "case_id": "crisis-fresh",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 70,
+      "infrastructure": 70,
+      "public_trust": 70,
+      "safety": 70
+    },
+    "operation": "crisis",
+    "public_content": {
+      "ai_recommendation_choice_id": "B",
+      "briefing": "A prolonged dry spell has lowered the river feeding the city’s reservoirs, while unusually high tides are pushing saltwater farther upstream. The municipal water-allocation system has begun setting household limits from smart-meter readings. A review found that some apartment buildings are being assigned unusually low allowances; the cause and full extent are not yet confirmed. The city has enough treated water for several days at current demand, but delaying a response could make later restrictions sharper. Officials need to decide how to allocate water while engineers check the readings and source conditions.",
+      "choices": [
+        {
+          "description": "Pause household meter-based limits and assign every resident a fixed minimum allowance by district. Use staffed help desks and printed notices while crews verify building records and adjust the system.",
+          "id": "A",
+          "title": "Set a guaranteed household floor"
+        },
+        {
+          "description": "Keep the allocation system running while engineers correct suspect building records, publish daily audit results, and staff a fast appeal channel with temporary allowances for verified cases.",
+          "id": "B",
+          "title": "Correct readings with rapid appeals"
+        },
+        {
+          "description": "Guarantee water deliveries to hospitals, care facilities, fire services, and critical food production first. Impose strict temporary household and nonessential-business limits until the river and meter data are reassessed.",
+          "id": "C",
+          "title": "Reserve supply for essential services"
+        }
+      ],
+      "id": "generated-932cbacec9feb14c57a25e75162b80acff7d552d4f2655770334b756bc53fc8e",
+      "title": "The Water Allocation Error"
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": []
+  },
+  {
+    "authoritative_history": [
+      {
+        "after": {
+          "economy": 67,
+          "infrastructure": 60,
+          "public_trust": 74,
+          "safety": 66
+        },
+        "applied_deltas": {
+          "economy": -3,
+          "infrastructure": -10,
+          "public_trust": 4,
+          "safety": -4
+        },
+        "before": {
+          "economy": 70,
+          "infrastructure": 70,
+          "public_trust": 70,
+          "safety": 70
+        },
+        "briefing": "EXTREME HEAT EVENT — Record temperatures have pushed the electrical grid to 96% capacity. Engineers predict a major cascading failure within two hours if demand is not reduced.",
+        "choice_id": "C",
+        "choice_title": "Preserve Service",
+        "crisis_id": "grid-under-pressure",
+        "crisis_number": 1,
+        "outcome": "Service continues, but reserve generation and uncertain conservation leave the grid exposed.",
+        "title": "Grid Under Pressure"
+      },
+      {
+        "after": {
+          "economy": 59,
+          "infrastructure": 52,
+          "public_trust": 80,
+          "safety": 76
+        },
+        "applied_deltas": {
+          "economy": -8,
+          "infrastructure": -8,
+          "public_trust": 6,
+          "safety": 10
+        },
+        "before": {
+          "economy": 67,
+          "infrastructure": 60,
+          "public_trust": 74,
+          "safety": 66
+        },
+        "briefing": "Heat-stressed pumps have lost pressure near the eastern water-treatment loop. Samples indicate possible contamination, but laboratory confirmation is still hours away. Households, food processors and emergency clinics share the network. Decide how much service to interrupt while engineers contain the exposure.",
+        "choice_id": "B",
+        "choice_title": "Isolate and Deliver",
+        "crisis_id": "waterline-alert",
+        "crisis_number": 2,
+        "outcome": "Targeted delivery earns public confidence and protects exposed residents. Most commerce continues, but distribution costs rise and uneven pressure damages older equipment.",
+        "title": "Waterline Alert"
+      },
+      {
+        "after": {
+          "economy": 39,
+          "infrastructure": 40,
+          "public_trust": 84,
+          "safety": 92
+        },
+        "applied_deltas": {
+          "economy": -20,
+          "infrastructure": -12,
+          "public_trust": 4,
+          "safety": 16
+        },
+        "before": {
+          "economy": 59,
+          "infrastructure": 52,
+          "public_trust": 80,
+          "safety": 76
+        },
+        "briefing": "Heat-related illness and the water alert have filled the regional hospitals. A new intake surge is expected overnight. Beds, staff, transport and backup equipment cannot all be expanded at once. The team must decide where to concentrate the next shift’s care capacity.",
+        "choice_id": "A",
+        "choice_title": "Open Temporary Care Wards",
+        "crisis_id": "care-at-capacity",
+        "crisis_number": 3,
+        "outcome": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves.",
+        "title": "Care at Capacity"
+      },
+      {
+        "after": {
+          "economy": 53,
+          "infrastructure": 30,
+          "public_trust": 70,
+          "safety": 82
+        },
+        "applied_deltas": {
+          "economy": 14,
+          "infrastructure": -10,
+          "public_trust": -14,
+          "safety": -10
+        },
+        "before": {
+          "economy": 39,
+          "infrastructure": 40,
+          "public_trust": 84,
+          "safety": 92
+        },
+        "briefing": "Emergency purchasing and disrupted deliveries have left warehouses unevenly stocked. Clinics need filters, repair crews need components, and shops need food. A limited freight corridor can reopen, but fuel, loading crews and bridge capacity cannot serve every destination today.",
+        "choice_id": "B",
+        "choice_title": "Auction Freight Access",
+        "crisis_id": "essential-corridor",
+        "crisis_number": 4,
+        "outcome": "Slot revenue and resumed trade improve finances. Uninspected routes deteriorate, poorer districts lose out, and uneven access increases both safety risks and public resentment.",
+        "title": "The Essential Corridor"
+      }
+    ],
+    "case_id": "crisis-infrastructure",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 53,
+      "infrastructure": 30,
+      "public_trust": 70,
+      "safety": 82
+    },
+    "operation": "crisis",
+    "public_content": {
+      "ai_recommendation_choice_id": "B",
+      "briefing": "A leak in the cooling loop at the municipal compute exchange has forced operators to reduce its workload. Thermal alarms indicate that the remaining cooling capacity may not hold through the next peak-demand period. The exchange supports services including transit coordination, benefits processing, emergency dispatch records and permit systems. A regional provider can accept some workloads, but the transfer window is limited; repair crews, replacement parts and temporary cooling equipment are also in short supply.",
+      "choices": [
+        {
+          "description": "Pay for a rapid transfer of dispatch records, transit coordination and other essential workloads to the regional provider while local crews repair the cooling loop.",
+          "id": "A",
+          "title": "Move Priority Workloads to Regional Cloud"
+        },
+        {
+          "description": "Keep dispatch and core transit functions running locally, pause lower-priority processing, and use the reduced load to complete a focused cooling-loop repair.",
+          "id": "B",
+          "title": "Throttle Nonessential Computing"
+        },
+        {
+          "description": "Keep most workloads online by bringing in temporary chillers and generators while repair crews work around the leak.",
+          "id": "C",
+          "title": "Rent Mobile Cooling and Backup Power"
+        }
+      ],
+      "id": "generated-97e1004bac05057cd4ade288500ff42f1c4141ea8c121a8a2659aa8bc25e0412",
+      "title": "The Civic Compute Cooling Failure"
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": []
+  },
+  {
+    "authoritative_history": [
+      {
+        "after": {
+          "economy": 72,
+          "infrastructure": 78,
+          "public_trust": 62,
+          "safety": 64
+        },
+        "applied_deltas": {
+          "economy": 2,
+          "infrastructure": 8,
+          "public_trust": -8,
+          "safety": -6
+        },
+        "before": {
+          "economy": 70,
+          "infrastructure": 70,
+          "public_trust": 70,
+          "safety": 70
+        },
+        "briefing": "EXTREME HEAT EVENT — Record temperatures have pushed the electrical grid to 96% capacity. Engineers predict a major cascading failure within two hours if demand is not reduced.",
+        "choice_id": "A",
+        "choice_title": "Follow the AI Recommendation",
+        "crisis_id": "grid-under-pressure",
+        "crisis_number": 1,
+        "outcome": "The grid stabilizes, but prolonged residential outages strain vulnerable residents and hospital backup power.",
+        "title": "Grid Under Pressure"
+      },
+      {
+        "after": {
+          "economy": 80,
+          "infrastructure": 75,
+          "public_trust": 50,
+          "safety": 48
+        },
+        "applied_deltas": {
+          "economy": 8,
+          "infrastructure": -3,
+          "public_trust": -12,
+          "safety": -16
+        },
+        "before": {
+          "economy": 72,
+          "infrastructure": 78,
+          "public_trust": 62,
+          "safety": 64
+        },
+        "briefing": "Heat-stressed pumps have lost pressure near the eastern water-treatment loop. Samples indicate possible contamination, but laboratory confirmation is still hours away. Households, food processors and emergency clinics share the network. Decide how much service to interrupt while engineers contain the exposure.",
+        "choice_id": "C",
+        "choice_title": "Keep Supply with a Boil Advisory",
+        "crisis_id": "waterline-alert",
+        "crisis_number": 2,
+        "outcome": "Businesses retain working supply, but uncertain compliance permits further illness. The delayed response damages confidence, and stressed pumps continue to deteriorate.",
+        "title": "Waterline Alert"
+      },
+      {
+        "after": {
+          "economy": 86,
+          "infrastructure": 79,
+          "public_trust": 40,
+          "safety": 36
+        },
+        "applied_deltas": {
+          "economy": 6,
+          "infrastructure": 4,
+          "public_trust": -10,
+          "safety": -12
+        },
+        "before": {
+          "economy": 80,
+          "infrastructure": 75,
+          "public_trust": 50,
+          "safety": 48
+        },
+        "briefing": "Heat-related illness and the water alert have filled the regional hospitals. A new intake surge is expected overnight. Beds, staff, transport and backup equipment cannot all be expanded at once. The team must decide where to concentrate the next shift’s care capacity.",
+        "choice_id": "B",
+        "choice_title": "Transfer to Regional Partners",
+        "crisis_id": "care-at-capacity",
+        "crisis_number": 3,
+        "outcome": "Local utility repairs and reimbursement strengthen systems and finances. Lengthy transfers delay treatment and distress families, increasing health risks and mistrust.",
+        "title": "Care at Capacity"
+      },
+      {
+        "after": {
+          "economy": 100,
+          "infrastructure": 69,
+          "public_trust": 26,
+          "safety": 26
+        },
+        "applied_deltas": {
+          "economy": 14,
+          "infrastructure": -10,
+          "public_trust": -14,
+          "safety": -10
+        },
+        "before": {
+          "economy": 86,
+          "infrastructure": 79,
+          "public_trust": 40,
+          "safety": 36
+        },
+        "briefing": "Emergency purchasing and disrupted deliveries have left warehouses unevenly stocked. Clinics need filters, repair crews need components, and shops need food. A limited freight corridor can reopen, but fuel, loading crews and bridge capacity cannot serve every destination today.",
+        "choice_id": "B",
+        "choice_title": "Auction Freight Access",
+        "crisis_id": "essential-corridor",
+        "crisis_number": 4,
+        "outcome": "Slot revenue and resumed trade improve finances. Uninspected routes deteriorate, poorer districts lose out, and uneven access increases both safety risks and public resentment.",
+        "title": "The Essential Corridor"
+      }
+    ],
+    "case_id": "crisis-trust",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 100,
+      "infrastructure": 69,
+      "public_trust": 26,
+      "safety": 26
+    },
+    "operation": "crisis",
+    "public_content": {
+      "ai_recommendation_choice_id": "B",
+      "briefing": "The city has confirmed unauthorized access to CivicPass, its digital credential for municipal services and reduced-fare transit. Investigators have not yet established how many accounts were viewed or whether credentials were copied. Some residents may be unable to use digital services safely while the investigation proceeds; a prolonged interruption would also disrupt routine access to city programs and transport. Officials must decide how to contain the breach and communicate with affected residents while keeping essential services available.",
+      "choices": [
+        {
+          "description": "Disable all CivicPass access while investigators work. Use staffed counters, paper vouchers, and temporary manual procedures for municipal services and reduced-fare transit.",
+          "id": "A",
+          "title": "Suspend CivicPass and Switch to Paper"
+        },
+        {
+          "description": "Invalidate exposed tokens, require a secure credential reset, and publish what is known and still uncertain. Fund direct outreach, accessible alternatives, and temporary support for affected service providers.",
+          "id": "B",
+          "title": "Reset Credentials and Notify Residents"
+        },
+        {
+          "description": "Isolate the affected vendor environment, monitor remaining tokens, and keep CivicPass running for accounts not yet flagged. Limit public disclosure until investigators can provide a more complete account.",
+          "id": "C",
+          "title": "Contain Quietly and Preserve Access"
+        }
+      ],
+      "id": "generated-f8a57de10ce6158b7852db951ff66b4e1a66378b1d2c5b226974fe1b35f5d445",
+      "title": "The CivicPass Exposure"
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": []
+  },
+  {
+    "authoritative_history": [
+      {
+        "after": {
+          "economy": 72,
+          "infrastructure": 78,
+          "public_trust": 62,
+          "safety": 64
+        },
+        "applied_deltas": {
+          "economy": 2,
+          "infrastructure": 8,
+          "public_trust": -8,
+          "safety": -6
+        },
+        "before": {
+          "economy": 70,
+          "infrastructure": 70,
+          "public_trust": 70,
+          "safety": 70
+        },
+        "briefing": "EXTREME HEAT EVENT — Record temperatures have pushed the electrical grid to 96% capacity. Engineers predict a major cascading failure within two hours if demand is not reduced.",
+        "choice_id": "A",
+        "choice_title": "Follow the AI Recommendation",
+        "crisis_id": "grid-under-pressure",
+        "crisis_number": 1,
+        "outcome": "The grid stabilizes, but prolonged residential outages strain vulnerable residents and hospital backup power.",
+        "title": "Grid Under Pressure"
+      },
+      {
+        "after": {
+          "economy": 64,
+          "infrastructure": 70,
+          "public_trust": 68,
+          "safety": 74
+        },
+        "applied_deltas": {
+          "economy": -8,
+          "infrastructure": -8,
+          "public_trust": 6,
+          "safety": 10
+        },
+        "before": {
+          "economy": 72,
+          "infrastructure": 78,
+          "public_trust": 62,
+          "safety": 64
+        },
+        "briefing": "Heat-stressed pumps have lost pressure near the eastern water-treatment loop. Samples indicate possible contamination, but laboratory confirmation is still hours away. Households, food processors and emergency clinics share the network. Decide how much service to interrupt while engineers contain the exposure.",
+        "choice_id": "B",
+        "choice_title": "Isolate and Deliver",
+        "crisis_id": "waterline-alert",
+        "crisis_number": 2,
+        "outcome": "Targeted delivery earns public confidence and protects exposed residents. Most commerce continues, but distribution costs rise and uneven pressure damages older equipment.",
+        "title": "Waterline Alert"
+      },
+      {
+        "after": {
+          "economy": 44,
+          "infrastructure": 58,
+          "public_trust": 72,
+          "safety": 90
+        },
+        "applied_deltas": {
+          "economy": -20,
+          "infrastructure": -12,
+          "public_trust": 4,
+          "safety": 16
+        },
+        "before": {
+          "economy": 64,
+          "infrastructure": 70,
+          "public_trust": 68,
+          "safety": 74
+        },
+        "briefing": "Heat-related illness and the water alert have filled the regional hospitals. A new intake surge is expected overnight. Beds, staff, transport and backup equipment cannot all be expanded at once. The team must decide where to concentrate the next shift’s care capacity.",
+        "choice_id": "A",
+        "choice_title": "Open Temporary Care Wards",
+        "crisis_id": "care-at-capacity",
+        "crisis_number": 3,
+        "outcome": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves.",
+        "title": "Care at Capacity"
+      }
+    ],
+    "case_id": "crisis-interconnected",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 44,
+      "infrastructure": 58,
+      "public_trust": 72,
+      "safety": 90
+    },
+    "operation": "crisis",
+    "public_content": {
+      "ai_recommendation_choice_id": "A",
+      "briefing": "A corrupted scheduling update has taken the regional freight exchange offline. Port gates are holding trucks while operators switch to limited manual procedures; refrigerated cargo and time-sensitive deliveries are beginning to queue. The cause is still under investigation, and terminal operators warn that restoring automated dispatch too quickly could send incompatible instructions to vehicles and loading equipment. The city must decide how to keep essential goods moving while the exchange is repaired.",
+      "choices": [
+        {
+          "description": "Temporarily place city logistics staff in charge of a transparent, manually scheduled flow for essential and time-sensitive cargo while technicians isolate the corrupted update.",
+          "id": "A",
+          "title": "Run a Municipal Manual Dispatch"
+        },
+        {
+          "description": "Keep terminal traffic at a minimum until an outside technical team verifies the update, then reopen in stages with public reporting on the findings.",
+          "id": "B",
+          "title": "Hold Movement for an Independent Audit"
+        },
+        {
+          "description": "Let the exchange vendor restore its last stable software version and resume automated scheduling quickly, with the city monitoring performance rather than directing dispatch.",
+          "id": "C",
+          "title": "Accept the Vendor's Emergency Rollback"
+        }
+      ],
+      "id": "generated-32db2120436f2e740c4cf7b826ef89a2a2cca1500ebdacd0b74852873d788c57",
+      "title": "The Freight Queue"
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": []
+  },
+  {
+    "authoritative_history": [
+      {
+        "after": {
+          "economy": 63,
+          "infrastructure": 75,
+          "public_trust": 67,
+          "safety": 72
+        },
+        "applied_deltas": {
+          "economy": -7,
+          "infrastructure": 5,
+          "public_trust": -3,
+          "safety": 2
+        },
+        "before": {
+          "economy": 70,
+          "infrastructure": 70,
+          "public_trust": 70,
+          "safety": 70
+        },
+        "briefing": "EXTREME HEAT EVENT — Record temperatures have pushed the electrical grid to 96% capacity. Engineers predict a major cascading failure within two hours if demand is not reduced.",
+        "choice_id": "B",
+        "choice_title": "Distribute the Burden",
+        "crisis_id": "grid-under-pressure",
+        "crisis_number": 1,
+        "outcome": "Rotating outages spread disruption and business losses while reducing sustained pressure on the grid.",
+        "title": "Grid Under Pressure"
+      },
+      {
+        "after": {
+          "economy": 55,
+          "infrastructure": 67,
+          "public_trust": 73,
+          "safety": 82
+        },
+        "applied_deltas": {
+          "economy": -8,
+          "infrastructure": -8,
+          "public_trust": 6,
+          "safety": 10
+        },
+        "before": {
+          "economy": 63,
+          "infrastructure": 75,
+          "public_trust": 67,
+          "safety": 72
+        },
+        "briefing": "Heat-stressed pumps have lost pressure near the eastern water-treatment loop. Samples indicate possible contamination, but laboratory confirmation is still hours away. Households, food processors and emergency clinics share the network. Decide how much service to interrupt while engineers contain the exposure.",
+        "choice_id": "B",
+        "choice_title": "Isolate and Deliver",
+        "crisis_id": "waterline-alert",
+        "crisis_number": 2,
+        "outcome": "Targeted delivery earns public confidence and protects exposed residents. Most commerce continues, but distribution costs rise and uneven pressure damages older equipment.",
+        "title": "Waterline Alert"
+      },
+      {
+        "after": {
+          "economy": 61,
+          "infrastructure": 71,
+          "public_trust": 63,
+          "safety": 70
+        },
+        "applied_deltas": {
+          "economy": 6,
+          "infrastructure": 4,
+          "public_trust": -10,
+          "safety": -12
+        },
+        "before": {
+          "economy": 55,
+          "infrastructure": 67,
+          "public_trust": 73,
+          "safety": 82
+        },
+        "briefing": "Heat-related illness and the water alert have filled the regional hospitals. A new intake surge is expected overnight. Beds, staff, transport and backup equipment cannot all be expanded at once. The team must decide where to concentrate the next shift’s care capacity.",
+        "choice_id": "B",
+        "choice_title": "Transfer to Regional Partners",
+        "crisis_id": "care-at-capacity",
+        "crisis_number": 3,
+        "outcome": "Local utility repairs and reimbursement strengthen systems and finances. Lengthy transfers delay treatment and distress families, increasing health risks and mistrust.",
+        "title": "Care at Capacity"
+      },
+      {
+        "after": {
+          "economy": 75,
+          "infrastructure": 61,
+          "public_trust": 49,
+          "safety": 60
+        },
+        "applied_deltas": {
+          "economy": 14,
+          "infrastructure": -10,
+          "public_trust": -14,
+          "safety": -10
+        },
+        "before": {
+          "economy": 61,
+          "infrastructure": 71,
+          "public_trust": 63,
+          "safety": 70
+        },
+        "briefing": "Emergency purchasing and disrupted deliveries have left warehouses unevenly stocked. Clinics need filters, repair crews need components, and shops need food. A limited freight corridor can reopen, but fuel, loading crews and bridge capacity cannot serve every destination today.",
+        "choice_id": "B",
+        "choice_title": "Auction Freight Access",
+        "crisis_id": "essential-corridor",
+        "crisis_number": 4,
+        "outcome": "Slot revenue and resumed trade improve finances. Uninspected routes deteriorate, poorer districts lose out, and uneven access increases both safety risks and public resentment.",
+        "title": "The Essential Corridor"
+      },
+      {
+        "after": {
+          "economy": 69,
+          "infrastructure": 55,
+          "public_trust": 55,
+          "safety": 62
+        },
+        "applied_deltas": {
+          "economy": -6,
+          "infrastructure": -6,
+          "public_trust": 6,
+          "safety": 2
+        },
+        "before": {
+          "economy": 75,
+          "infrastructure": 61,
+          "public_trust": 49,
+          "safety": 60
+        },
+        "briefing": "Conflicting claims about water, hospital access and supply allocation are overwhelming official channels. Some warnings are fabricated; others describe real delays. Residents need usable instructions now, but verification teams cannot investigate every report before the next shift change.",
+        "choice_id": "C",
+        "choice_title": "Fund Trusted Local Relays",
+        "crisis_id": "signal-and-rumour",
+        "crisis_number": 5,
+        "outcome": "Local messengers rebuild confidence and help people avoid harm. Supporting the relays costs money and pulls technical staff from recovery, while uneven reach limits the safety gain.",
+        "title": "Signal and Rumour"
+      },
+      {
+        "after": {
+          "economy": 59,
+          "infrastructure": 61,
+          "public_trust": 59,
+          "safety": 56
+        },
+        "applied_deltas": {
+          "economy": -10,
+          "infrastructure": 6,
+          "public_trust": 4,
+          "safety": -6
+        },
+        "before": {
+          "economy": 69,
+          "infrastructure": 55,
+          "public_trust": 55,
+          "safety": 62
+        },
+        "briefing": "A cyber intrusion is disrupting service scheduling and utility telemetry during the emergency response. Engineers can still operate essential systems, but they cannot yet trust every automated status report. Recovery must balance isolation, continuity and a limited pool of qualified staff.",
+        "choice_id": "C",
+        "choice_title": "Isolate in Stages",
+        "crisis_id": "services-under-intrusion",
+        "crisis_number": 6,
+        "outcome": "Staged recovery repairs systems and a visible service plan rebuilds confidence. Manual staffing is expensive, and fatigued teams miss some urgent needs.",
+        "title": "Services Under Intrusion"
+      },
+      {
+        "after": {
+          "economy": 51,
+          "infrastructure": 51,
+          "public_trust": 69,
+          "safety": 60
+        },
+        "applied_deltas": {
+          "economy": -8,
+          "infrastructure": -10,
+          "public_trust": 10,
+          "safety": 4
+        },
+        "before": {
+          "economy": 59,
+          "infrastructure": 61,
+          "public_trust": 59,
+          "safety": 56
+        },
+        "briefing": "A severe coastal storm is approaching while response crews and service systems remain under strain. Tide forecasts disagree on the size of the surge. Transport capacity can support evacuation or protection of key substations, but not a full version of both before landfall.",
+        "choice_id": "C",
+        "choice_title": "Stage Neighbourhood Evacuations",
+        "crisis_id": "storm-at-the-barrier",
+        "crisis_number": 7,
+        "outcome": "Local participation improves legitimacy and selective evacuation reduces harm. Delayed asset protection weakens infrastructure, while interrupted routes and transport costs reduce economic capacity.",
+        "title": "Storm at the Barrier"
+      },
+      {
+        "after": {
+          "economy": 59,
+          "infrastructure": 59,
+          "public_trust": 63,
+          "safety": 46
+        },
+        "applied_deltas": {
+          "economy": 8,
+          "infrastructure": 8,
+          "public_trust": -6,
+          "safety": -14
+        },
+        "before": {
+          "economy": 51,
+          "infrastructure": 51,
+          "public_trust": 69,
+          "safety": 60
+        },
+        "briefing": "Emergency expenditure, interrupted trade and storm preparations have unsettled local lenders. Several essential employers may miss payroll before normal credit resumes. Public guarantees could restore confidence, but the city cannot protect every deposit, business and service contract at once.",
+        "choice_id": "C",
+        "choice_title": "Secure Critical-Service Credit",
+        "crisis_id": "credit-under-strain",
+        "crisis_number": 8,
+        "outcome": "Critical suppliers resume parts deliveries and productive work, improving infrastructure and economic capacity. Excluded households and firms lose confidence, and gaps in emergency staffing increase harm.",
+        "title": "Credit Under Strain"
+      },
+      {
+        "after": {
+          "economy": 65,
+          "infrastructure": 65,
+          "public_trust": 43,
+          "safety": 50
+        },
+        "applied_deltas": {
+          "economy": 6,
+          "infrastructure": 6,
+          "public_trust": -20,
+          "safety": 4
+        },
+        "before": {
+          "economy": 59,
+          "infrastructure": 59,
+          "public_trust": 63,
+          "safety": 46
+        },
+        "briefing": "Queues at distribution points are growing as emergency resources remain uneven. Residents question who receives priority, and isolated confrontations are disrupting deliveries. The city must protect access without turning contested allocation into a lasting loss of legitimacy.",
+        "choice_id": "A",
+        "choice_title": "Enforce Protected Priority Lanes",
+        "crisis_id": "a-fair-share",
+        "crisis_number": 9,
+        "outcome": "Protected routes restore repairs, trade and immediate physical security. Imposed priorities and enforcement sharply damage legitimacy among residents who feel excluded.",
+        "title": "A Fair Share"
+      },
+      {
+        "after": {
+          "economy": 55,
+          "infrastructure": 55,
+          "public_trust": 49,
+          "safety": 64
+        },
+        "applied_deltas": {
+          "economy": -10,
+          "infrastructure": -10,
+          "public_trust": 6,
+          "safety": 14
+        },
+        "before": {
+          "economy": 65,
+          "infrastructure": 65,
+          "public_trust": 43,
+          "safety": 50
+        },
+        "briefing": "The city faces a combined recovery deadline: utility maintenance, medical dispatch, supplier payments and resident support are competing for the same exhausted teams. A cascading outage is possible if coordination fails. Choose how to carry the accumulated civilization state through the final emergency shift.",
+        "choice_id": "B",
+        "choice_title": "Protect Lifeline Islands",
+        "crisis_id": "the-last-coordination",
+        "crisis_number": 10,
+        "outcome": "Protected lifelines reduce immediate harm and the staged plan earns confidence. Sacrificed equipment lowers infrastructure capacity, and restricted commerce plus logistics costs weaken the economy.",
+        "title": "The Last Coordination"
+      }
+    ],
+    "case_id": "endgame-victory",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 55,
+      "infrastructure": 55,
+      "public_trust": 49,
+      "safety": 64
+    },
+    "operation": "endgame",
+    "public_content": {
+      "conclusion": {
+        "sections": [
+          {
+            "key": "journey",
+            "references": [
+              {
+                "choice_id": "B",
+                "choice_title": "Distribute the Burden",
+                "crisis_id": "grid-under-pressure",
+                "crisis_number": 1,
+                "crisis_title": "Grid Under Pressure",
+                "outcome": "Rotating outages spread disruption and business losses while reducing sustained pressure on the grid."
+              },
+              {
+                "choice_id": "B",
+                "choice_title": "Isolate and Deliver",
+                "crisis_id": "waterline-alert",
+                "crisis_number": 2,
+                "crisis_title": "Waterline Alert",
+                "outcome": "Targeted delivery earns public confidence and protects exposed residents. Most commerce continues, but distribution costs rise and uneven pressure damages older equipment."
+              },
+              {
+                "choice_id": "B",
+                "choice_title": "Protect Lifeline Islands",
+                "crisis_id": "the-last-coordination",
+                "crisis_number": 10,
+                "crisis_title": "The Last Coordination",
+                "outcome": "Protected lifelines reduce immediate harm and the staged plan earns confidence. Sacrificed equipment lowers infrastructure capacity, and restricted commerce plus logistics costs weaken the economy."
+              }
+            ],
+            "text": "The city’s victory came through a long sequence of imperfect choices: rotating outages eased pressure on the grid but disrupted businesses; targeted water delivery protected exposed residents while straining equipment and budgets. Later, freight auctions brought revenue at the cost of fair access, and the final plan protected lifeline services while sacrificing equipment and commerce. Across the journey, keeping essential systems moving repeatedly meant choosing who bore the disruption.",
+            "title": "The Civilization’s Journey"
+          },
+          {
+            "key": "cost",
+            "references": [
+              {
+                "choice_id": "B",
+                "choice_title": "Transfer to Regional Partners",
+                "crisis_id": "care-at-capacity",
+                "crisis_number": 3,
+                "crisis_title": "Care at Capacity",
+                "outcome": "Local utility repairs and reimbursement strengthen systems and finances. Lengthy transfers delay treatment and distress families, increasing health risks and mistrust."
+              },
+              {
+                "choice_id": "B",
+                "choice_title": "Auction Freight Access",
+                "crisis_id": "essential-corridor",
+                "crisis_number": 4,
+                "crisis_title": "The Essential Corridor",
+                "outcome": "Slot revenue and resumed trade improve finances. Uninspected routes deteriorate, poorer districts lose out, and uneven access increases both safety risks and public resentment."
+              },
+              {
+                "choice_id": "A",
+                "choice_title": "Enforce Protected Priority Lanes",
+                "crisis_id": "a-fair-share",
+                "crisis_number": 9,
+                "crisis_title": "A Fair Share",
+                "outcome": "Protected routes restore repairs, trade and immediate physical security. Imposed priorities and enforcement sharply damage legitimacy among residents who feel excluded."
+              }
+            ],
+            "text": "The gains were real, but so were the tradeoffs. Transferring patients to regional partners supported local systems and finances while delayed treatment distressed families. Auctioning freight access revived trade but damaged routes and deepened resentment in poorer districts. Later, enforcing protected priority lanes restored repairs and security, yet sharply weakened residents’ sense of being treated fairly. These choices record competing needs, not proof of unrest beyond what was reported.",
+            "title": "The Cost of Survival"
+          },
+          {
+            "key": "standing",
+            "references": [
+              {
+                "choice_id": "C",
+                "choice_title": "Secure Critical-Service Credit",
+                "crisis_id": "credit-under-strain",
+                "crisis_number": 8,
+                "crisis_title": "Credit Under Strain",
+                "outcome": "Critical suppliers resume parts deliveries and productive work, improving infrastructure and economic capacity. Excluded households and firms lose confidence, and gaps in emergency staffing increase harm."
+              },
+              {
+                "choice_id": "A",
+                "choice_title": "Enforce Protected Priority Lanes",
+                "crisis_id": "a-fair-share",
+                "crisis_number": 9,
+                "crisis_title": "A Fair Share",
+                "outcome": "Protected routes restore repairs, trade and immediate physical security. Imposed priorities and enforcement sharply damage legitimacy among residents who feel excluded."
+              },
+              {
+                "choice_id": "B",
+                "choice_title": "Protect Lifeline Islands",
+                "crisis_id": "the-last-coordination",
+                "crisis_number": 10,
+                "crisis_title": "The Last Coordination",
+                "outcome": "Protected lifelines reduce immediate harm and the staged plan earns confidence. Sacrificed equipment lowers infrastructure capacity, and restricted commerce plus logistics costs weaken the economy."
+              }
+            ],
+            "text": "The city completed all ten crises, with protected lifelines and a staged coordination plan helping limit immediate harm at the end. Its capacity to protect essential services is a hard-won strength, but public confidence remains a clear vulnerability: households and firms felt excluded by credit decisions, and imposed priorities further damaged legitimacy. The city stands victorious, yet with strained systems and trust still needing repair.",
+            "title": "Where the City Stands"
+          }
+        ],
+        "status": "generated"
+      },
+      "consensus_score": 55.75,
+      "consensus_windows": 0,
+      "crises_completed": 10,
+      "final_metrics": {
+        "economy": 55,
+        "infrastructure": 55,
+        "public_trust": 49,
+        "safety": 64
+      },
+      "final_vote_crises": 0,
+      "narrative_outcome": "The city survived all configured crises. The final executed decision was Protect Lifeline Islands. Protected lifelines reduce immediate harm and the staged plan earns confidence. Sacrificed equipment lowers infrastructure capacity, and restricted commerce plus logistics costs weaken the economy.",
+      "notable_decisions": [
+        {
+          "choice_title": "Auction Freight Access",
+          "crisis_number": 4,
+          "crisis_title": "The Essential Corridor",
+          "outcome": "Slot revenue and resumed trade improve finances. Uninspected routes deteriorate, poorer districts lose out, and uneven access increases both safety risks and public resentment."
+        },
+        {
+          "choice_title": "Secure Critical-Service Credit",
+          "crisis_number": 8,
+          "crisis_title": "Credit Under Strain",
+          "outcome": "Critical suppliers resume parts deliveries and productive work, improving infrastructure and economic capacity. Excluded households and firms lose confidence, and gaps in emergency staffing increase harm."
+        },
+        {
+          "choice_title": "Protect Lifeline Islands",
+          "crisis_number": 10,
+          "crisis_title": "The Last Coordination",
+          "outcome": "Protected lifelines reduce immediate harm and the staged plan earns confidence. Sacrificed equipment lowers infrastructure capacity, and restricted commerce plus logistics costs weaken the economy."
+        }
+      ],
+      "outcome": "victory",
+      "resolution_breakdown": {
+        "ai_tie_break": 0,
+        "final_plurality": 0,
+        "initial_plurality": 10,
+        "no_vote_ai_fallback": 0
+      },
+      "total_crises": 10
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": {
+      "cost": [
+        3,
+        4,
+        9
+      ],
+      "journey": [
+        1,
+        2,
+        10
+      ],
+      "standing": [
+        8,
+        9,
+        10
+      ]
+    }
+  },
+  {
+    "authoritative_history": [
+      {
+        "after": {
+          "economy": 63,
+          "infrastructure": 75,
+          "public_trust": 67,
+          "safety": 72
+        },
+        "applied_deltas": {
+          "economy": -7,
+          "infrastructure": 5,
+          "public_trust": -3,
+          "safety": 2
+        },
+        "before": {
+          "economy": 70,
+          "infrastructure": 70,
+          "public_trust": 70,
+          "safety": 70
+        },
+        "briefing": "EXTREME HEAT EVENT — Record temperatures have pushed the electrical grid to 96% capacity. Engineers predict a major cascading failure within two hours if demand is not reduced.",
+        "choice_id": "B",
+        "choice_title": "Distribute the Burden",
+        "crisis_id": "grid-under-pressure",
+        "crisis_number": 1,
+        "outcome": "Rotating outages spread disruption and business losses while reducing sustained pressure on the grid.",
+        "title": "Grid Under Pressure"
+      },
+      {
+        "after": {
+          "economy": 41,
+          "infrastructure": 87,
+          "public_trust": 57,
+          "safety": 82
+        },
+        "applied_deltas": {
+          "economy": -22,
+          "infrastructure": 12,
+          "public_trust": -10,
+          "safety": 10
+        },
+        "before": {
+          "economy": 63,
+          "infrastructure": 75,
+          "public_trust": 67,
+          "safety": 72
+        },
+        "briefing": "Heat-stressed pumps have lost pressure near the eastern water-treatment loop. Samples indicate possible contamination, but laboratory confirmation is still hours away. Households, food processors and emergency clinics share the network. Decide how much service to interrupt while engineers contain the exposure.",
+        "choice_id": "A",
+        "choice_title": "Flush the Entire Network",
+        "crisis_id": "waterline-alert",
+        "crisis_number": 2,
+        "outcome": "The flush restores network reliability and reduces exposure. Citywide interruptions anger households and close processors, while emergency delivery absorbs substantial funds.",
+        "title": "Waterline Alert"
+      },
+      {
+        "after": {
+          "economy": 21,
+          "infrastructure": 75,
+          "public_trust": 61,
+          "safety": 98
+        },
+        "applied_deltas": {
+          "economy": -20,
+          "infrastructure": -12,
+          "public_trust": 4,
+          "safety": 16
+        },
+        "before": {
+          "economy": 41,
+          "infrastructure": 87,
+          "public_trust": 57,
+          "safety": 82
+        },
+        "briefing": "Heat-related illness and the water alert have filled the regional hospitals. A new intake surge is expected overnight. Beds, staff, transport and backup equipment cannot all be expanded at once. The team must decide where to concentrate the next shift’s care capacity.",
+        "choice_id": "A",
+        "choice_title": "Open Temporary Care Wards",
+        "crisis_id": "care-at-capacity",
+        "crisis_number": 3,
+        "outcome": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves.",
+        "title": "Care at Capacity"
+      },
+      {
+        "after": {
+          "economy": 0,
+          "infrastructure": 69,
+          "public_trust": 49,
+          "safety": 100
+        },
+        "applied_deltas": {
+          "economy": -21,
+          "infrastructure": -6,
+          "public_trust": -12,
+          "safety": 2
+        },
+        "before": {
+          "economy": 21,
+          "infrastructure": 75,
+          "public_trust": 61,
+          "safety": 98
+        },
+        "briefing": "Emergency purchasing and disrupted deliveries have left warehouses unevenly stocked. Clinics need filters, repair crews need components, and shops need food. A limited freight corridor can reopen, but fuel, loading crews and bridge capacity cannot serve every destination today.",
+        "choice_id": "A",
+        "choice_title": "Purchase and Commandeer",
+        "crisis_id": "essential-corridor",
+        "crisis_number": 4,
+        "outcome": "Urgent supplies reach care teams and reduce immediate harm. Costly purchases drain reserves, compulsory redirection damages legitimacy, and rushed freight movements wear the network.",
+        "title": "The Essential Corridor"
+      }
+    ],
+    "case_id": "endgame-defeat",
+    "category": "success",
+    "continuity_human_classification": null,
+    "human_scores_status": "pending",
+    "metrics": {
+      "economy": 0,
+      "infrastructure": 69,
+      "public_trust": 49,
+      "safety": 100
+    },
+    "operation": "endgame",
+    "public_content": {
+      "conclusion": {
+        "sections": [
+          {
+            "key": "journey",
+            "references": [
+              {
+                "choice_id": "B",
+                "choice_title": "Distribute the Burden",
+                "crisis_id": "grid-under-pressure",
+                "crisis_number": 1,
+                "crisis_title": "Grid Under Pressure",
+                "outcome": "Rotating outages spread disruption and business losses while reducing sustained pressure on the grid."
+              },
+              {
+                "choice_id": "A",
+                "choice_title": "Flush the Entire Network",
+                "crisis_id": "waterline-alert",
+                "crisis_number": 2,
+                "crisis_title": "Waterline Alert",
+                "outcome": "The flush restores network reliability and reduces exposure. Citywide interruptions anger households and close processors, while emergency delivery absorbs substantial funds."
+              },
+              {
+                "choice_id": "A",
+                "choice_title": "Open Temporary Care Wards",
+                "crisis_id": "care-at-capacity",
+                "crisis_number": 3,
+                "crisis_title": "Care at Capacity",
+                "outcome": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves."
+              }
+            ],
+            "text": "The city distributed the strain of the grid through rotating outages, accepting disruption and business losses to ease sustained pressure. When water contamination was possible, a full-network flush restored reliability but interrupted households and processors. As care demand rose, temporary wards reduced immediate harm and reassured families, even as the response strained utilities and reserves.",
+            "title": "The Civilization’s Journey"
+          },
+          {
+            "key": "cost",
+            "references": [
+              {
+                "choice_id": "A",
+                "choice_title": "Flush the Entire Network",
+                "crisis_id": "waterline-alert",
+                "crisis_number": 2,
+                "crisis_title": "Waterline Alert",
+                "outcome": "The flush restores network reliability and reduces exposure. Citywide interruptions anger households and close processors, while emergency delivery absorbs substantial funds."
+              },
+              {
+                "choice_id": "A",
+                "choice_title": "Open Temporary Care Wards",
+                "crisis_id": "care-at-capacity",
+                "crisis_number": 3,
+                "crisis_title": "Care at Capacity",
+                "outcome": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves."
+              },
+              {
+                "choice_id": "A",
+                "choice_title": "Purchase and Commandeer",
+                "crisis_id": "essential-corridor",
+                "crisis_number": 4,
+                "crisis_title": "The Essential Corridor",
+                "outcome": "Urgent supplies reach care teams and reduce immediate harm. Costly purchases drain reserves, compulsory redirection damages legitimacy, and rushed freight movements wear the network."
+              }
+            ],
+            "text": "These choices protected essential services by spending elsewhere: outages and the water flush disrupted work and daily life; temporary wards required costly staffing and equipment; and the corridor response bought and commandeered supplies, draining reserves, damaging legitimacy, and wearing the network. The accumulated economic loss was decisive, not a cost-free route to safety.",
+            "title": "The Cost of Survival"
+          },
+          {
+            "key": "standing",
+            "references": [
+              {
+                "choice_id": "A",
+                "choice_title": "Open Temporary Care Wards",
+                "crisis_id": "care-at-capacity",
+                "crisis_number": 3,
+                "crisis_title": "Care at Capacity",
+                "outcome": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves."
+              },
+              {
+                "choice_id": "A",
+                "choice_title": "Purchase and Commandeer",
+                "crisis_id": "essential-corridor",
+                "crisis_number": 4,
+                "crisis_title": "The Essential Corridor",
+                "outcome": "Urgent supplies reach care teams and reduce immediate harm. Costly purchases drain reserves, compulsory redirection damages legitimacy, and rushed freight movements wear the network."
+              }
+            ],
+            "text": "The record closes in defeat. Immediate harm was reduced by the care and supply responses, but the city is left with depleted finances, weakened public trust, and infrastructure worn by urgent demands. The gains in safety could not offset those compounded costs; this account does not extend beyond the recorded outcome.",
+            "title": "Where the City Stands"
+          }
+        ],
+        "status": "generated"
+      },
+      "consensus_score": 54.5,
+      "consensus_windows": 0,
+      "crises_completed": 4,
+      "final_metrics": {
+        "economy": 0,
+        "infrastructure": 69,
+        "public_trust": 49,
+        "safety": 100
+      },
+      "final_vote_crises": 0,
+      "narrative_outcome": "The mission ended when Economy reached zero. The final executed decision was Purchase and Commandeer. Urgent supplies reach care teams and reduce immediate harm. Costly purchases drain reserves, compulsory redirection damages legitimacy, and rushed freight movements wear the network.",
+      "notable_decisions": [
+        {
+          "choice_title": "Flush the Entire Network",
+          "crisis_number": 2,
+          "crisis_title": "Waterline Alert",
+          "outcome": "The flush restores network reliability and reduces exposure. Citywide interruptions anger households and close processors, while emergency delivery absorbs substantial funds."
+        },
+        {
+          "choice_title": "Open Temporary Care Wards",
+          "crisis_number": 3,
+          "crisis_title": "Care at Capacity",
+          "outcome": "Nearby beds reduce immediate harm and reassure families. Rapid utility conversion strains essential systems, and staffing plus equipment purchases deplete financial reserves."
+        },
+        {
+          "choice_title": "Purchase and Commandeer",
+          "crisis_number": 4,
+          "crisis_title": "The Essential Corridor",
+          "outcome": "Urgent supplies reach care teams and reduce immediate harm. Costly purchases drain reserves, compulsory redirection damages legitimacy, and rushed freight movements wear the network."
+        }
+      ],
+      "outcome": "defeat",
+      "resolution_breakdown": {
+        "ai_tie_break": 0,
+        "final_plurality": 0,
+        "initial_plurality": 4,
+        "no_vote_ai_fallback": 0
+      },
+      "total_crises": 10
+    },
+    "schema_issues": [],
+    "source": "generated",
+    "validated_references": {
+      "cost": [
+        2,
+        3,
+        4
+      ],
+      "journey": [
+        1,
+        2,
+        3
+      ],
+      "standing": [
+        3,
+        4
+      ]
+    }
+  }
+]

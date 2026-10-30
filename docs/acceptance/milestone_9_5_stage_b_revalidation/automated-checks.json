@@ -1,0 +1,30 @@
+[
+  {
+    "case_id": "crisis-fresh",
+    "common_public_content_passed": true,
+    "history_and_metrics_unchanged": true,
+    "private_projections_passed": true,
+    "result_hashes_unchanged": true
+  },
+  {
+    "case_id": "crisis-infrastructure",
+    "common_public_content_passed": true,
+    "history_and_metrics_unchanged": true,
+    "private_projections_passed": true,
+    "result_hashes_unchanged": true
+  },
+  {
+    "case_id": "crisis-trust",
+    "common_public_content_passed": true,
+    "history_and_metrics_unchanged": true,
+    "private_projections_passed": true,
+    "result_hashes_unchanged": true
+  },
+  {
+    "case_id": "crisis-interconnected",
+    "common_public_content_passed": true,
+    "history_and_metrics_unchanged": true,
+    "private_projections_passed": true,
+    "result_hashes_unchanged": true
+  }
+]

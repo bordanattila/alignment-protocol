@@ -1,0 +1,28 @@
+{
+  "additional_test_requests": 0,
+  "administrative_ceiling_usd": "1.00",
+  "attempted_requests": 4,
+  "baseline_and_development_and_preparation_hashes_match": true,
+  "calculated_cost_usd": "0.0051644",
+  "endgame_requests": 0,
+  "expected_cost_usd": "0.0060",
+  "full_backend_suite": "Two preparation runs timed out; not passing",
+  "input_price_per_million_usd": "0.10",
+  "maximum_attempts": 4,
+  "model": "gpt-6-luna",
+  "output_price_per_million_usd": "0.50",
+  "production_sources_changed": false,
+  "replacement_requests": 0,
+  "request_order": [
+    "crisis-fresh",
+    "crisis-infrastructure",
+    "crisis-trust",
+    "crisis-interconnected"
+  ],
+  "retries": 0,
+  "semantic_quality_ratings": "Not assigned; human review pending",
+  "source": "Explicit user authorization in this chat",
+  "status": "executed_once_authorization_exhausted",
+  "timeout_seconds": 60,
+  "unknown_billing_reserve_usd": "0"
+}

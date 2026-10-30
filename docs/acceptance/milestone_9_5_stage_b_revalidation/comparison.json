@@ -1,0 +1,1096 @@
+{
+  "baseline": {
+    "cost": {
+      "assumptions": [
+        "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+        "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+        "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+        "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+        "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+      ],
+      "complete_observed_batch_estimate": "0.0047954",
+      "known_request_count": 4,
+      "known_usage_subtotal": "0.0047954",
+      "missions": 1,
+      "per_crisis_known_sample_mean": "0.00119885",
+      "per_endgame_known_sample_mean": null,
+      "pricing": {
+        "gpt-6-luna": {
+          "input_per_million": "0.10",
+          "output_per_million": "0.50"
+        }
+      },
+      "projected_repeated_missions": null,
+      "projected_ten_crisis_mission": null,
+      "unknown_attempt_count": 0,
+      "unknown_cost_request_count": 0
+    },
+    "evidence_mode": "real-stage-a",
+    "human_meaningful_continuity": "pending",
+    "metrics": {
+      "all": {
+        "accepted_count": 4,
+        "accepted_rate": 1.0,
+        "attempt_status_unknown_count": 0,
+        "attempted_fallback_rate": 0.0,
+        "attempted_fallback_rate_by_reason": {},
+        "configuration_count": 0,
+        "configured_models": [
+          {
+            "known_attempts": 4,
+            "model": "gpt-6-luna"
+          }
+        ],
+        "continuity": {
+          "accepted_with_history_sample_count": 3,
+          "accepted_with_supported_references": 0,
+          "accepted_without_references": 4,
+          "explicit_reference_utilization_rate": 0.0,
+          "meaningful_utilization": "manual_review_required",
+          "semantic_consistency": "manual_review_required",
+          "utilization_denominator": "accepted known-attempt outputs with history and measured reference count"
+        },
+        "disabled_count": 0,
+        "fallback_by_reason": {},
+        "fallback_count": 0,
+        "fallback_rate_by_reason": {},
+        "historical_reference_rejection_count": 0,
+        "latency": {
+          "availability_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "provider_seconds": {
+            "max": 29.722232,
+            "min": 20.737118,
+            "p50": 24.938114,
+            "p95": 29.722232,
+            "sample_count": 4
+          },
+          "timeout_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "total_generation_seconds": {
+            "max": 29.722707,
+            "min": 20.73748,
+            "p50": 24.938657,
+            "p95": 29.722707,
+            "sample_count": 4
+          },
+          "validation_seconds": {
+            "max": 0.000581,
+            "min": 0.000325,
+            "p50": 0.000389,
+            "p95": 0.000581,
+            "sample_count": 4
+          }
+        },
+        "not_attempted_count": 0,
+        "objective_repetition_count": 0,
+        "outcome_fallback_rate": 0.0,
+        "provider_attempts": 4,
+        "provider_error_count": 0,
+        "rate_denominators": {
+          "accepted_rate": "known provider attempts",
+          "attempted_fallback_rate": "known provider attempts",
+          "attempted_fallback_rate_by_reason": "known provider attempts",
+          "fallback_rate_by_reason": "all supplied outcome records",
+          "outcome_fallback_rate": "all supplied outcome records",
+          "rejection_rate": "known provider attempts"
+        },
+        "record_count": 4,
+        "rejected_count": 0,
+        "rejection_rate": 0.0,
+        "schema_rejection_count": 0,
+        "timeout_count": 0,
+        "usage": {
+          "input_tokens": {
+            "known_request_count": 4,
+            "known_sum": 11679,
+            "unknown_request_count": 0
+          },
+          "output_tokens": {
+            "known_request_count": 4,
+            "known_sum": 7255,
+            "unknown_request_count": 0
+          },
+          "total_tokens": {
+            "known_request_count": 4,
+            "known_sum": 18934,
+            "unknown_request_count": 0
+          }
+        }
+      },
+      "coverage": "supplied outcome records only; production final-per-crisis records are not a full retry audit",
+      "crisis": {
+        "accepted_count": 4,
+        "accepted_rate": 1.0,
+        "attempt_status_unknown_count": 0,
+        "attempted_fallback_rate": 0.0,
+        "attempted_fallback_rate_by_reason": {},
+        "configuration_count": 0,
+        "configured_models": [
+          {
+            "known_attempts": 4,
+            "model": "gpt-6-luna"
+          }
+        ],
+        "continuity": {
+          "accepted_with_history_sample_count": 3,
+          "accepted_with_supported_references": 0,
+          "accepted_without_references": 4,
+          "explicit_reference_utilization_rate": 0.0,
+          "meaningful_utilization": "manual_review_required",
+          "semantic_consistency": "manual_review_required",
+          "utilization_denominator": "accepted known-attempt outputs with history and measured reference count"
+        },
+        "disabled_count": 0,
+        "fallback_by_reason": {},
+        "fallback_count": 0,
+        "fallback_rate_by_reason": {},
+        "historical_reference_rejection_count": 0,
+        "latency": {
+          "availability_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "provider_seconds": {
+            "max": 29.722232,
+            "min": 20.737118,
+            "p50": 24.938114,
+            "p95": 29.722232,
+            "sample_count": 4
+          },
+          "timeout_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "total_generation_seconds": {
+            "max": 29.722707,
+            "min": 20.73748,
+            "p50": 24.938657,
+            "p95": 29.722707,
+            "sample_count": 4
+          },
+          "validation_seconds": {
+            "max": 0.000581,
+            "min": 0.000325,
+            "p50": 0.000389,
+            "p95": 0.000581,
+            "sample_count": 4
+          }
+        },
+        "not_attempted_count": 0,
+        "objective_repetition_count": 0,
+        "outcome_fallback_rate": 0.0,
+        "provider_attempts": 4,
+        "provider_error_count": 0,
+        "rate_denominators": {
+          "accepted_rate": "known provider attempts",
+          "attempted_fallback_rate": "known provider attempts",
+          "attempted_fallback_rate_by_reason": "known provider attempts",
+          "fallback_rate_by_reason": "all supplied outcome records",
+          "outcome_fallback_rate": "all supplied outcome records",
+          "rejection_rate": "known provider attempts"
+        },
+        "record_count": 4,
+        "rejected_count": 0,
+        "rejection_rate": 0.0,
+        "schema_rejection_count": 0,
+        "timeout_count": 0,
+        "usage": {
+          "input_tokens": {
+            "known_request_count": 4,
+            "known_sum": 11679,
+            "unknown_request_count": 0
+          },
+          "output_tokens": {
+            "known_request_count": 4,
+            "known_sum": 7255,
+            "unknown_request_count": 0
+          },
+          "total_tokens": {
+            "known_request_count": 4,
+            "known_sum": 18934,
+            "unknown_request_count": 0
+          }
+        }
+      },
+      "endgame": {
+        "accepted_count": 0,
+        "accepted_rate": null,
+        "attempt_status_unknown_count": 0,
+        "attempted_fallback_rate": null,
+        "attempted_fallback_rate_by_reason": {},
+        "configuration_count": 0,
+        "configured_models": [],
+        "continuity": {
+          "accepted_with_history_sample_count": 0,
+          "accepted_with_supported_references": 0,
+          "accepted_without_references": 0,
+          "explicit_reference_utilization_rate": null,
+          "meaningful_utilization": "manual_review_required",
+          "semantic_consistency": "manual_review_required",
+          "utilization_denominator": "accepted known-attempt outputs with history and measured reference count"
+        },
+        "disabled_count": 0,
+        "fallback_by_reason": {},
+        "fallback_count": 0,
+        "fallback_rate_by_reason": {},
+        "historical_reference_rejection_count": 0,
+        "latency": {
+          "availability_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "provider_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "timeout_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "total_generation_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "validation_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          }
+        },
+        "not_attempted_count": 0,
+        "objective_repetition_count": 0,
+        "outcome_fallback_rate": null,
+        "provider_attempts": 0,
+        "provider_error_count": 0,
+        "rate_denominators": {
+          "accepted_rate": "known provider attempts",
+          "attempted_fallback_rate": "known provider attempts",
+          "attempted_fallback_rate_by_reason": "known provider attempts",
+          "fallback_rate_by_reason": "all supplied outcome records",
+          "outcome_fallback_rate": "all supplied outcome records",
+          "rejection_rate": "known provider attempts"
+        },
+        "record_count": 0,
+        "rejected_count": 0,
+        "rejection_rate": null,
+        "schema_rejection_count": 0,
+        "timeout_count": 0,
+        "usage": {
+          "input_tokens": {
+            "known_request_count": 0,
+            "known_sum": 0,
+            "unknown_request_count": 0
+          },
+          "output_tokens": {
+            "known_request_count": 0,
+            "known_sum": 0,
+            "unknown_request_count": 0
+          },
+          "total_tokens": {
+            "known_request_count": 0,
+            "known_sum": 0,
+            "unknown_request_count": 0
+          }
+        }
+      },
+      "percentile_method": "nearest-rank p95; median p50; empty samples remain null",
+      "timing_boundary": "provider_seconds measures the full adapter call, not network-only latency; availability is unknown"
+    }
+  },
+  "dry_run_functional_checks": null,
+  "per_case": [
+    {
+      "case_id": "crisis-fresh",
+      "human_comparison": "pending",
+      "revalidation": {
+        "calculated_cost": {
+          "assumptions": [
+            "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+            "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+            "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+            "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+            "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+          ],
+          "complete_observed_batch_estimate": "0.0012336",
+          "known_request_count": 1,
+          "known_usage_subtotal": "0.0012336",
+          "missions": 1,
+          "per_crisis_known_sample_mean": "0.0012336",
+          "per_endgame_known_sample_mean": null,
+          "pricing": {
+            "gpt-6-luna": {
+              "input_per_million": "0.10",
+              "output_per_million": "0.50"
+            }
+          },
+          "projected_repeated_missions": null,
+          "projected_ten_crisis_mission": null,
+          "unknown_attempt_count": 0,
+          "unknown_cost_request_count": 0
+        },
+        "category": "success",
+        "http_status": 200,
+        "provider_seconds": 32.141843,
+        "reference_count": 0,
+        "schema_accepted": true,
+        "source": "generated",
+        "total_seconds": 32.14234,
+        "usage": {
+          "input_tokens": 2086,
+          "output_tokens": 2050,
+          "total_tokens": 4136
+        },
+        "validation_seconds": 0.000392
+      },
+      "revalidation_category": "success",
+      "stage_a": {
+        "calculated_cost": {
+          "assumptions": [
+            "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+            "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+            "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+            "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+            "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+          ],
+          "complete_observed_batch_estimate": "0.0011966",
+          "known_request_count": 1,
+          "known_usage_subtotal": "0.0011966",
+          "missions": 1,
+          "per_crisis_known_sample_mean": "0.0011966",
+          "per_endgame_known_sample_mean": null,
+          "pricing": {
+            "gpt-6-luna": {
+              "input_per_million": "0.10",
+              "output_per_million": "0.50"
+            }
+          },
+          "projected_repeated_missions": null,
+          "projected_ten_crisis_mission": null,
+          "unknown_attempt_count": 0,
+          "unknown_cost_request_count": 0
+        },
+        "category": "success",
+        "http_status": 200,
+        "provider_seconds": 29.722232,
+        "reference_count": 0,
+        "schema_accepted": true,
+        "source": "generated",
+        "total_seconds": 29.722707,
+        "usage": {
+          "input_tokens": 2086,
+          "output_tokens": 1976,
+          "total_tokens": 4062
+        },
+        "validation_seconds": 0.000372
+      },
+      "stage_a_category": "success",
+      "stage_a_references": 0
+    },
+    {
+      "case_id": "crisis-infrastructure",
+      "human_comparison": "pending",
+      "revalidation": {
+        "calculated_cost": {
+          "assumptions": [
+            "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+            "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+            "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+            "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+            "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+          ],
+          "complete_observed_batch_estimate": "0.0015261",
+          "known_request_count": 1,
+          "known_usage_subtotal": "0.0015261",
+          "missions": 1,
+          "per_crisis_known_sample_mean": "0.0015261",
+          "per_endgame_known_sample_mean": null,
+          "pricing": {
+            "gpt-6-luna": {
+              "input_per_million": "0.10",
+              "output_per_million": "0.50"
+            }
+          },
+          "projected_repeated_missions": null,
+          "projected_ten_crisis_mission": null,
+          "unknown_attempt_count": 0,
+          "unknown_cost_request_count": 0
+        },
+        "category": "success",
+        "http_status": 200,
+        "provider_seconds": 28.300156,
+        "reference_count": 2,
+        "schema_accepted": true,
+        "source": "generated",
+        "total_seconds": 28.300592,
+        "usage": {
+          "input_tokens": 3311,
+          "output_tokens": 2390,
+          "total_tokens": 5701
+        },
+        "validation_seconds": 0.00039
+      },
+      "revalidation_category": "success",
+      "stage_a": {
+        "calculated_cost": {
+          "assumptions": [
+            "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+            "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+            "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+            "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+            "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+          ],
+          "complete_observed_batch_estimate": "0.0013326",
+          "known_request_count": 1,
+          "known_usage_subtotal": "0.0013326",
+          "missions": 1,
+          "per_crisis_known_sample_mean": "0.0013326",
+          "per_endgame_known_sample_mean": null,
+          "pricing": {
+            "gpt-6-luna": {
+              "input_per_million": "0.10",
+              "output_per_million": "0.50"
+            }
+          },
+          "projected_repeated_missions": null,
+          "projected_ten_crisis_mission": null,
+          "unknown_attempt_count": 0,
+          "unknown_cost_request_count": 0
+        },
+        "category": "success",
+        "http_status": 200,
+        "provider_seconds": 27.820314,
+        "reference_count": 0,
+        "schema_accepted": true,
+        "source": "generated",
+        "total_seconds": 27.820954,
+        "usage": {
+          "input_tokens": 3271,
+          "output_tokens": 2011,
+          "total_tokens": 5282
+        },
+        "validation_seconds": 0.000581
+      },
+      "stage_a_category": "success",
+      "stage_a_references": 0
+    },
+    {
+      "case_id": "crisis-trust",
+      "human_comparison": "pending",
+      "revalidation": {
+        "calculated_cost": {
+          "assumptions": [
+            "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+            "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+            "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+            "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+            "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+          ],
+          "complete_observed_batch_estimate": "0.0012871",
+          "known_request_count": 1,
+          "known_usage_subtotal": "0.0012871",
+          "missions": 1,
+          "per_crisis_known_sample_mean": "0.0012871",
+          "per_endgame_known_sample_mean": null,
+          "pricing": {
+            "gpt-6-luna": {
+              "input_per_million": "0.10",
+              "output_per_million": "0.50"
+            }
+          },
+          "projected_repeated_missions": null,
+          "projected_ten_crisis_mission": null,
+          "unknown_attempt_count": 0,
+          "unknown_cost_request_count": 0
+        },
+        "category": "success",
+        "http_status": 200,
+        "provider_seconds": 23.56639,
+        "reference_count": 1,
+        "schema_accepted": true,
+        "source": "generated",
+        "total_seconds": 23.566773,
+        "usage": {
+          "input_tokens": 3351,
+          "output_tokens": 1904,
+          "total_tokens": 5255
+        },
+        "validation_seconds": 0.000345
+      },
+      "revalidation_category": "success",
+      "stage_a": {
+        "calculated_cost": {
+          "assumptions": [
+            "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+            "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+            "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+            "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+            "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+          ],
+          "complete_observed_batch_estimate": "0.0011796",
+          "known_request_count": 1,
+          "known_usage_subtotal": "0.0011796",
+          "missions": 1,
+          "per_crisis_known_sample_mean": "0.0011796",
+          "per_endgame_known_sample_mean": null,
+          "pricing": {
+            "gpt-6-luna": {
+              "input_per_million": "0.10",
+              "output_per_million": "0.50"
+            }
+          },
+          "projected_repeated_missions": null,
+          "projected_ten_crisis_mission": null,
+          "unknown_attempt_count": 0,
+          "unknown_cost_request_count": 0
+        },
+        "category": "success",
+        "http_status": 200,
+        "provider_seconds": 22.055914,
+        "reference_count": 0,
+        "schema_accepted": true,
+        "source": "generated",
+        "total_seconds": 22.056361,
+        "usage": {
+          "input_tokens": 3311,
+          "output_tokens": 1697,
+          "total_tokens": 5008
+        },
+        "validation_seconds": 0.000407
+      },
+      "stage_a_category": "success",
+      "stage_a_references": 0
+    },
+    {
+      "case_id": "crisis-interconnected",
+      "human_comparison": "pending",
+      "revalidation": {
+        "calculated_cost": {
+          "assumptions": [
+            "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+            "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+            "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+            "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+            "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+          ],
+          "complete_observed_batch_estimate": "0.0011176",
+          "known_request_count": 1,
+          "known_usage_subtotal": "0.0011176",
+          "missions": 1,
+          "per_crisis_known_sample_mean": "0.0011176",
+          "per_endgame_known_sample_mean": null,
+          "pricing": {
+            "gpt-6-luna": {
+              "input_per_million": "0.10",
+              "output_per_million": "0.50"
+            }
+          },
+          "projected_repeated_missions": null,
+          "projected_ten_crisis_mission": null,
+          "unknown_attempt_count": 0,
+          "unknown_cost_request_count": 0
+        },
+        "category": "success",
+        "http_status": 200,
+        "provider_seconds": 20.568149,
+        "reference_count": 2,
+        "schema_accepted": true,
+        "source": "generated",
+        "total_seconds": 20.568565,
+        "usage": {
+          "input_tokens": 3051,
+          "output_tokens": 1625,
+          "total_tokens": 4676
+        },
+        "validation_seconds": 0.000372
+      },
+      "revalidation_category": "success",
+      "stage_a": {
+        "calculated_cost": {
+          "assumptions": [
+            "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+            "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+            "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+            "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+            "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+          ],
+          "complete_observed_batch_estimate": "0.0010866",
+          "known_request_count": 1,
+          "known_usage_subtotal": "0.0010866",
+          "missions": 1,
+          "per_crisis_known_sample_mean": "0.0010866",
+          "per_endgame_known_sample_mean": null,
+          "pricing": {
+            "gpt-6-luna": {
+              "input_per_million": "0.10",
+              "output_per_million": "0.50"
+            }
+          },
+          "projected_repeated_missions": null,
+          "projected_ten_crisis_mission": null,
+          "unknown_attempt_count": 0,
+          "unknown_cost_request_count": 0
+        },
+        "category": "success",
+        "http_status": 200,
+        "provider_seconds": 20.737118,
+        "reference_count": 0,
+        "schema_accepted": true,
+        "source": "generated",
+        "total_seconds": 20.73748,
+        "usage": {
+          "input_tokens": 3011,
+          "output_tokens": 1571,
+          "total_tokens": 4582
+        },
+        "validation_seconds": 0.000325
+      },
+      "stage_a_category": "success",
+      "stage_a_references": 0
+    }
+  ],
+  "revalidation": {
+    "cost": {
+      "assumptions": [
+        "Prices are operator-supplied currency units per million tokens; no current price is assumed.",
+        "Known-usage means include rejected responses and fallbacks, not only accepted outputs.",
+        "Projection assumes known samples represent future attempts: ten crisis requests plus one endgame request.",
+        "Unknown usage can still be billable. This is a conditional projection, not a spending cap or provider invoice.",
+        "Flat input/output rates do not model cached-token discounts, service tiers or retries."
+      ],
+      "complete_observed_batch_estimate": "0.0051644",
+      "known_request_count": 4,
+      "known_usage_subtotal": "0.0051644",
+      "missions": 1,
+      "per_crisis_known_sample_mean": "0.0012911",
+      "per_endgame_known_sample_mean": null,
+      "pricing": {
+        "gpt-6-luna": {
+          "input_per_million": "0.10",
+          "output_per_million": "0.50"
+        }
+      },
+      "projected_repeated_missions": null,
+      "projected_ten_crisis_mission": null,
+      "unknown_attempt_count": 0,
+      "unknown_cost_request_count": 0
+    },
+    "human_meaningful_continuity": "pending",
+    "metrics": {
+      "all": {
+        "accepted_count": 4,
+        "accepted_rate": 1.0,
+        "attempt_status_unknown_count": 0,
+        "attempted_fallback_rate": 0.0,
+        "attempted_fallback_rate_by_reason": {},
+        "configuration_count": 0,
+        "configured_models": [
+          {
+            "known_attempts": 4,
+            "model": "gpt-6-luna"
+          }
+        ],
+        "continuity": {
+          "accepted_with_history_sample_count": 3,
+          "accepted_with_supported_references": 3,
+          "accepted_without_references": 1,
+          "explicit_reference_utilization_rate": 1.0,
+          "meaningful_utilization": "manual_review_required",
+          "semantic_consistency": "manual_review_required",
+          "utilization_denominator": "accepted known-attempt outputs with history and measured reference count"
+        },
+        "disabled_count": 0,
+        "fallback_by_reason": {},
+        "fallback_count": 0,
+        "fallback_rate_by_reason": {},
+        "historical_reference_rejection_count": 0,
+        "latency": {
+          "availability_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "provider_seconds": {
+            "max": 32.141843,
+            "min": 20.568149,
+            "p50": 25.933273,
+            "p95": 32.141843,
+            "sample_count": 4
+          },
+          "timeout_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "total_generation_seconds": {
+            "max": 32.14234,
+            "min": 20.568565,
+            "p50": 25.933683,
+            "p95": 32.14234,
+            "sample_count": 4
+          },
+          "validation_seconds": {
+            "max": 0.000392,
+            "min": 0.000345,
+            "p50": 0.000381,
+            "p95": 0.000392,
+            "sample_count": 4
+          }
+        },
+        "not_attempted_count": 0,
+        "objective_repetition_count": 0,
+        "outcome_fallback_rate": 0.0,
+        "provider_attempts": 4,
+        "provider_error_count": 0,
+        "rate_denominators": {
+          "accepted_rate": "known provider attempts",
+          "attempted_fallback_rate": "known provider attempts",
+          "attempted_fallback_rate_by_reason": "known provider attempts",
+          "fallback_rate_by_reason": "all supplied outcome records",
+          "outcome_fallback_rate": "all supplied outcome records",
+          "rejection_rate": "known provider attempts"
+        },
+        "record_count": 4,
+        "rejected_count": 0,
+        "rejection_rate": 0.0,
+        "schema_rejection_count": 0,
+        "timeout_count": 0,
+        "usage": {
+          "input_tokens": {
+            "known_request_count": 4,
+            "known_sum": 11799,
+            "unknown_request_count": 0
+          },
+          "output_tokens": {
+            "known_request_count": 4,
+            "known_sum": 7969,
+            "unknown_request_count": 0
+          },
+          "total_tokens": {
+            "known_request_count": 4,
+            "known_sum": 19768,
+            "unknown_request_count": 0
+          }
+        }
+      },
+      "coverage": "supplied outcome records only; production final-per-crisis records are not a full retry audit",
+      "crisis": {
+        "accepted_count": 4,
+        "accepted_rate": 1.0,
+        "attempt_status_unknown_count": 0,
+        "attempted_fallback_rate": 0.0,
+        "attempted_fallback_rate_by_reason": {},
+        "configuration_count": 0,
+        "configured_models": [
+          {
+            "known_attempts": 4,
+            "model": "gpt-6-luna"
+          }
+        ],
+        "continuity": {
+          "accepted_with_history_sample_count": 3,
+          "accepted_with_supported_references": 3,
+          "accepted_without_references": 1,
+          "explicit_reference_utilization_rate": 1.0,
+          "meaningful_utilization": "manual_review_required",
+          "semantic_consistency": "manual_review_required",
+          "utilization_denominator": "accepted known-attempt outputs with history and measured reference count"
+        },
+        "disabled_count": 0,
+        "fallback_by_reason": {},
+        "fallback_count": 0,
+        "fallback_rate_by_reason": {},
+        "historical_reference_rejection_count": 0,
+        "latency": {
+          "availability_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "provider_seconds": {
+            "max": 32.141843,
+            "min": 20.568149,
+            "p50": 25.933273,
+            "p95": 32.141843,
+            "sample_count": 4
+          },
+          "timeout_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "total_generation_seconds": {
+            "max": 32.14234,
+            "min": 20.568565,
+            "p50": 25.933683,
+            "p95": 32.14234,
+            "sample_count": 4
+          },
+          "validation_seconds": {
+            "max": 0.000392,
+            "min": 0.000345,
+            "p50": 0.000381,
+            "p95": 0.000392,
+            "sample_count": 4
+          }
+        },
+        "not_attempted_count": 0,
+        "objective_repetition_count": 0,
+        "outcome_fallback_rate": 0.0,
+        "provider_attempts": 4,
+        "provider_error_count": 0,
+        "rate_denominators": {
+          "accepted_rate": "known provider attempts",
+          "attempted_fallback_rate": "known provider attempts",
+          "attempted_fallback_rate_by_reason": "known provider attempts",
+          "fallback_rate_by_reason": "all supplied outcome records",
+          "outcome_fallback_rate": "all supplied outcome records",
+          "rejection_rate": "known provider attempts"
+        },
+        "record_count": 4,
+        "rejected_count": 0,
+        "rejection_rate": 0.0,
+        "schema_rejection_count": 0,
+        "timeout_count": 0,
+        "usage": {
+          "input_tokens": {
+            "known_request_count": 4,
+            "known_sum": 11799,
+            "unknown_request_count": 0
+          },
+          "output_tokens": {
+            "known_request_count": 4,
+            "known_sum": 7969,
+            "unknown_request_count": 0
+          },
+          "total_tokens": {
+            "known_request_count": 4,
+            "known_sum": 19768,
+            "unknown_request_count": 0
+          }
+        }
+      },
+      "endgame": {
+        "accepted_count": 0,
+        "accepted_rate": null,
+        "attempt_status_unknown_count": 0,
+        "attempted_fallback_rate": null,
+        "attempted_fallback_rate_by_reason": {},
+        "configuration_count": 0,
+        "configured_models": [],
+        "continuity": {
+          "accepted_with_history_sample_count": 0,
+          "accepted_with_supported_references": 0,
+          "accepted_without_references": 0,
+          "explicit_reference_utilization_rate": null,
+          "meaningful_utilization": "manual_review_required",
+          "semantic_consistency": "manual_review_required",
+          "utilization_denominator": "accepted known-attempt outputs with history and measured reference count"
+        },
+        "disabled_count": 0,
+        "fallback_by_reason": {},
+        "fallback_count": 0,
+        "fallback_rate_by_reason": {},
+        "historical_reference_rejection_count": 0,
+        "latency": {
+          "availability_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "fallback_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "provider_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "timeout_total_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "total_generation_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          },
+          "validation_seconds": {
+            "max": null,
+            "min": null,
+            "p50": null,
+            "p95": null,
+            "sample_count": 0
+          }
+        },
+        "not_attempted_count": 0,
+        "objective_repetition_count": 0,
+        "outcome_fallback_rate": null,
+        "provider_attempts": 0,
+        "provider_error_count": 0,
+        "rate_denominators": {
+          "accepted_rate": "known provider attempts",
+          "attempted_fallback_rate": "known provider attempts",
+          "attempted_fallback_rate_by_reason": "known provider attempts",
+          "fallback_rate_by_reason": "all supplied outcome records",
+          "outcome_fallback_rate": "all supplied outcome records",
+          "rejection_rate": "known provider attempts"
+        },
+        "record_count": 0,
+        "rejected_count": 0,
+        "rejection_rate": null,
+        "schema_rejection_count": 0,
+        "timeout_count": 0,
+        "usage": {
+          "input_tokens": {
+            "known_request_count": 0,
+            "known_sum": 0,
+            "unknown_request_count": 0
+          },
+          "output_tokens": {
+            "known_request_count": 0,
+            "known_sum": 0,
+            "unknown_request_count": 0
+          },
+          "total_tokens": {
+            "known_request_count": 0,
+            "known_sum": 0,
+            "unknown_request_count": 0
+          }
+        }
+      },
+      "percentile_method": "nearest-rank p95; median p50; empty samples remain null",
+      "timing_boundary": "provider_seconds measures the full adapter call, not network-only latency; availability is unknown"
+    },
+    "status": "executed"
+  },
+  "warning": "Fake results test the harness only. Valid references are not a human semantic score."
+}

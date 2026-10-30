@@ -1,0 +1,17 @@
+{
+  "docs/MILESTONE_9_5_STAGE_B_REVALIDATION_RESULTS.md": "a7e1a0140ec20f9665ea7e7bf428988071f1bbb8b9d609cef2d5e67335f9491b",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/archive-checks.json": "a9ca71ee865f375a3a419b31bcff4d7c985b0f09ea7758b1bf0f94aa9915e1e7",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/attempt-journal.json": "26521c6e2b4de0204f95b1f7cf200b4035ed195bec8f742106648217a22c0fa3",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/authorization.json": "5ee6c62783d68b2e54db21b6dbb2e14a5c7323c540c12b70cb922264e99082c6",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/automated-checks.json": "56b70a9c94dedea769724b412966e9bcd250524381d88c77a6c21edbea884fc3",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/comparison.json": "fb4d2baf609b34a317a37a11acbbe9369514d7046b1dbfaf7fb813d2e45cdb55",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/diagnostics.json": "aeff890f7cf323a11bcdb0e74761145658f9722103b52aeb54b2e231620bc585",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/evaluation.json": "98f3a10bd2c7854a2fa508706b4e2d7c740e171e1bbcce742d148fff6f6184dd",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/execution.log": "0a333813587ad93838fd7c190578d5e3f4ea65dfb050c52d5027a3ed396f770f",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/human-review.json": "7de9816ef9f3ce5d11075f927d6dab8913dd56f5d21cda379770607c2e901426",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/public-review.json": "db3a5bceffa71a2c10a43001a89785a330c9caf76859948b8e2feae3de7dd932",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/restart-checks.json": "b86e72b6c4a769380e49759e0407bb0c97dfe4f17aa7d0efbdb993e8c5c6f6bf",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/review.checks.json": "b0f429b884970186860332920a0f7b731d9b2286323f77ebc2500c4a0218d2ff",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/review.html": "c21a43540997c5ff372d6aa9f7433d4bd2ae257c62bb29b191d1929851d0f639",
+  "docs/acceptance/milestone_9_5_stage_b_revalidation/source-integrity.json": "d9524bdb715ba139fbbad53a106c2d155edf49bda9d06982a3bcf408bec79613"
+}

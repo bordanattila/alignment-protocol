@@ -34,7 +34,6 @@ def test_actual_adapter_request_aligns_prompt_serialized_context_and_schema(form
     def handler(request):
         calls.append(request);payload=json.loads(request.content)
         prompt=payload['messages'][0]['content']
-        assert 'Narrative continuity is optional' in prompt
         assert 'used_scenario_ids is an exclusion list' in prompt
         assert json.loads(payload['messages'][1]['content'])==json.loads(GenerationRequest(context=ctx).model_dump_json())
         embedded=json.loads(prompt.split('\nJSON contract: ',1)[1])
@@ -42,9 +41,12 @@ def test_actual_adapter_request_aligns_prompt_serialized_context_and_schema(form
         refs=embedded['properties']['continuity_references']
         assert refs['maxItems']==len(records)
         if records:
+            assert 'Prefer a crisis whose constraints or choices are materially shaped' in prompt
+            assert 'use [] when no supported connection fits' in prompt
             assert 'Do not invent missing/older history' in prompt
             assert json.dumps({'crisis_number':1,'choice_id':'B'}) in prompt
         else:
+            assert 'Prefer a crisis whose constraints' not in prompt
             assert 'This is Crisis 1, the opening crisis.' in prompt
             assert 'NO previous player decisions exist' in prompt
             assert 'continuity_references: [] exactly' in prompt

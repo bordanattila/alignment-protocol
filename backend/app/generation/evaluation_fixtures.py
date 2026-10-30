@@ -89,3 +89,72 @@ class FixtureProvider:
         content=story(request,self.mode) if isinstance(request,EndgameRequest) else scenario(request,self.mode)
         usage=None if self.mode=='missing-usage' else TokenUsage(input_tokens=1000,output_tokens=600,total_tokens=1600)
         return ProviderResponse(content,200,usage)
+
+# Scripted contrasts for human review, not semantic classifications or scores.
+CONTINUITY_CASES=(
+    ('fresh-opening','fresh'),
+    ('one-supported-reference','interconnected'),
+    ('multiple-supported-references','interconnected'),
+    ('relevant-without-reference','interconnected'),
+    ('invented-reference','interconnected'),
+    ('contradictory-prose','interconnected'),
+    ('superficial-reference','interconnected'),
+    ('develop-recorded-consequence','interconnected'),
+    ('interacting-decisions','interconnected'),
+    ('independent-emergency','interconnected'),
+)
+
+
+def continuity_scenario(request, case):
+    """Use actual fixture consequences; adversarial prose is deliberately not judged."""
+    if case not in {key for key,name in CONTINUITY_CASES}:raise ValueError('Unknown continuity case')
+    raw=json.loads(scenario(request))
+    if case=='fresh-opening':return json.dumps(raw)
+    records={r.crisis_number:r for r in reference_history(request.context)}
+    water,care=records[2],records[3]  # Existing interconnected fixture: 2/B and 3/A.
+    def ref(record):return {'crisis_number':record.crisis_number,'choice_id':record.choice_id}
+    raw['continuity_references']=[ref(care)]
+    if case=='one-supported-reference':
+        text=('The temporary care wards reduced immediate harm, but their recorded utility strain now limits '
+              'how the city can support a newly proposed cooling site. It must choose which service can carry the added load.')
+    elif case=='multiple-supported-references':
+        text=('Two recorded costs shape the next repair allocation. '+water.consequence+' '+care.consequence+
+              ' The city must choose between equipment restoration and keeping current services operating.')
+        raw['continuity_references']=[ref(water),ref(care)]
+    elif case=='relevant-without-reference':
+        text=('Temporary care wards reduced immediate harm while utility conversion strained essential systems '
+              'and purchases depleted reserves. Those recorded costs constrain a new utility-repair allocation.')
+        raw['continuity_references']=[]
+    elif case=='invented-reference':
+        text=('A new allocation dispute is attributed to a supposed earlier executed decision that is absent '
+              'from the supplied history. This is an unsupported-reference fixture, not an accepted historical fact.')
+        raw['continuity_references']=[{'crisis_number':10,'choice_id':'C'}]
+    elif case=='contradictory-prose':
+        text=('The earlier temporary care wards left essential utilities unstrained and replenished financial reserves. '
+              'Officials therefore say the city has spare capacity for a new repair program, requiring a fresh allocation decision.')
+    elif case=='superficial-reference':
+        text=('The city remembers opening temporary care wards. A new sensor procurement dispute has appeared, '
+              'with several credible bids. The team must select its approach; the earlier decision is mentioned without changing the dilemma.')
+    elif case=='develop-recorded-consequence':
+        text=('The recorded care response was '+care.choice_title+'. '+care.consequence+
+              ' A new cooling-equipment fault requires spending, so the recorded reserve depletion constrains '
+              'repair versus temporary-service options. The earlier choice is not asserted to have caused this new fault.')
+    elif case=='interacting-decisions':
+        text=('The water response recorded: '+water.consequence+' The care response recorded: '+care.consequence+
+              ' Together those costs constrain a new allocation between repairing damaged equipment and sustaining care. '
+              'Any new fault remains a separate event, rather than an invented past consequence.')
+        raw['continuity_references']=[ref(water),ref(care)]
+    else:
+        text=('A lightning strike has interrupted a traffic relay serving a freight terminal. The new weather event '
+              'is independent of earlier choices. The city must choose a temporary routing approach while the relay is repaired.')
+        raw['continuity_references']=[]
+    raw['crisis']['briefing']=text
+    return json.dumps(raw)
+
+
+class ContinuityFixtureProvider:
+    def __init__(self,clock,case):self.clock=clock;self.case=case;self.calls=0
+    async def generate(self,request):
+        self.calls+=1;self.clock.advance(.2)
+        return ProviderResponse(continuity_scenario(request,self.case),200,
+                                TokenUsage(input_tokens=1000,output_tokens=600,total_tokens=1600))

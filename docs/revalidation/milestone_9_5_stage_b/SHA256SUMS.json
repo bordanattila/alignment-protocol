@@ -1,0 +1,11 @@
+{
+  "backend/tests/revalidate_stage_b.py": "ef6ce2392129ac270d5ec86a981d6cbcc07d1b908c2f1fd666580b2d2800414d",
+  "backend/tests/test_stage_b_revalidation_protocol.py": "351d6adff9b6add037342cbba16e86b121bd81ed886f13147cfa4946ab1d259c",
+  "docs/MILESTONE_9_5_STAGE_B_REVALIDATION_PLAN.md": "1b3ba6ba5b664f5e871c919f21db9533d16714adda9c927254b76bca85dc88ae",
+  "docs/revalidation/milestone_9_5_stage_b/comparison.json": "5ae11f1b33a63d43ee9515e30b316a20ce04e1eb253de5e90208ad178732dae6",
+  "docs/revalidation/milestone_9_5_stage_b/human-review.json": "79d087bb3cbc4b478e7b56cf0b77287461a685e5859e3051a86a94c14c94bddb",
+  "docs/revalidation/milestone_9_5_stage_b/offline-checks.json": "a33522630f210594d9c932ac8b84dfb4a2b30ba72f9da3bac63e8e058741a6a6",
+  "docs/revalidation/milestone_9_5_stage_b/preserved-evidence.json": "22954fba8ad2cd74a33f49b22d91b5398645fce09fd64d187b9bed2c525260c3",
+  "docs/revalidation/milestone_9_5_stage_b/protocol.json": "357ac27a23a0b4716081eed042e1ab25f71ff9637f72221249c1fa388e0a39e1",
+  "docs/revalidation/milestone_9_5_stage_b/readiness.json": "a3e3a31a69676a55f9acf30f9da0fecb6127d190b27de9c86c12fb7546e74e34"
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "case_id": "endgame-victory",
+    "existing_review_component": true,
+    "outcome_label": true,
+    "charts": 4,
+    "score": 55.75,
+    "human_browser_acceptance": false
+  },
+  {
+    "case_id": "endgame-defeat",
+    "existing_review_component": true,
+    "outcome_label": true,
+    "charts": 4,
+    "score": 54.5,
+    "human_browser_acceptance": false
+  }
+]

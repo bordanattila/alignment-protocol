@@ -70,14 +70,15 @@ INSTRUCTIONS = (
 
 def continuity_instructions(context: GenerationContext) -> str:
     common = (
-        'Narrative continuity is optional. A standalone crisis is always allowed; '
-        'use continuity_references: [] when no historical link is needed. '
         'Only context.history and narrative_memory.significant_earlier_decisions establish completed player decisions. '
         'used_scenario_ids is an exclusion list, not evidence of prior choices. '
         'Do not infer past player actions from current metrics, crisis numbering, or unexecuted options. '
     )
     if not reference_history(context):
-        return common + (
+        return (
+            'Narrative continuity is optional. A standalone crisis is always allowed; '
+            'use continuity_references: [] when no historical link is needed. '
+        ) + common + (
             ('This is Crisis 1, the opening crisis. ' if context.current_crisis_number == 1 else '')
             + 'Authoritative decision history is empty: NO previous player decisions exist. '
             'Return continuity_references: [] exactly. Do not invent earlier votes, player actions, '
@@ -86,12 +87,15 @@ def continuity_instructions(context: GenerationContext) -> str:
         )
     pairs = [{'crisis_number': r.crisis_number, 'choice_id': r.choice_id} for r in reference_history(context)]
     return common + (
-        'If referencing a prior decision, use only the actual executed choice, crisis number, '
-        'scenario identifier and selected consequence explicitly supplied in context.history '
-        'or narrative_memory.significant_earlier_decisions. '
-        'Do not invent missing/older history or treat unchosen alternatives as executed. '
+        'Prefer a crisis whose constraints or choices are materially shaped by one or two supplied decisions '
+        'and their recorded consequences. State that connection in the public briefing and cite the exact '
+        '(crisis_number, choice_id) pairs in continuity_references. Recorded costs, damage, lost trust or '
+        'successful mitigation should affect the dilemma, not merely be named. '
+        'Distinguish a new emergency\'s cause from historical constraints on the response: a metric deficit '
+        'does not prove an event occurred. Do not invent missing/older history or treat unchosen alternatives as executed. '
+        'Preserve variety: a new independent emergency is welcome; use [] when no supported connection fits. '
         'Each continuity_references entry must match one exact allowed pair; do not mix pairs or repeat them. '
-        'Allowed reference pairs: ' + json.dumps(pairs) + '. An empty array remains valid.'
+        'Allowed reference pairs: ' + json.dumps(pairs) + '.'
     )
 
 

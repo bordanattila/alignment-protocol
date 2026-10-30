@@ -14,7 +14,8 @@ from .config import GenerationSettings
 from .service import GenerationService
 from .contract import accept_proposal
 from .conclusion_live import generate_conclusion
-from .evaluation_fixtures import HISTORIES, fixture, FixtureProvider, SimulationClock, scenario
+from .evaluation_fixtures import (HISTORIES, fixture, FixtureProvider, SimulationClock, scenario,
+                                  CONTINUITY_CASES, ContinuityFixtureProvider)
 from .evaluation_report import EvaluationRecord, Pricing, report, estimate_cost
 from .inspect_diagnostics import inspect
 
@@ -37,7 +38,7 @@ def review_template(case_ids):
         'cases':[{'case_id':key,'scores':{criterion:None for criterion in CRITERIA},'notes':'','review_status':'not_reviewed'} for key in case_ids]}
 
 
-async def run_offline():
+async def run_offline(*, include_continuity=False):
     records=[]
     cases=[(name,'valid') for name in HISTORIES]+[(name,'linked') for name in HISTORIES if name!='fresh']
     cases += [('resolved',mode) for mode in ('schema','malformed','provider-error','timeout','invented','repeated-title','repeated-content','duplicate-choice-text','identical-effects','missing-usage','disabled')]
@@ -62,6 +63,17 @@ async def run_offline():
         outcome=await generate_conclusion(config,provider,request,clock)
         assert provider.calls==(0 if mode=='disabled' else 1)
         records.append(EvaluationRecord(case_id=f'endgame-{name}-{mode}',diagnostic=outcome.diagnostic))
+    if include_continuity:
+        for case,name in CONTINUITY_CASES:
+            request=fixture(name);clock=SimulationClock();provider=ContinuityFixtureProvider(clock,case)
+            config=GenerationSettings(enabled=True,model='fixture-model-v1',timeout_seconds=60)
+            selector=lambda:load_crisis_sequence()[request.context.current_crisis_number-1]
+            outcome=await GenerationService(config,provider,selector,clock).generate(request)
+            diagnostic=GenerationDiagnostic(crisis_number=request.context.current_crisis_number,
+                source='generated' if outcome.source=='generated' else 'authored_fallback',category=outcome.failure or 'success',
+                duration_seconds=outcome.duration_seconds,http_status=outcome.http_status,measurement=outcome.measurement)
+            assert provider.calls==1
+            records.append(EvaluationRecord(case_id='continuity-'+case,diagnostic=diagnostic))
     return records
 
 
@@ -82,10 +94,12 @@ def main():
     parser.add_argument('--mission-index',type=int,default=1)
     parser.add_argument('--pricing',type=Path,help='Explicit model -> input_per_million/output_per_million JSON')
     parser.add_argument('--missions',type=int,default=1)
+    parser.add_argument('--continuity-cases',action='store_true',help='Add ten scripted contrasts; semantic ratings remain human review')
     args=parser.parse_args()
     logging.getLogger('app.generation').setLevel(logging.CRITICAL)
     try:
         if args.missions<1:raise ValueError('Invalid mission count')
+        if args.database and args.continuity_cases:raise ValueError('Fixture contrasts cannot be mixed with operator records')
         if args.database:
             protected=[args.database]+[Path(str(args.database)+suffix) for suffix in ('-wal','-shm','.lock')]
             for target in (args.output,args.review_template):
@@ -95,7 +109,7 @@ def main():
             records=[EvaluationRecord(case_id=f'crisis-{raw["crisis_number"]}',diagnostic=GenerationDiagnostic.model_validate(raw)) for raw in inspect(args.database,args.mission_index)]
             from ..narrative_models import EndgameDiagnostic
             records += [EvaluationRecord(case_id='endgame',diagnostic=EndgameDiagnostic.model_validate(raw)) for raw in inspect(args.database,args.mission_index,'endgame')]
-        else:records=asyncio.run(run_offline())
+        else:records=asyncio.run(run_offline(include_continuity=args.continuity_cases))
         prices=None
         if args.pricing:
             raw=json.loads(args.pricing.read_text());prices={model:Pricing.model_validate(value) for model,value in raw.items()}

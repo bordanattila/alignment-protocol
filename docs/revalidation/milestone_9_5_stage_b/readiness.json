@@ -1,0 +1,58 @@
+{
+  "authorization": "Separate explicit authorization required before any paid request.",
+  "commands": [
+    {
+      "command": ".venv/bin/python -m pytest backend/tests/test_stage_b_revalidation_protocol.py -q -x",
+      "result": "8 passed in 0.41s"
+    },
+    {
+      "command": ".venv/bin/python -m pytest backend/tests/test_stage_b_revalidation_protocol.py backend/tests/test_stage_b_continuity.py backend/tests/test_generation_continuity.py -q",
+      "result": "54 passed, 1 existing deprecation warning in 1.02s"
+    },
+    {
+      "command": ".venv/bin/python backend/tests/revalidate_stage_b.py --output /tmp/ce95b-revalidation-ready-v2",
+      "result": "passed, four fake-provider attempts, zero real-provider requests"
+    },
+    {
+      "command": ".venv/bin/python backend/tests/revalidate_stage_b.py --output /tmp/ce95b-revalidation-final",
+      "result": "passed after adding per-case comparison details, four fake-provider attempts, zero real-provider requests"
+    },
+    {
+      "command": "timeout 90 .venv/bin/python -m pytest backend/tests -q -o faulthandler_timeout=40",
+      "result": "Both runs timed out (exit 124) after 90 seconds: WebSocket TestClient receive in test_sync_privacy_multitab_disconnect_and_reconnect, then test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only."
+    },
+    {
+      "command": ".venv/bin/python -m pip check",
+      "result": "No broken requirements found."
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "commit_tag_push_performed": false,
+  "concerns": [
+    "Full backend suite cannot be reported passing: two bounded attempts stalled in existing WebSocket receive tests; no unrelated test or gameplay fixes made.",
+    "No live authentication, quota, model availability, or processing tier verification was performed.",
+    "Administrative ceiling and estimated usage do not guarantee provider-side billing cap.",
+    "New actual latency, usage, acceptance, continuity, and cost remain unknown pending authorization and execution.",
+    "Both Stage A and new semantic continuity require human review; supported identifiers do not establish meaning."
+  ],
+  "configuration": {
+    "credentials_present": true,
+    "credentials_validity_verified": false,
+    "enabled": true,
+    "endpoint_host": "api.openai.com",
+    "model": "gpt-6-luna",
+    "response_format": "json_schema",
+    "timeout_seconds": 60
+  },
+  "expected_expenditure_usd": "0.0060",
+  "frontend": "Not rerun: frontend unchanged and source hashes match.",
+  "paid_expenditure_during_preparation_usd": "0.00",
+  "preserved_file_count": 66,
+  "preserved_hashes_match": true,
+  "proposed_maximum_usd": "1.00",
+  "real_provider_requests": 0,
+  "status": "ready_for_authorization_with_test_suite_limitation"
+}

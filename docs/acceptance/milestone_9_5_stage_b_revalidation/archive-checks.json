@@ -1,0 +1,10 @@
+{
+  "all_human_scores_unassigned": true,
+  "all_known_usage": true,
+  "four_requests_in_original_order": true,
+  "new_real_requests_from_archival_or_restart": 0,
+  "no_unknown_billing_reserve": true,
+  "preparation_hashes_match": true,
+  "preserved_66_file_hashes_match": true,
+  "restart_checks_passed": true
+}

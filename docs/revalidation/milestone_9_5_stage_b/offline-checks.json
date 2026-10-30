@@ -1,0 +1,54 @@
+{
+  "checks": {
+    "automated-checks.json": [
+      {
+        "case_id": "crisis-fresh",
+        "common_public_content_passed": true,
+        "history_and_metrics_unchanged": true,
+        "private_projections_passed": true,
+        "result_hashes_unchanged": true
+      },
+      {
+        "case_id": "crisis-infrastructure",
+        "common_public_content_passed": true,
+        "history_and_metrics_unchanged": true,
+        "private_projections_passed": true,
+        "result_hashes_unchanged": true
+      },
+      {
+        "case_id": "crisis-trust",
+        "common_public_content_passed": true,
+        "history_and_metrics_unchanged": true,
+        "private_projections_passed": true,
+        "result_hashes_unchanged": true
+      },
+      {
+        "case_id": "crisis-interconnected",
+        "common_public_content_passed": true,
+        "history_and_metrics_unchanged": true,
+        "private_projections_passed": true,
+        "result_hashes_unchanged": true
+      }
+    ],
+    "restart-checks.json": {
+      "cases": 4,
+      "passed": true,
+      "provider_requests_during_restart": 0
+    },
+    "source-integrity.json": {
+      "sha256": {
+        "backend/app/generation/conclusion_live.py": "829a95ddd7a9813e0061049c5b8db79735475ae71af04742e3e5e4fe45e096e7",
+        "backend/app/generation/config.py": "d76b17cc1b4305fdcb15a8ec0db02f4dc422adb0cf31770aaeccf89a4092ec58",
+        "backend/app/generation/context.py": "29e1510f8fb834e6bcccf115a16b5ede40817a97410ee6b4d19f2b76d3025e43",
+        "backend/app/generation/contract.py": "05334336bbbd608f5ebb30e7a26db4e39d177b38d8011b9e1e9e9b01cb8901c7",
+        "backend/app/generation/endgame.py": "b047fdb08060c6083652e92feca82f790877767d8acbeda62457ca3978de3d0c",
+        "backend/app/generation/provider.py": "73d8f0f03c838dc2b40d3110376855dbba6646f92b7ee35019ac6f81e112ab30",
+        "backend/app/generation/service.py": "7ec9935edefdc7b86784774310550641d2f40d849034ebf50464c6237fca43c8",
+        "backend/app/missions.py": "2235b943a08412e82c57d49974967da321b33d78d9cd405a4c0444c030fd0a49"
+      },
+      "unchanged": true
+    }
+  },
+  "mode": "fake-provider-offline-only",
+  "real_provider_requests": 0
+}

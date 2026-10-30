@@ -1,0 +1,46 @@
+{
+  "assumed_input_tokens_per_request": 5000,
+  "assumed_output_tokens_per_request": 2000,
+  "automatic_retries": false,
+  "case_order": [
+    {
+      "case_id": "crisis-fresh",
+      "fixture": "fresh"
+    },
+    {
+      "case_id": "crisis-infrastructure",
+      "fixture": "infrastructure-damage"
+    },
+    {
+      "case_id": "crisis-trust",
+      "fixture": "declining-trust"
+    },
+    {
+      "case_id": "crisis-interconnected",
+      "fixture": "interconnected"
+    }
+  ],
+  "currency": "USD",
+  "execution": "Sequential, journal fsynced before dispatch, one new isolated directory and SQLite database, no resume after interruption.",
+  "expected_total_expenditure": "0.0060",
+  "failure_policy": "Timeouts, errors, and rejected responses consume an attempt. No retries or replacements. Unknown billing stops the batch.",
+  "input_price_per_million": "0.10",
+  "maximum_requests": 4,
+  "model": "gpt-6-luna",
+  "output_price_per_million": "0.50",
+  "preservation_manifest": "preserved-evidence.json",
+  "prices_source": "Operator-supplied planning assumptions; not independently verified current pricing.",
+  "proposed_administrative_ceiling": "1.00",
+  "provider_billing_cap_guaranteed": false,
+  "real_provider_attempts": 0,
+  "replacement_requests": false,
+  "status": "authorization_pending",
+  "stop_conditions": [
+    "configuration or authorization concern",
+    "projected total exceeds ceiling",
+    "unknown usage/billing",
+    "observed spending exceeds ceiling",
+    "four attempted calls exhausted"
+  ],
+  "timeout_seconds": 60
+}
