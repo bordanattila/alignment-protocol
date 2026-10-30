@@ -140,16 +140,17 @@ export function ActiveGameplay({ mission, connected, sendIntent, sample, continu
 }) {
   const region = useRef<HTMLElement>(null);
   const interactive = mission.phase === 'discussion' || mission.phase === 'consensus_window' || mission.phase === 'voting' || mission.phase === 'decision_locked' || mission.phase === 'failed' || mission.phase === 'completed';
+  const preparing = mission.phase === 'preparing' && mission.result !== null;
   const roundId = mission.voting?.round_id;
   useEffect(() => {
-    if (!interactive) return;
+    if (!interactive && !preparing) return;
     // A phase change can happen while someone is reading intelligence far below.
     // Bring the actual interaction (and its deadline) into view once, without
     // moving focus again for chat messages, presence updates, or vote progress.
     region.current?.focus({ preventScroll: true });
     region.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
-  }, [mission.phase, roundId, interactive]);
-  if (mission.phase === 'preparing' && mission.result) return <section className="panel" aria-label="Recorded outcome during preparation">
+  }, [mission.phase, roundId, interactive, preparing]);
+  if (preparing && mission.result) return <section className="panel" aria-label="Recorded outcome during preparation" tabIndex={-1} ref={region}>
     <p>Preparing next crisis. You can review the recorded outcome while you wait.</p>
     <h2>{mission.result.choice_title}</h2>
     <ConsequenceOutcome mission={mission} connected={connected} continuing={continuing} onContinue={onContinue} />

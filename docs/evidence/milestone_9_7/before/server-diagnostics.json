@@ -1,0 +1,456 @@
+{
+  "main": {
+    "attempts": [
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 1
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 2
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 3
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 4
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 5
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 6
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 7
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 8
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 9
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 10
+      },
+      {
+        "profile": "main",
+        "operation": "endgame",
+        "crisis_number": null
+      }
+    ],
+    "lifecycle": [],
+    "diagnostics": [
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.001389,
+          "validation_seconds": 0.000245,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": false,
+          "reference_count": 0,
+          "rejection_detail": null
+        },
+        "crisis_number": 1,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.001732,
+        "http_status": null
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 26.001727,
+          "validation_seconds": 0.00025,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": 1,
+          "rejection_detail": null
+        },
+        "crisis_number": 2,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 26.002005,
+        "http_status": null
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.000253,
+          "validation_seconds": null,
+          "fallback_seconds": 0.000293,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": null,
+          "rejection_detail": null
+        },
+        "crisis_number": 3,
+        "source": "authored_fallback",
+        "category": "unavailable",
+        "duration_seconds": 0.000588,
+        "http_status": 503
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.00008,
+          "validation_seconds": null,
+          "fallback_seconds": 0.000127,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": null,
+          "rejection_detail": null
+        },
+        "crisis_number": 4,
+        "source": "authored_fallback",
+        "category": "timeout",
+        "duration_seconds": 0.000228,
+        "http_status": null
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.001687,
+          "validation_seconds": 0.000483,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": 1,
+          "rejection_detail": null
+        },
+        "crisis_number": 5,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.002195,
+        "http_status": null
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.001407,
+          "validation_seconds": 0.000251,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": 1,
+          "rejection_detail": null
+        },
+        "crisis_number": 6,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.001752,
+        "http_status": null
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.001583,
+          "validation_seconds": 0.000252,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": 1,
+          "rejection_detail": null
+        },
+        "crisis_number": 7,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.001873,
+        "http_status": null
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.00146,
+          "validation_seconds": 0.00025,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": 1,
+          "rejection_detail": null
+        },
+        "crisis_number": 8,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.001734,
+        "http_status": null
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.001566,
+          "validation_seconds": 0.000256,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": 1,
+          "rejection_detail": null
+        },
+        "crisis_number": 9,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.001845,
+        "http_status": null
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.001477,
+          "validation_seconds": 0.000293,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": 1,
+          "rejection_detail": null
+        },
+        "crisis_number": 10,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.001796,
+        "http_status": null
+      }
+    ]
+  },
+  "defeat": {
+    "attempts": [
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 1
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 2
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 3
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 4
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 5
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 6
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 7
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 8
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 9
+      },
+      {
+        "profile": "main",
+        "operation": "crisis",
+        "crisis_number": 10
+      },
+      {
+        "profile": "main",
+        "operation": "endgame",
+        "crisis_number": null
+      },
+      {
+        "profile": "defeat",
+        "operation": "crisis",
+        "crisis_number": 1
+      },
+      {
+        "profile": "defeat",
+        "operation": "crisis",
+        "crisis_number": 2
+      },
+      {
+        "profile": "defeat",
+        "operation": "crisis",
+        "crisis_number": 3
+      },
+      {
+        "profile": "defeat",
+        "operation": "endgame",
+        "crisis_number": null
+      }
+    ],
+    "lifecycle": [
+      {
+        "crisis_number": 1,
+        "status": "admitted",
+        "source": "generated",
+        "queue_seconds": 0.004794,
+        "generation_seconds": 0.001802,
+        "admission_seconds": 0.004534,
+        "server_preparation_seconds": 0.011157,
+        "publication_seconds": 0.004897,
+        "player_visible_wait_seconds": null,
+        "browser_render_seconds": null
+      },
+      {
+        "crisis_number": 2,
+        "status": "admitted",
+        "source": "generated",
+        "queue_seconds": 0.004981,
+        "generation_seconds": 0.002166,
+        "admission_seconds": 0.004847,
+        "server_preparation_seconds": 0.012018,
+        "publication_seconds": 0.005492,
+        "player_visible_wait_seconds": null,
+        "browser_render_seconds": null
+      },
+      {
+        "crisis_number": 3,
+        "status": "admitted",
+        "source": "generated",
+        "queue_seconds": 0.005562,
+        "generation_seconds": 0.001924,
+        "admission_seconds": 0.006191,
+        "server_preparation_seconds": 0.013698,
+        "publication_seconds": 0.005469,
+        "player_visible_wait_seconds": null,
+        "browser_render_seconds": null
+      }
+    ],
+    "diagnostics": [
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.001459,
+          "validation_seconds": 0.000246,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": false,
+          "reference_count": 0,
+          "rejection_detail": null
+        },
+        "crisis_number": 1,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.001802,
+        "http_status": 200
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.001894,
+          "validation_seconds": 0.000244,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": 1,
+          "rejection_detail": null
+        },
+        "crisis_number": 2,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.002166,
+        "http_status": 200
+      },
+      {
+        "measurement": {
+          "version": 1,
+          "operation": "crisis",
+          "model": "fixture",
+          "provider_attempted": true,
+          "provider_seconds": 0.001667,
+          "validation_seconds": 0.000233,
+          "fallback_seconds": null,
+          "availability_seconds": null,
+          "usage": null,
+          "history_available": true,
+          "reference_count": 1,
+          "rejection_detail": null
+        },
+        "crisis_number": 3,
+        "source": "generated",
+        "category": "success",
+        "duration_seconds": 0.001924,
+        "http_status": 200
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "status": "failed",
+  "stage": "preparation",
+  "error_category": "browser_operation_failed",
+  "private_diagnostics_retained": true,
+  "real_provider_requests": 0
+}

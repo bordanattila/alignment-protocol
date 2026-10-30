@@ -32,6 +32,14 @@ export default function App() {
   const entryRequest = useRef(new MissionEntryRequest());
   const { mission, status, rejected, sendIntent, actionError, clockSample, connected = status === 'Connected' } = useLobby(session);
   const activeMission = mission != null && mission.phase !== 'lobby';
+  const crisisHeading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (mission?.phase !== 'briefing') return;
+    // Preparation removes the previous action/focus target. Start the admitted
+    // briefing at its title, once per phase/crisis, not on presence updates.
+    crisisHeading.current?.focus({ preventScroll: true });
+    crisisHeading.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
+  }, [mission?.phase, mission?.crisis?.id]);
 
   async function enter(event: FormEvent) {
     event.preventDefault();
@@ -91,7 +99,7 @@ export default function App() {
     {mission && <PlayerPresence mission={mission} connected={connected} />}
     {activeMission ? <section className="mission-header" aria-label="Current mission">
       <p className="eyebrow">{mission.phase === 'preparing' ? 'Mission preparation' : `Crisis ${mission.crisis_number.toString().padStart(2, '0')} / ${mission.crisis_count}`} <span>· {phaseLabel(mission)}</span></p>
-      <h1>{mission.crisis?.title ?? 'Preparing next crisis'}</h1>
+      <h1 ref={crisisHeading} tabIndex={-1}>{mission.crisis?.title ?? 'Preparing next crisis'}</h1>
     </section> : <section className="intro">
       <p className="eyebrow">Civic coordination network</p>
       <h1>Intelligence proposes.<br /><em>Humanity decides.</em></h1>

@@ -1,0 +1,486 @@
+[
+  {
+    "name": "browser_environment",
+    "browser": "156.0.8078.4",
+    "headless": true,
+    "isolated_contexts": 3,
+    "real_provider_requests": 0
+  },
+  {
+    "name": "accessibility_lobby",
+    "unnamed_controls": 0,
+    "status_regions": 2,
+    "automated_tree_only": true
+  },
+  {
+    "name": "computed_contrast_lobby",
+    "sampled_text_elements": 46,
+    "minimum_ratio": 7.199400616598931,
+    "below_size_adjusted_threshold": 0,
+    "unsupported_or_translucent_skipped": 0,
+    "reduced_motion": true
+  },
+  {
+    "name": "three_player_lobby",
+    "distinct_identities": 3,
+    "independent_contexts": true,
+    "guest_host_controls_absent": true
+  },
+  {
+    "name": "layout_briefing_desktop",
+    "viewport": 1440,
+    "document": 1440,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_briefing_tablet",
+    "viewport": 768,
+    "document": 768,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_briefing_mobile",
+    "viewport": 390,
+    "document": 390,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_briefing_narrow",
+    "viewport": 320,
+    "document": 320,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "briefing_refresh_privacy",
+    "role_coverage": 4,
+    "role_counts": [
+      1,
+      1,
+      2
+    ],
+    "common_public": true,
+    "authorized_private_only": true
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "browser_chat_unread",
+    "independent_reading_position": true,
+    "new_message_control": true,
+    "keyboard_jump": true,
+    "focus_retained_in_history": true,
+    "chat_contents_exported": false
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "layout_voting_desktop",
+    "viewport": 1440,
+    "document": 1440,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "radio_hit_test_desktop",
+    "blocked_visible_radios": 0
+  },
+  {
+    "name": "layout_voting_tablet",
+    "viewport": 768,
+    "document": 768,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "radio_hit_test_tablet",
+    "blocked_visible_radios": 0
+  },
+  {
+    "name": "layout_voting_mobile",
+    "viewport": 390,
+    "document": 390,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "radio_hit_test_mobile",
+    "blocked_visible_radios": 0
+  },
+  {
+    "name": "layout_voting_narrow",
+    "viewport": 320,
+    "document": 320,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "radio_hit_test_narrow",
+    "blocked_visible_radios": 0
+  },
+  {
+    "name": "unauthorized_vote",
+    "extra_player_identity_rejected": true,
+    "submitted_count_unchanged": true
+  },
+  {
+    "name": "keyboard_vote",
+    "space_selects": true,
+    "focus_outline": "solid"
+  },
+  {
+    "name": "clear_plurality",
+    "choice": "B",
+    "consensus": false,
+    "history_count": 1
+  },
+  {
+    "name": "preparation_focus",
+    "tag": "SECTION",
+    "label": "Recorded outcome during preparation",
+    "correct_target": true,
+    "scrollY": 385
+  },
+  {
+    "name": "accessibility_preparation",
+    "unnamed_controls": 0,
+    "status_regions": 3,
+    "automated_tree_only": true
+  },
+  {
+    "name": "computed_contrast_preparation",
+    "sampled_text_elements": 53,
+    "minimum_ratio": 7.199400616598931,
+    "below_size_adjusted_threshold": 0,
+    "unsupported_or_translucent_skipped": 0,
+    "reduced_motion": true
+  },
+  {
+    "name": "layout_preparation_desktop",
+    "viewport": 1440,
+    "document": 1440,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_preparation_tablet",
+    "viewport": 768,
+    "document": 768,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_preparation_mobile",
+    "viewport": 390,
+    "document": 390,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_preparation_narrow",
+    "viewport": 320,
+    "document": 320,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "browser_preparation_timing",
+    "clock": "single browser performance.now, host document unchanged",
+    "action_to_preparation_receipt_ms": 28.299999982118607,
+    "action_to_preparation_render_ms": 31.399999976158142,
+    "action_to_briefing_receipt_ms": 26044.899999976158,
+    "action_to_briefing_render_ms": 26047.09999999404,
+    "briefing_receipt_to_dom_frame_ms": 2.2000000178813934,
+    "physical_paint_or_screen_reader_timing": false
+  },
+  {
+    "name": "next_briefing_focus",
+    "tag": "H1",
+    "label": null,
+    "correct_target": true,
+    "scrollY": 323
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "countdown_consensus",
+    "within_one_second": true,
+    "shown_seconds": 20
+  },
+  {
+    "name": "accessibility_consensus",
+    "unnamed_controls": 0,
+    "status_regions": 2,
+    "automated_tree_only": true
+  },
+  {
+    "name": "computed_contrast_consensus",
+    "sampled_text_elements": 81,
+    "minimum_ratio": 7.199400616598931,
+    "below_size_adjusted_threshold": 0,
+    "unsupported_or_translucent_skipped": 0,
+    "reduced_motion": true
+  },
+  {
+    "name": "countdown_final",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "consensus_and_final_tie",
+    "consensus_window_seconds": 20,
+    "final_vote_seconds": 30,
+    "reason": "ai_tie_break",
+    "history_count": 2,
+    "chat_restored": true
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "failure_timeout_nonresponse",
+    "failure_fallback": true,
+    "timeout_fallback": true,
+    "nonresponses": 1,
+    "late_vote_rejected": true,
+    "presence_gated": true
+  },
+  {
+    "name": "backend_restart",
+    "same_identities": true,
+    "same_roles": true,
+    "history_preserved": true,
+    "chat_preserved": true,
+    "current_crisis_preserved": true,
+    "discussion_deadline_preserved": true
+  },
+  {
+    "name": "countdown_post_restart_vote",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "host_and_saved_identity_recovery",
+    "host_restored": true,
+    "saved_identity_new_tab": true,
+    "seats": 3
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "layout_victory_desktop",
+    "viewport": 1440,
+    "document": 1440,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_victory_tablet",
+    "viewport": 768,
+    "document": 768,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_victory_mobile",
+    "viewport": 390,
+    "document": 390,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_victory_narrow",
+    "viewport": 320,
+    "document": 320,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "accessibility_victory",
+    "unnamed_controls": 0,
+    "status_regions": 2,
+    "automated_tree_only": true
+  },
+  {
+    "name": "computed_contrast_victory",
+    "sampled_text_elements": 697,
+    "minimum_ratio": 7.717425278636418,
+    "below_size_adjusted_threshold": 0,
+    "unsupported_or_translucent_skipped": 0,
+    "reduced_motion": true
+  },
+  {
+    "name": "victory_review",
+    "crises": 10,
+    "metrics": {
+      "infrastructure": 49,
+      "public_trust": 100,
+      "economy": 46,
+      "safety": 75
+    },
+    "score": 67.5,
+    "chronological": true,
+    "narrative_rendered": true,
+    "terminal_restart_preserved": true,
+    "no_extra_crisis_generation": true
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "countdown_discussion",
+    "within_one_second": true,
+    "shown_seconds": 60
+  },
+  {
+    "name": "countdown_voting",
+    "within_one_second": true,
+    "shown_seconds": 30
+  },
+  {
+    "name": "layout_defeat_desktop",
+    "viewport": 1440,
+    "document": 1440,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_defeat_tablet",
+    "viewport": 768,
+    "document": 768,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_defeat_mobile",
+    "viewport": 390,
+    "document": 390,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "layout_defeat_narrow",
+    "viewport": 320,
+    "document": 320,
+    "panelOverflows": 0,
+    "clippedButtons": 0
+  },
+  {
+    "name": "early_defeat",
+    "crises": 3,
+    "collapsed_metric": "infrastructure",
+    "metrics": {
+      "infrastructure": 0,
+      "public_trust": 79,
+      "economy": 73,
+      "safety": 73
+    },
+    "no_extra_crisis_generation": true
+  },
+  {
+    "name": "complete",
+    "browser_console_error_count": 0,
+    "uncaught_page_errors": 0,
+    "findings": 0,
+    "real_provider_requests": 0
+  }
+]

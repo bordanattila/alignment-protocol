@@ -115,7 +115,7 @@ textarea { display: block; width: 100%; resize: vertical; min-height: 72px; padd
 .active-gameplay .phase-clock { margin: 0; }
 .active-gameplay .decision-status { margin-top: 0; }
 .reference-options, .chat-archive { margin-top: 20px; }
-.vote-submit { position: sticky; bottom: 0; padding: 8px 0; background: #172329; }
+.vote-submit { padding: 8px 0; background: #172329; }
 .active-gameplay .response-card { padding: 12px; }
 .active-gameplay .chat-history { max-height: 220px; }
 

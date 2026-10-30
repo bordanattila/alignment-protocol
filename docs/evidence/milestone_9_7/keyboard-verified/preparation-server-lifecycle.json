@@ -1,0 +1,14 @@
+[
+  {
+    "crisis_number": 2,
+    "status": "admitted",
+    "source": "generated",
+    "queue_seconds": 0.005157,
+    "generation_seconds": 5.001384,
+    "admission_seconds": 0.009099,
+    "server_preparation_seconds": 5.015667,
+    "publication_seconds": 0.005617,
+    "player_visible_wait_seconds": null,
+    "browser_render_seconds": null
+  }
+]

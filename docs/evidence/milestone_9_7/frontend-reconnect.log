@@ -1,0 +1,4 @@
+PASS individual interruption: B/C chat, timer transition and vote stay live; A automatically restores identity, roles, intelligence, chat and original deadline; exactly three votes
+PASS restart: three held-open production controllers reconnect through Vite automatically without remount/refresh; identity, roles, private intelligence, crisis, metrics, history, chat and deadline retained; gameplay continues with exactly-once resolution
+PASS presence UX: real three-client snapshots show C disconnected, 2/3 connected and a local loss notice; deadline records one nonresponse; HTTP 409 and disabled Next crisis name C; reconnect clears warning, shows 3/3, enables Next crisis; stale vote rejected and Crisis 4 opens
+NETWORK SMOKE PASS (Node WebSocket + server-rendered UI, not browser acceptance)

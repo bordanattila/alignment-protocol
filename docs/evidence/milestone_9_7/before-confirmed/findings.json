@@ -1,0 +1,22 @@
+[
+  {
+    "code": "sticky_submit_covers_radio",
+    "checkpoint": "voting",
+    "viewport": 320,
+    "blocked_visible_radios": 1
+  },
+  {
+    "code": "preparation_focus_lost",
+    "checkpoint": "after_host_acknowledgement",
+    "tag": "BODY",
+    "label": null,
+    "scrollY": 369
+  },
+  {
+    "code": "briefing_focus_lost",
+    "checkpoint": "after_preparation",
+    "tag": "BODY",
+    "label": null,
+    "scrollY": 369
+  }
+]

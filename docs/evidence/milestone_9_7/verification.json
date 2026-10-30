@@ -1,0 +1,138 @@
+{
+  "browser": "Chromium 156.0.8078.4",
+  "playwright": "1.64.1",
+  "headless": true,
+  "completed_realistic_delay_runs": 5,
+  "post_fix_clean_realistic_runs": 3,
+  "initial_before_findings": 1,
+  "confirmed_before_findings": 3,
+  "fast_keyboard_regression": "passed with 5-second fake delay",
+  "incomplete_fast_probe": "50ms fixture too short for pending refresh; not counted as accepted",
+  "initial_timing_correlation": "invalid initial preparation fields retained; excluded from conclusions",
+  "backend": {
+    "passed": 634,
+    "failed": 0,
+    "seconds": 19.78,
+    "warnings": 1
+  },
+  "frontend": {
+    "passed": 109,
+    "failed": 0,
+    "skipped": 0
+  },
+  "typecheck": "passed",
+  "build": "passed",
+  "pip_check": "passed",
+  "npm_ls": "passed",
+  "whitespace": "passed",
+  "network_smokes": [
+    {
+      "name": "persistence-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_milestone7.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "name": "generation-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_live_generation.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "name": "endgame-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_adaptive_narrative.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "name": "campaign-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_milestone5.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "name": "frontend-reconnect",
+      "command": [
+        "node",
+        "--experimental-websocket",
+        "frontend/tests/smokeReconnection.mjs"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "name": "review-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_milestone6.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 65
+    },
+    {
+      "name": "expansion-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_milestone8.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 65
+    },
+    {
+      "name": "captured-chat",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/test_chat_acceptance.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 65
+    }
+  ],
+  "browser_wait": {
+    "name": "browser_preparation_timing",
+    "clock": "single browser performance.now, host document unchanged",
+    "action_to_preparation_receipt_ms": 15.400000005960464,
+    "action_to_preparation_render_ms": 30,
+    "action_to_previous_result_visible_ms": 30,
+    "action_to_briefing_receipt_ms": 26029.600000023842,
+    "action_to_briefing_render_ms": 26045.70000001788,
+    "briefing_receipt_to_dom_frame_ms": 16.099999994039536,
+    "physical_paint_or_screen_reader_timing": false
+  },
+  "layout_combinations_passed": 20,
+  "public_json_field_scan": "passed",
+  "historical_artifacts_unchanged": 118,
+  "real_provider_requests": 0,
+  "application_changes": [
+    "preparation focus target",
+    "admitted briefing focus target",
+    "non-overlaying vote submit bar"
+  ],
+  "limitations": [
+    "Headless Chromium only; no physical devices or screen-reader speech.",
+    "Viewport/touch emulation is not physical mobile Safari acceptance.",
+    "Computed contrast/tree checks are not a complete WCAG audit.",
+    "Fake 26-second inference is not a real-model performance measurement.",
+    "Authored fallback is deterministic per mission seed; different new missions can select different authored fallbacks."
+  ]
+}

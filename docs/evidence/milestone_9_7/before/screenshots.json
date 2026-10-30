@@ -1,0 +1,272 @@
+[
+  {
+    "file": "three-player-lobby.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "initial-briefing.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "briefing-desktop.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "briefing-tablet.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "briefing-mobile.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "briefing-narrow.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "individual-voting.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "voting-desktop.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "voting-tablet.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "voting-mobile.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "voting-narrow.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "decision-result.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "crisis-preparation.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "preparation-desktop.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "preparation-tablet.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "preparation-mobile.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "preparation-narrow.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "consensus-discussion.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "final-voting.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "connection-loss.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "endgame-review.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "victory-desktop.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "victory-tablet.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "victory-mobile.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "victory-narrow.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "early-defeat.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "defeat-desktop.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "defeat-tablet.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "defeat-mobile.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  },
+  {
+    "file": "defeat-narrow.png",
+    "redactions": [
+      "private panels",
+      "invite",
+      "chat",
+      "submitted voting state"
+    ]
+  }
+]

@@ -1,0 +1,96 @@
+{
+  "browser_prerequisites": [
+    "mkdir -p /tmp/ce97-browser-libs",
+    "apt-get download libnspr4 libnss3 (cwd /tmp/ce97-browser-libs)",
+    "dpkg-deb -x each downloaded package into /tmp/ce97-browser-libs/runtime"
+  ],
+  "browser_environment": {
+    "CONSENSUS_PLAYWRIGHT_MODULE": "existing external playwright/index.mjs",
+    "CONSENSUS_CHROMIUM": "/home/attila_unix/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+    "LD_LIBRARY_PATH": "/tmp/ce97-browser-libs/runtime/usr/lib/x86_64-linux-gnu"
+  },
+  "browser_runs": [
+    {
+      "command": "node frontend/tests/browserAcceptance.mjs docs/evidence/milestone_9_7/before",
+      "result": {
+        "status": "completed",
+        "findings": 1,
+        "headless": true,
+        "real_provider_requests": 0
+      }
+    },
+    {
+      "command": "node frontend/tests/browserAcceptance.mjs docs/evidence/milestone_9_7/before-confirmed",
+      "result": {
+        "status": "completed",
+        "findings": 3,
+        "headless": true,
+        "real_provider_requests": 0
+      }
+    },
+    {
+      "command": "node frontend/tests/browserAcceptance.mjs docs/evidence/milestone_9_7/after --require-clean",
+      "result": {
+        "status": "completed",
+        "findings": 0,
+        "headless": true,
+        "real_provider_requests": 0
+      }
+    },
+    {
+      "command": "node frontend/tests/browserAcceptance.mjs docs/evidence/milestone_9_7/final --require-clean",
+      "result": {
+        "status": "completed",
+        "findings": 0,
+        "headless": true,
+        "real_provider_requests": 0
+      }
+    },
+    {
+      "command": "node frontend/tests/browserAcceptance.mjs docs/evidence/milestone_9_7/verified --require-clean",
+      "result": {
+        "status": "completed",
+        "findings": 0,
+        "headless": true,
+        "real_provider_requests": 0
+      }
+    },
+    {
+      "command": "node frontend/tests/browserAcceptance.mjs docs/evidence/milestone_9_7/keyboard-regression --require-clean --fast-fake-regression",
+      "result": {
+        "status": "failed",
+        "stage": "preparation",
+        "error_category": "browser_operation_failed",
+        "private_diagnostics_retained": true,
+        "real_provider_requests": 0
+      }
+    },
+    {
+      "command": "node frontend/tests/browserAcceptance.mjs docs/evidence/milestone_9_7/keyboard-verified --require-clean --fast-fake-regression",
+      "result": {
+        "status": "completed",
+        "findings": 0,
+        "headless": true,
+        "mode": "fast-fake-regression",
+        "real_provider_requests": 0
+      }
+    }
+  ],
+  "backend": "timeout 90 .venv/bin/python -m pytest backend/tests -q -o faulthandler_timeout=15",
+  "frontend": [
+    "npm test",
+    "MISSION_REVIEW_FILE=/tmp/ce-m6-live.json EXPANSION_REVIEW_FILE=/tmp/ce-m8-live.json CHAT_ACCEPTANCE_FILE=/tmp/ce-chat-5-1.json MISSION_RESTART_FILE=/tmp/ce-m7-restart.json npm test",
+    "npm run typecheck",
+    "npm run build",
+    "npm ls --depth=0"
+  ],
+  "python_dependencies": ".venv/bin/python -m pip check",
+  "whitespace": "git diff --check",
+  "network_smokes_file": "network-smokes.json",
+  "setup_corrections": [
+    "Initial Chromium missing NSS/NSPR; resolved with temporary extraction.",
+    "One npm build invocation from repo root had no package.json; corrected to frontend cwd.",
+    "Initial preparing timing event miscorrelated; corrected before confirmed runs.",
+    "50ms fast fixture too short for pending refresh; preserved as incomplete and changed fake delay to 5s."
+  ]
+}

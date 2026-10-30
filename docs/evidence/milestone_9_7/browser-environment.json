@@ -1,0 +1,33 @@
+{
+  "os": "Ubuntu 24.04 WSL",
+  "node": "20.19.5",
+  "playwright": "1.64.1",
+  "chromium": "156.0.8078.4",
+  "initial_launch_error": "libnspr4.so missing; NSS/NSPR missing from ldd",
+  "resolution": "Temporary apt-get download and dpkg-deb extraction of libnspr4/libnss3; no system installation",
+  "library_path": "/tmp/ce97-browser-libs/runtime/usr/lib/x86_64-linux-gnu",
+  "project_dependencies_changed": false,
+  "contexts": 3,
+  "screenshots": true,
+  "native_accessibility_tree": true,
+  "viewports": [
+    [
+      1440,
+      900
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      320,
+      640
+    ]
+  ],
+  "axe_available": false,
+  "browser_sandbox": "disabled by existing Playwright launch defaults"
+}

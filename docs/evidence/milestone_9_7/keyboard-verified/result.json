@@ -1,0 +1,7 @@
+{
+  "status": "completed",
+  "findings": 0,
+  "headless": true,
+  "mode": "fast-fake-regression",
+  "real_provider_requests": 0
+}

@@ -1,0 +1,17 @@
+
+> consensus-engine-client@0.1.0 build
+> npm run typecheck && vite build
+
+
+> consensus-engine-client@0.1.0 typecheck
+> tsc --noEmit
+
+vite v6.4.5 building for production...
+transforming...
+✓ 43 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.44 kB │ gzip:  0.29 kB
+dist/assets/index-ChZp3zm9.css   12.87 kB │ gzip:  3.46 kB
+dist/assets/index-CVmqH3ej.js   266.54 kB │ gzip: 82.18 kB
+✓ built in 505ms

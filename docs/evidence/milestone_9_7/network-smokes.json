@@ -1,0 +1,83 @@
+[
+  {
+    "name": "persistence-network",
+    "command": [
+      "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+      "backend/tests/smoke_milestone7.py"
+    ],
+    "result": "passed",
+    "exit_code": 0,
+    "timeout_seconds": 60
+  },
+  {
+    "name": "generation-network",
+    "command": [
+      "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+      "backend/tests/smoke_live_generation.py"
+    ],
+    "result": "passed",
+    "exit_code": 0,
+    "timeout_seconds": 60
+  },
+  {
+    "name": "endgame-network",
+    "command": [
+      "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+      "backend/tests/smoke_adaptive_narrative.py"
+    ],
+    "result": "passed",
+    "exit_code": 0,
+    "timeout_seconds": 60
+  },
+  {
+    "name": "campaign-network",
+    "command": [
+      "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+      "backend/tests/smoke_milestone5.py"
+    ],
+    "result": "passed",
+    "exit_code": 0,
+    "timeout_seconds": 60
+  },
+  {
+    "name": "frontend-reconnect",
+    "command": [
+      "node",
+      "--experimental-websocket",
+      "frontend/tests/smokeReconnection.mjs"
+    ],
+    "result": "passed",
+    "exit_code": 0,
+    "timeout_seconds": 60
+  },
+  {
+    "name": "review-network",
+    "command": [
+      "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+      "backend/tests/smoke_milestone6.py"
+    ],
+    "result": "passed",
+    "exit_code": 0,
+    "timeout_seconds": 65
+  },
+  {
+    "name": "expansion-network",
+    "command": [
+      "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+      "backend/tests/smoke_milestone8.py"
+    ],
+    "result": "passed",
+    "exit_code": 0,
+    "timeout_seconds": 65
+  },
+  {
+    "name": "captured-chat",
+    "command": [
+      "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+      "backend/tests/test_chat_acceptance.py"
+    ],
+    "result": "passed",
+    "exit_code": 0,
+    "timeout_seconds": 65
+  }
+]

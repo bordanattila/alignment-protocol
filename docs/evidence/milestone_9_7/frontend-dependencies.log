@@ -1,0 +1,9 @@
+consensus-engine-client@0.1.0 /home/attila_unix/projects/consensus-engine/frontend
+├── @types/react-dom@19.3.0
+├── @types/react@19.3.0
+├── @vitejs/plugin-react@4.7.0
+├── react-dom@19.3.1
+├── react@19.3.1
+├── typescript@5.7.3
+└── vite@6.4.5
+

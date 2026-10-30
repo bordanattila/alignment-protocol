@@ -1,0 +1,5 @@
+PASS: actual reconnect at crisis 6 / discussion
+PASS: actual reconnect at crisis 8 / voting
+PASS: actual reconnect at crisis 9 / decision_locked
+PASS: live three-client ten-crisis victory, separate Crisis 4 collapse, initial/final ties, identical history/summary after terminal reconnect
+Victory score: 55.75; defeat score: 54.5; review snapshots: /tmp/ce-m6-live.json
