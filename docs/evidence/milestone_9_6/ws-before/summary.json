@@ -1,0 +1,50 @@
+[
+  {
+    "run": 1,
+    "status": "success",
+    "tests": [
+      "foundation reconnect",
+      "campaign reconnect counts 2,3,4"
+    ]
+  },
+  {
+    "run": 2,
+    "status": "success",
+    "tests": [
+      "foundation reconnect",
+      "campaign reconnect counts 2,3,4"
+    ]
+  },
+  {
+    "run": 3,
+    "status": "success",
+    "tests": [
+      "foundation reconnect",
+      "campaign reconnect counts 2,3,4"
+    ]
+  },
+  {
+    "run": 4,
+    "status": "success",
+    "tests": [
+      "foundation reconnect",
+      "campaign reconnect counts 2,3,4"
+    ]
+  },
+  {
+    "run": 5,
+    "status": "success",
+    "tests": [
+      "foundation reconnect",
+      "campaign reconnect counts 2,3,4"
+    ]
+  },
+  {
+    "run": 6,
+    "status": "success",
+    "tests": [
+      "foundation reconnect",
+      "campaign reconnect counts 2,3,4"
+    ]
+  }
+]

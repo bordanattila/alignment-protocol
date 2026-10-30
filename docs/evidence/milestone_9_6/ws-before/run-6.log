@@ -1,0 +1,4 @@
+/tmp/ce96_ws_audit_plugin.py:4: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import WebSocketTestSession
+....
+4 passed in 1.93s

@@ -1,0 +1,4 @@
+Initial complete run: 627 passed, 2 failed, 1 warning in 20.50s.
+Both failures were Stage B offline tests rejecting changed sources against the historical live source seal.
+Later complete run: 632 passed in 21.56s. Final complete run: 634 passed in 20.46s.
+Initial added timer regression had an incorrect expectation for zero-vote resolution; corrected to the existing no_vote_ai_fallback rule. No voting behavior changed.

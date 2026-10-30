@@ -1,0 +1,11 @@
+{
+  "evidence": "real loopback HTTP/WebSocket clients; fake 0.05s provider",
+  "clients": 3,
+  "initial_ready_to_all_client_receipts_seconds": 0.076327,
+  "next_ready_to_all_client_receipts_seconds": 0.080473,
+  "pending_result_visible": true,
+  "common_content": true,
+  "browser_render_seconds": null,
+  "real_provider_requests": 0,
+  "warning": "Includes local HTTP, ASGI, commit and socket delivery; not a real provider benchmark or browser timing."
+}

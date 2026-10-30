@@ -1,0 +1,5 @@
+PASS A/E: genuine killed-process recovery after Crisis 1; three identities/roles, metrics/history/chat and independent mission restored
+PASS B: unexpired partial vote survives process restart; duplicate vote rejected and initial tie preserved
+PASS C: expired Consensus Window survives restart; final vote gets a fresh 30s opportunity and keeps initial tallies
+PASS D: ten-crisis victory and early defeat restore canonical history/timeline/summary byte-equivalently; score 55.75 and 54.5 retained
+LIVE RESTART SMOKE PASS: five real server process generations; captured snapshots: /tmp/ce-m7-restart.json

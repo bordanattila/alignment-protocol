@@ -1,0 +1,559 @@
+
+> consensus-engine-client@0.1.0 test
+> node tests/run.mjs
+
+TAP version 13
+# Subtest: victory review prominently displays authoritative outcome, completion, score and final metrics
+ok 1 - victory review prominently displays authoritative outcome, completion, score and final metrics
+  ---
+  duration_ms: 19.840047
+  ...
+# Subtest: defeat review explicitly remains defeat despite a numerical score and preserves zero outcome
+ok 2 - defeat review explicitly remains defeat despite a numerical score and preserves zero outcome
+  ---
+  duration_ms: 4.235566
+  ...
+# Subtest: terminal review has no chat composer, voting or progression controls and retains return navigation
+ok 3 - terminal review has no chat composer, voting or progression controls and retains return navigation
+  ---
+  duration_ms: 7.170642
+  ...
+# Subtest: timeline includes starting snapshot and every recorded point with exact table values and labeled distinct patterns
+ok 4 - timeline includes starting snapshot and every recorded point with exact table values and labeled distinct patterns
+  ---
+  duration_ms: 1.282428
+  ...
+# Subtest: native collapsed crisis details expose summary and expandable public context without mutating state
+ok 5 - native collapsed crisis details expose summary and expandable public context without mutating state
+  ---
+  duration_ms: 1.038197
+  ...
+# Subtest: history distinguishes initial and final vote totals, consensus, abstentions and actual applied metric changes
+ok 6 - history distinguishes initial and final vote totals, consensus, abstentions and actual applied metric changes
+  ---
+  duration_ms: 1.132474
+  ...
+# Subtest: team statistics use the authoritative summary without player rankings
+ok 7 - team statistics use the authoritative summary without player rankings
+  ---
+  duration_ms: 3.952092
+  ...
+# Subtest: reconnecting after completion renders the same authoritative review
+ok 8 - reconnecting after completion renders the same authoritative review
+  ---
+  duration_ms: 7.192534
+  ...
+# Subtest: missing optional historical context renders unavailable labels, not invented data
+ok 9 - missing optional historical context renders unavailable labels, not invented data
+  ---
+  duration_ms: 4.682773
+  ...
+# Subtest: historical text is escaped and chronologically ordered using stable records
+ok 10 - historical text is escaped and chronologically ordered using stable records
+  ---
+  duration_ms: 4.476535
+  ...
+# Subtest: snapshot ordering rejects duplicate and stale terminal regressions without merging history
+ok 11 - snapshot ordering rejects duplicate and stale terminal regressions without merging history
+  ---
+  duration_ms: 0.277564
+  ...
+# Subtest: mobile review fits its chart and confines only wide tables to labeled scroll regions
+ok 12 - mobile review fits its chart and confines only wide tables to labeled scroll regions
+  ---
+  duration_ms: 5.96149
+  ...
+# Subtest: live victory and defeat snapshots render full review and survive stale snapshot replay
+ok 13 - live victory and defeat snapshots render full review and survive stale snapshot replay # SKIP
+  ---
+  duration_ms: 0.072762
+  ...
+# Subtest: metric deltas retain explicit signs and names with positive, negative and neutral styling
+ok 14 - metric deltas retain explicit signs and names with positive, negative and neutral styling
+  ---
+  duration_ms: 1.123819
+  ...
+# Subtest: collapsed and expanded history use identical applied delta badges without changing recorded values
+ok 15 - collapsed and expanded history use identical applied delta badges without changing recorded values
+  ---
+  duration_ms: 1.964348
+  ...
+# Subtest: chart layout fits 320px viewport model with complete data and readable tick spacing
+ok 16 - chart layout fits 320px viewport model with complete data and readable tick spacing
+  ---
+  duration_ms: 0.219648
+  ...
+# Subtest: chart layout fits 375px viewport model with complete data and readable tick spacing
+ok 17 - chart layout fits 375px viewport model with complete data and readable tick spacing
+  ---
+  duration_ms: 0.109772
+  ...
+# Subtest: chart layout fits 390px viewport model with complete data and readable tick spacing
+ok 18 - chart layout fits 390px viewport model with complete data and readable tick spacing
+  ---
+  duration_ms: 0.129478
+  ...
+# Subtest: chart layout fits 430px viewport model with complete data and readable tick spacing
+ok 19 - chart layout fits 430px viewport model with complete data and readable tick spacing
+  ---
+  duration_ms: 0.068963
+  ...
+# Subtest: chart layout fits 768px viewport model with complete data and readable tick spacing
+ok 20 - chart layout fits 768px viewport model with complete data and readable tick spacing
+  ---
+  duration_ms: 0.068733
+  ...
+# Subtest: chart layout fits 1120px viewport model with complete data and readable tick spacing
+ok 21 - chart layout fits 1120px viewport model with complete data and readable tick spacing
+  ---
+  duration_ms: 0.075388
+  ...
+# Subtest: responsive chart preserves every series value, point title, order, color and pattern
+ok 22 - responsive chart preserves every series value, point title, order, color and pattern
+  ---
+  duration_ms: 3.688723
+  ...
+# Subtest: review tables preserve headings without word splits and align numeric values in their own overflow region
+ok 23 - review tables preserve headings without word splits and align numeric values in their own overflow region
+  ---
+  duration_ms: 3.210128
+  ...
+# Subtest: long expanded content and keyboard-native summaries keep wrapping and visible touch/focus affordances
+ok 24 - long expanded content and keyboard-native summaries keep wrapping and visible touch/focus affordances
+  ---
+  duration_ms: 1.482957
+  ...
+# Subtest: review renders only authoritative narrative outcome and recorded notable decisions
+ok 25 - review renders only authoritative narrative outcome and recorded notable decisions
+  ---
+  duration_ms: 8.069167
+  ...
+# Subtest: review narrative escapes authored text without fabricating additional events
+ok 26 - review narrative escapes authored text without fabricating additional events
+  ---
+  duration_ms: 3.222954
+  ...
+# Subtest: expanded real-process campaign review matches its authoritative captured history and summary
+ok 27 - expanded real-process campaign review matches its authoritative captured history and summary # SKIP
+  ---
+  duration_ms: 0.047928
+  ...
+# Subtest: pending endgame retains deterministic ending and verified statistics without blocking review
+ok 28 - pending endgame retains deterministic ending and verified statistics without blocking review
+  ---
+  duration_ms: 3.632212
+  ...
+# Subtest: generated endgame sections show labeled interpretation and server supplied recorded basis
+ok 29 - generated endgame sections show labeled interpretation and server supplied recorded basis
+  ---
+  duration_ms: 3.071019
+  ...
+# Subtest: fallback keeps deterministic defeat and does not reveal provider diagnostics or loading state
+ok 30 - fallback keeps deterministic defeat and does not reveal provider diagnostics or loading state
+  ---
+  duration_ms: 2.793132
+  ...
+# Subtest: pending to generated snapshot retains unchanged history charts and verified result
+ok 31 - pending to generated snapshot retains unchanged history charts and verified result
+  ---
+  duration_ms: 6.242566
+  ...
+# Subtest: reconnected generated review displays the same accepted sections and original defeat statistics
+ok 32 - reconnected generated review displays the same accepted sections and original defeat statistics
+  ---
+  duration_ms: 6.277187
+  ...
+# Subtest: generated prose is escaped and remains outside authoritative statistical markup
+ok 33 - generated prose is escaped and remains outside authoritative statistical markup
+  ---
+  duration_ms: 2.994145
+  ...
+# Subtest: initial existing history starts at latest without historical unread messages
+ok 34 - initial existing history starts at latest without historical unread messages
+  ---
+  duration_ms: 0.31511
+  ...
+# Subtest: incoming messages auto-follow at bottom and within 40px fractional tolerance
+ok 35 - incoming messages auto-follow at bottom and within 40px fractional tolerance
+  ---
+  duration_ms: 0.096175
+  ...
+# Subtest: reading earlier preserves scroll position and counts batches and successive arrivals
+ok 36 - reading earlier preserves scroll position and counts batches and successive arrivals
+  ---
+  duration_ms: 0.067629
+  ...
+# Subtest: jump to latest clears unread and resumes following without outer scrolling
+ok 37 - jump to latest clears unread and resumes following without outer scrolling
+  ---
+  duration_ms: 0.093105
+  ...
+# Subtest: manual return to bottom clears unread and resumes auto-follow
+ok 38 - manual return to bottom clears unread and resumes auto-follow
+  ---
+  duration_ms: 0.121294
+  ...
+# Subtest: own authoritative message confirms send and follows; unconfirmed or rejected send does not
+ok 39 - own authoritative message confirms send and follows; unconfirmed or rejected send does not
+  ---
+  duration_ms: 0.071044
+  ...
+# Subtest: duplicate snapshots, unrelated rerenders, reconnect replay and old backfill never double count
+ok 40 - duplicate snapshots, unrelated rerenders, reconnect replay and old backfill never double count
+  ---
+  duration_ms: 0.128071
+  ...
+# Subtest: equal-timestamp messages use stable IDs, not just timestamps or array length
+ok 41 - equal-timestamp messages use stable IDs, not just timestamps or array length
+  ---
+  duration_ms: 0.091822
+  ...
+# Subtest: bounded history rollover detects arrivals even with unchanged list length
+ok 42 - bounded history rollover detects arrivals even with unchanged list length
+  ---
+  duration_ms: 4.285425
+  ...
+# Subtest: crisis change alone retains history and reading position without false unread; remount starts latest
+ok 43 - crisis change alone retains history and reading position without false unread; remount starts latest
+  ---
+  duration_ms: 0.131257
+  ...
+# Subtest: wrapped content/viewport resizing follows only while following latest
+ok 44 - wrapped content/viewport resizing follows only while following latest
+  ---
+  duration_ms: 0.060339
+  ...
+# Subtest: scroll listener and both resize observations are cleaned up; no global listeners
+ok 45 - scroll listener and both resize observations are cleaned up; no global listeners
+  ---
+  duration_ms: 0.143951
+  ...
+# Subtest: unread button is counted, accessible and keyboard focus returns to history without page scroll
+ok 46 - unread button is counted, accessible and keyboard focus returns to history without page scroll
+  ---
+  duration_ms: 0.477259
+  ...
+# Subtest: arrivals and resizes cannot call focus or page scroll APIs
+ok 47 - arrivals and resizes cannot call focus or page scroll APIs
+  ---
+  duration_ms: 0.073778
+  ...
+# Subtest: three simulated recipients consume captured server snapshots with independent reading positions
+ok 48 - three simulated recipients consume captured server snapshots with independent reading positions # SKIP
+  ---
+  duration_ms: 0.024574
+  ...
+# Subtest: creation defaults to authored and generated choice respects server availability
+ok 49 - creation defaults to authored and generated choice respects server availability
+  ---
+  duration_ms: 0.816237
+  ...
+# Subtest: creation sends selected mode and invitations never override the mission mode
+ok 50 - creation sends selected mode and invitations never override the mission mode
+  ---
+  duration_ms: 0.213232
+  ...
+# Subtest: capability lookup requires explicit server true and fails closed on unavailable API
+ok 51 - capability lookup requires explicit server true and fails closed on unavailable API
+  ---
+  duration_ms: 0.212345
+  ...
+# Subtest: preparation snapshots announce progress without interactive votes or provider details
+ok 52 - preparation snapshots announce progress without interactive votes or provider details
+  ---
+  duration_ms: 3.395767
+  ...
+# Subtest: discussion puts the enabled composer and countdown above reference information
+ok 53 - discussion puts the enabled composer and countdown above reference information
+  ---
+  duration_ms: 4.980534
+  ...
+# Subtest: A/B/C tie enables consensus chat for every player despite their previous vote
+ok 54 - A/B/C tie enables consensus chat for every player despite their previous vote
+  ---
+  duration_ms: 5.904383
+  ...
+# Subtest: final voting renders all fresh unselected controls prominently for every eligible seat
+ok 55 - final voting renders all fresh unselected controls prominently for every eligible seat
+  ---
+  duration_ms: 6.253681
+  ...
+# Subtest: a submitted final vote restores confirmation and disables the current round
+ok 56 - a submitted final vote restores confirmation and disables the current round
+  ---
+  duration_ms: 1.994892
+  ...
+# Subtest: reconnecting clients cannot submit until their socket is connected
+ok 57 - reconnecting clients cannot submit until their socket is connected
+  ---
+  duration_ms: 3.988381
+  ...
+# Subtest: decision lock places the actual result and totals before the roster and archives chat
+ok 58 - decision lock places the actual result and totals before the roster and archives chat
+  ---
+  duration_ms: 2.471317
+  ...
+# Subtest: pending generation keeps the recorded public outcome visible without progression controls
+ok 59 - pending generation keeps the recorded public outcome visible without progression controls
+  ---
+  duration_ms: 2.499324
+  ...
+# Subtest: authoritative outcome shows old/new values, signed deltas and host progression above references
+ok 60 - authoritative outcome shows old/new values, signed deltas and host progression above references
+  ---
+  duration_ms: 7.996267
+  ...
+# Subtest: clamped result displays actual applied change separately from authored delta
+ok 61 - clamped result displays actual applied change separately from authored delta
+  ---
+  duration_ms: 2.38744
+  ...
+# Subtest: next crisis header and briefing use authoritative number and fresh voting state
+ok 62 - next crisis header and briefing use authoritative number and fresh voting state
+  ---
+  duration_ms: 1.897017
+  ...
+# Subtest: collapse renders server-identified zero metrics and no active progression or voting controls
+ok 63 - collapse renders server-identified zero metrics and no active progression or voting controls
+  ---
+  duration_ms: 2.582127
+  ...
+# Subtest: final configured result offers Finish mission; completed snapshot shows only server score
+ok 64 - final configured result offers Finish mission; completed snapshot shows only server score
+  ---
+  duration_ms: 4.153608
+  ...
+# Subtest: duplicate error is associated with the editable callsign field and preserves the value
+ok 65 - duplicate error is associated with the editable callsign field and preserves the value
+  ---
+  duration_ms: 0.278039
+  ...
+# Subtest: pending entry shows accessible busy state and disables duplicate button submission
+ok 66 - pending entry shows accessible busy state and disables duplicate button submission
+  ---
+  duration_ms: 0.095232
+  ...
+# Subtest: duplicate API error maps to friendly text, releases pending gate and permits another callsign
+ok 67 - duplicate API error maps to friendly text, releases pending gate and permits another callsign
+  ---
+  duration_ms: 12.410277
+  ...
+# Subtest: two rapid form requests send only one network request while pending
+ok 68 - two rapid form requests send only one network request while pending
+  ---
+  duration_ms: 0.217908
+  ...
+# Subtest: completed score is prominent before the outcome, appears once, and survives restored snapshots
+ok 69 - completed score is prominent before the outcome, appears once, and survives restored snapshots
+  ---
+  duration_ms: 1.694657
+  ...
+# Subtest: server score formatting preserves whole, fractional, zero and maximum scores
+ok 70 - server score formatting preserves whole, fractional, zero and maximum scores
+  ---
+  duration_ms: 0.322161
+  ...
+# Subtest: long history stays in one history region after the composer; voting replaces active chat
+ok 71 - long history stays in one history region after the composer; voting replaces active chat
+  ---
+  duration_ms: 9.422595
+  ...
+# Subtest: all ten authored crises render public text and only authorized multi-role intelligence
+ok 72 - all ten authored crises render public text and only authorized multi-role intelligence
+  ---
+  duration_ms: 12.039533
+  ...
+# Subtest: mission-wide chat labels earlier crises without duplicating the active composer
+ok 73 - mission-wide chat labels earlier crises without duplicating the active composer
+  ---
+  duration_ms: 0.59023
+  ...
+# Subtest: recovered mission waits explicitly for all participants with restored read-only chat and no timer reset
+ok 74 - recovered mission waits explicitly for all participants with restored read-only chat and no timer reset
+  ---
+  duration_ms: 0.581652
+  ...
+# Subtest: restored voting keeps the saved own vote and disables duplicate submission
+ok 75 - restored voting keeps the saved own vote and disables duplicate submission
+  ---
+  duration_ms: 0.586432
+  ...
+# Subtest: restored discussion shows each stable chat message once without changing the saved deadline
+ok 76 - restored discussion shows each stable chat message once without changing the saved deadline
+  ---
+  duration_ms: 0.666773
+  ...
+# Subtest: expired restored deadline never displays a negative countdown while waiting for server transition
+ok 77 - expired restored deadline never displays a negative countdown while waiting for server transition
+  ---
+  duration_ms: 0.516304
+  ...
+# Subtest: restored mission controls stay disabled while the socket is reconnecting
+ok 78 - restored mission controls stay disabled while the socket is reconnecting
+  ---
+  duration_ms: 1.473804
+  ...
+# Subtest: real process-restart snapshots restore discussion, final voting and terminal reviews
+ok 79 - real process-restart snapshots restore discussion, final voting and terminal reviews # SKIP
+  ---
+  duration_ms: 0.03417
+  ...
+# Subtest: reconnection statuses are announced and disconnected voting/chat stay disabled
+ok 80 - reconnection statuses are announced and disconnected voting/chat stay disabled
+  ---
+  duration_ms: 2.860561
+  ...
+# Subtest: Reconnected status resumes interactions and remains visible on terminal review
+ok 81 - Reconnected status resumes interactions and remains visible on terminal review
+  ---
+  duration_ms: 1.351416
+  ...
+# Subtest: connection warning precedes gameplay in every live phase and clears after snapshot restore
+ok 82 - connection warning precedes gameplay in every live phase and clears after snapshot restore
+  ---
+  duration_ms: 5.85049
+  ...
+# Subtest: terminal review retains visible connection warning and participant presence
+ok 83 - terminal review retains visible connection warning and participant presence
+  ---
+  duration_ms: 0.65141
+  ...
+# Subtest: presence shows authoritative assigned seat counts and text labels without secret fields
+ok 84 - presence shows authoritative assigned seat counts and text labels without secret fields
+  ---
+  duration_ms: 0.176735
+  ...
+# Subtest: disconnected browser labels cached presence instead of claiming live teammate status
+ok 85 - disconnected browser labels cached presence instead of claiming live teammate status
+  ---
+  duration_ms: 0.11813
+  ...
+# Subtest: presence reflects reconnect snapshot without stale offline labels
+ok 86 - presence reflects reconnect snapshot without stale offline labels
+  ---
+  duration_ms: 0.216983
+  ...
+# Subtest: Next crisis names a missing seat and remains disabled until all seats restore
+ok 87 - Next crisis names a missing seat and remains disabled until all seats restore
+  ---
+  duration_ms: 1.102909
+  ...
+# Subtest: multiple missing seats are identified and guest host requirement stays accurate
+ok 88 - multiple missing seats are identified and guest host requirement stays accurate
+  ---
+  duration_ms: 1.407832
+  ...
+# Subtest: other progression blocks distinguish local loss, pending request and host ownership
+ok 89 - other progression blocks distinguish local loss, pending request and host ownership
+  ---
+  duration_ms: 0.133248
+  ...
+# Subtest: unrecoverable and initial connection notices never promise an active automatic retry
+ok 90 - unrecoverable and initial connection notices never promise an active automatic retry
+  ---
+  duration_ms: 0.124677
+  ...
+# Subtest: mobile presence uses a shrinkable single column and wrapping callsigns
+ok 91 - mobile presence uses a shrinkable single column and wrapping callsigns
+  ---
+  duration_ms: 0.298717
+  ...
+# Subtest: resolved decision shows immediate consequences and recorded connection to prior choices
+ok 92 - resolved decision shows immediate consequences and recorded connection to prior choices
+  ---
+  duration_ms: 1.154224
+  ...
+# Subtest: reconnect during preparation restores authoritative status and then the same ready crisis
+ok 93 - reconnect during preparation restores authoritative status and then the same ready crisis
+  ---
+  duration_ms: 1.353401
+  ...
+# Subtest: OPEN authenticates with the saved credential but gameplay waits for snapshot
+ok 94 - OPEN authenticates with the saved credential but gameplay waits for snapshot
+  ---
+  duration_ms: 0.191995
+  ...
+# Subtest: unexpected close retries and fresh snapshot restores connectivity
+ok 95 - unexpected close retries and fresh snapshot restores connectivity
+  ---
+  duration_ms: 0.17584
+  ...
+# Subtest: regression: initial error without close retires CONNECTING and schedules retry
+ok 96 - regression: initial error without close retires CONNECTING and schedules retry
+  ---
+  duration_ms: 0.102756
+  ...
+# Subtest: silent CONNECTING and OPEN without authentication snapshot both time out
+ok 97 - silent CONNECTING and OPEN without authentication snapshot both time out
+  ---
+  duration_ms: 0.176414
+  ...
+# Subtest: repeated failures continue with bounded exponential jitter then succeed
+ok 98 - repeated failures continue with bounded exponential jitter then succeed
+  ---
+  duration_ms: 0.695099
+  ...
+# Subtest: constructor failure retries instead of escaping React effect
+ok 99 - constructor failure retries instead of escaping React effect
+  ---
+  duration_ms: 0.192259
+  ...
+# Subtest: obsolete close/error/open/message callbacks cannot affect the new socket
+ok 100 - obsolete close/error/open/message callbacks cannot affect the new socket
+  ---
+  duration_ms: 0.180013
+  ...
+# Subtest: one error followed by close cannot schedule duplicate connections
+ok 101 - one error followed by close cannot schedule duplicate connections
+  ---
+  duration_ms: 0.129768
+  ...
+# Subtest: intentional leave cancels retry, watchdog, and late callbacks
+ok 102 - intentional leave cancels retry, watchdog, and late callbacks
+  ---
+  duration_ms: 0.164402
+  ...
+# Subtest: 1008 invalid/unavailable session stops retry and preserves credential
+ok 103 - 1008 invalid/unavailable session stops retry and preserves credential
+  ---
+  duration_ms: 0.082821
+  ...
+# Subtest: revision order remains monotonic across sockets and duplicate snapshots ignored
+ok 104 - revision order remains monotonic across sockets and duplicate snapshots ignored
+  ---
+  duration_ms: 0.12481
+  ...
+# Subtest: reconnect restores full chat and your saved vote without replaying intents
+ok 105 - reconnect restores full chat and your saved vote without replaying intents
+  ---
+  duration_ms: 0.154633
+  ...
+# Subtest: terminal post-game snapshot and review recover on the same connection loop
+ok 106 - terminal post-game snapshot and review recover on the same connection loop
+  ---
+  duration_ms: 0.159407
+  ...
+# Subtest: malformed frame retries without applying an event; wrong mission snapshot is ignored
+ok 107 - malformed frame retries without applying an event; wrong mission snapshot is ignored
+  ---
+  duration_ms: 0.173406
+  ...
+# Subtest: browser session storage retains the original reconnect credential
+ok 108 - browser session storage retains the original reconnect credential
+  ---
+  duration_ms: 0.210831
+  ...
+# Subtest: synchronous send failure disables actions and retries without resending
+ok 109 - synchronous send failure disables actions and retries without resending
+  ---
+  duration_ms: 0.13556
+  ...
+1..109
+# tests 109
+# suites 0
+# pass 105
+# fail 0
+# cancelled 0
+# skipped 4
+# todo 0
+# duration_ms 290.900549

@@ -1,0 +1,276 @@
+PASS: actual reconnect at crisis 6 / discussion
+PASS: actual reconnect at crisis 8 / voting
+PASS: actual reconnect at crisis 9 / decision_locked
+{
+  "complete": [
+    {
+      "crisis": 1,
+      "title": "Grid Under Pressure",
+      "choice": "B",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": 5,
+        "public_trust": -3,
+        "economy": -7,
+        "safety": 2
+      },
+      "metrics": {
+        "infrastructure": 75,
+        "public_trust": 67,
+        "economy": 63,
+        "safety": 72
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 2,
+      "title": "Waterline Alert",
+      "choice": "B",
+      "reason": "final_plurality",
+      "deltas": {
+        "infrastructure": -8,
+        "public_trust": 6,
+        "economy": -8,
+        "safety": 10
+      },
+      "metrics": {
+        "infrastructure": 67,
+        "public_trust": 73,
+        "economy": 55,
+        "safety": 82
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 3,
+      "title": "Care at Capacity",
+      "choice": "B",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": 4,
+        "public_trust": -10,
+        "economy": 6,
+        "safety": -12
+      },
+      "metrics": {
+        "infrastructure": 71,
+        "public_trust": 63,
+        "economy": 61,
+        "safety": 70
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 4,
+      "title": "The Essential Corridor",
+      "choice": "C",
+      "reason": "ai_tie_break",
+      "deltas": {
+        "infrastructure": 10,
+        "public_trust": 6,
+        "economy": -12,
+        "safety": -8
+      },
+      "metrics": {
+        "infrastructure": 81,
+        "public_trust": 69,
+        "economy": 49,
+        "safety": 62
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 5,
+      "title": "Signal and Rumour",
+      "choice": "C",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": -6,
+        "public_trust": 6,
+        "economy": -6,
+        "safety": 2
+      },
+      "metrics": {
+        "infrastructure": 75,
+        "public_trust": 75,
+        "economy": 43,
+        "safety": 64
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 6,
+      "title": "Services Under Intrusion",
+      "choice": "B",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": 16,
+        "public_trust": -8,
+        "economy": -18,
+        "safety": 4
+      },
+      "metrics": {
+        "infrastructure": 91,
+        "public_trust": 67,
+        "economy": 25,
+        "safety": 68
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 7,
+      "title": "Storm at the Barrier",
+      "choice": "C",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": -10,
+        "public_trust": 10,
+        "economy": -8,
+        "safety": 4
+      },
+      "metrics": {
+        "infrastructure": 81,
+        "public_trust": 77,
+        "economy": 17,
+        "safety": 72
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 8,
+      "title": "Credit Under Strain",
+      "choice": "A",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": -6,
+        "public_trust": -14,
+        "economy": 18,
+        "safety": -10
+      },
+      "metrics": {
+        "infrastructure": 75,
+        "public_trust": 63,
+        "economy": 35,
+        "safety": 62
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 9,
+      "title": "A Fair Share",
+      "choice": "A",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": 6,
+        "public_trust": -20,
+        "economy": 6,
+        "safety": 4
+      },
+      "metrics": {
+        "infrastructure": 81,
+        "public_trust": 43,
+        "economy": 41,
+        "safety": 66
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 10,
+      "title": "The Last Coordination",
+      "choice": "C",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": -18,
+        "public_trust": 12,
+        "economy": 12,
+        "safety": -14
+      },
+      "metrics": {
+        "infrastructure": 63,
+        "public_trust": 55,
+        "economy": 53,
+        "safety": 52
+      },
+      "next_phase": "completed"
+    }
+  ],
+  "collapse": [
+    {
+      "crisis": 1,
+      "title": "Grid Under Pressure",
+      "choice": "B",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": 5,
+        "public_trust": -3,
+        "economy": -7,
+        "safety": 2
+      },
+      "metrics": {
+        "infrastructure": 75,
+        "public_trust": 67,
+        "economy": 63,
+        "safety": 72
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 2,
+      "title": "Waterline Alert",
+      "choice": "A",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": 12,
+        "public_trust": -10,
+        "economy": -22,
+        "safety": 10
+      },
+      "metrics": {
+        "infrastructure": 87,
+        "public_trust": 57,
+        "economy": 41,
+        "safety": 82
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 3,
+      "title": "Care at Capacity",
+      "choice": "A",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": -12,
+        "public_trust": 4,
+        "economy": -20,
+        "safety": 16
+      },
+      "metrics": {
+        "infrastructure": 75,
+        "public_trust": 61,
+        "economy": 21,
+        "safety": 98
+      },
+      "next_phase": "briefing"
+    },
+    {
+      "crisis": 4,
+      "title": "The Essential Corridor",
+      "choice": "A",
+      "reason": "initial_plurality",
+      "deltas": {
+        "infrastructure": -6,
+        "public_trust": -12,
+        "economy": -24,
+        "safety": 16
+      },
+      "metrics": {
+        "infrastructure": 69,
+        "public_trust": 49,
+        "economy": 0,
+        "safety": 100
+      },
+      "next_phase": "failed"
+    }
+  ]
+}
+MILESTONE 5 LIVE SMOKE PASS: production content, three clients, ten crises, ties, reconnects, completion and natural collapse (20x clock)

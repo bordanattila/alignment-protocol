@@ -1,0 +1,3 @@
+PASS new campaign restart: same saved content, identities, roles, history and branch-ready state
+PASS ten real crises: common history/metrics, final voting, authored follow-ups, no duplicate IDs, privacy and exactly-once acknowledgements
+EXPANSION LIVE SMOKE PASS; score=62.25; followups=1; review=/tmp/ce-m8-live.json

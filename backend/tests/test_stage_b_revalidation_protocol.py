@@ -14,6 +14,18 @@ import revalidate_stage_b as protocol
 def config():return GenerationSettings(enabled=True,model='gpt-6-luna',timeout_seconds=60)
 
 
+@pytest.fixture
+def offline_preservation_manifest(tmp_path, monkeypatch):
+    # The historical live harness must still reject changes since Stage B.
+    # Offline unit tests instead seal their current sources in an isolated file;
+    # never rewrite the immutable acceptance/preflight manifests.
+    original = json.loads(protocol.PRESERVED.read_text())
+    manifest = tmp_path/'offline-preservation.json'
+    manifest.write_text(json.dumps({name:protocol.digest(name) for name in original}))
+    monkeypatch.setattr(protocol, 'PRESERVED', manifest)
+    return manifest
+
+
 def test_four_original_cases_and_exact_planned_cost():
     assert protocol.CASES==[('crisis-fresh','fresh'),('crisis-infrastructure','infrastructure-damage'),
         ('crisis-trust','declining-trust'),('crisis-interconnected','interconnected')]
@@ -70,7 +82,7 @@ def test_unknown_usage_stops_without_calling_it_free(tmp_path):
     assert 'known_estimated_cost_usd' not in provider.attempts[-1]
 
 
-def test_dry_run_preserves_real_baseline_and_leaves_real_comparison_pending(tmp_path,monkeypatch):
+def test_dry_run_preserves_real_baseline_and_leaves_real_comparison_pending(tmp_path,monkeypatch,offline_preservation_manifest):
     def forbidden(*args,**kwargs):raise AssertionError('Real adapter or credential loading forbidden in offline mode')
     monkeypatch.setattr(protocol,'ChatCompletionsProvider',forbidden)
     monkeypatch.setattr(GenerationSettings,'from_env',forbidden)
@@ -88,10 +100,21 @@ def test_dry_run_preserves_real_baseline_and_leaves_real_comparison_pending(tmp_
     protocol.verify_preserved()
 
 
-def test_human_reviews_remain_unassigned(tmp_path,monkeypatch):
+def test_human_reviews_remain_unassigned(tmp_path,monkeypatch,offline_preservation_manifest):
     monkeypatch.setattr(protocol,'ChatCompletionsProvider',lambda *a:pytest.fail('No real adapter'))
     root=tmp_path/'dry';asyncio.run(protocol.run(False,root))
     rows=json.loads((root/'human-review.json').read_text())['cases']
     assert len(rows)==4
     assert all(row['continuity_classification'] is None and row['review_status']=='not_reviewed' for row in rows)
     assert all(score is None for row in rows for score in row['scores'].values())
+
+
+def test_offline_manifest_still_refuses_changed_sealed_evidence(tmp_path,monkeypatch):
+    source=tmp_path/'source.txt'; source.write_text('original')
+    manifest=tmp_path/'manifest.json'
+    manifest.write_text(json.dumps({str(source):protocol.digest(source)}))
+    monkeypatch.setattr(protocol,'PRESERVED',manifest)
+    protocol.verify_preserved()
+    source.write_text('changed')
+    with pytest.raises(protocol.BatchStop,match='preserved_evidence_changed'):
+        protocol.verify_preserved()

@@ -191,6 +191,22 @@ function outcome(phase: LobbyState['phase'] = 'decision_locked'): LobbyState {
   return mission;
 }
 
+test('pending generation keeps the recorded public outcome visible without progression controls', () => {
+  const mission = outcome('preparing');
+  mission.mode = 'generated'; mission.generation_status = 'preparing';
+  mission.crisis = null; mission.decision = null; mission.voting = null; mission.closed_rounds = [];
+  mission.private_intelligence = {};
+  const html = render(mission);
+  assert.match(html, /Recorded outcome during preparation/);
+  assert.match(html, /Public authored outcome after rotating outages/);
+  assert.match(html, /Civilization impact/);
+  assert.match(html, /70 → <strong>75<\/strong>/);
+  assert.ok(!html.includes('>Next crisis</button>') && !html.includes('Begin discussion'));
+  assert.ok(!html.includes('<fieldset') && !html.includes('Your authorized'));
+  mission.result = null;
+  assert.ok(!render(mission).includes('Recorded outcome during preparation'));
+});
+
 test('authoritative outcome shows old/new values, signed deltas and host progression above references', () => {
   const html = render(outcome());
   assertActiveBeforeReferences(html);

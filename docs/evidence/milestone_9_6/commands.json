@@ -1,0 +1,21 @@
+{
+  "original_single": "PYTHONPATH=backend:/tmp timeout 12 .venv/bin/python -m pytest -p ce96_ws_audit_plugin backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect -q -s -o faulthandler_timeout=5",
+  "original_traced_repetitions": ".venv/bin/python /tmp/ce96_repeat_ws.py docs/evidence/milestone_9_6/ws-before 6 audit",
+  "original_uninstrumented_repetitions": ".venv/bin/python /tmp/ce96_repeat_ws.py docs/evidence/milestone_9_6/ws-before-uninstrumented 10",
+  "managed_initial_repetitions": ".venv/bin/python /tmp/ce96_repeat_ws.py docs/evidence/milestone_9_6/ws-after 10",
+  "managed_verbose_repetitions": ".venv/bin/python backend/tests/repeat_websocket_tests.py --output docs/evidence/milestone_9_6/ws-after-final --runs 10 --timeout 7",
+  "managed_current_repetitions": ".venv/bin/python backend/tests/repeat_websocket_tests.py --output docs/evidence/milestone_9_6/ws-current-final --runs 10 --timeout 7",
+  "final_full_backend": "timeout 90 .venv/bin/python -m pytest backend/tests -q -o faulthandler_timeout=15",
+  "final_focused": ".venv/bin/python -m pytest backend/tests/test_generation_responsiveness.py backend/tests/test_websocket_harness.py backend/tests/test_live_generation.py backend/tests/test_durable_generation_diagnostics.py -q -x",
+  "simulated_evaluation": ".venv/bin/python backend/tests/measure_responsiveness.py --output docs/evidence/milestone_9_6/simulated-lifecycle.json",
+  "local_receipt": "timeout 30 .venv/bin/python backend/tests/smoke_responsiveness.py --output docs/evidence/milestone_9_6/local-client-receipt.json",
+  "frontend_captured": "cd frontend && MISSION_REVIEW_FILE=/tmp/ce-m6-live.json EXPANSION_REVIEW_FILE=/tmp/ce-m8-live.json CHAT_ACCEPTANCE_FILE=/tmp/ce-chat-5-1.json MISSION_RESTART_FILE=/tmp/ce-m7-restart.json npm test",
+  "frontend_other": [
+    "npm test",
+    "npm run typecheck",
+    "npm run build",
+    "npm ls --depth=0"
+  ],
+  "python_dependencies": ".venv/bin/python -m pip check",
+  "whitespace": "git diff --check"
+}

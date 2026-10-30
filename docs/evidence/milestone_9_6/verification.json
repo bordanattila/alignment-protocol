@@ -1,0 +1,144 @@
+{
+  "backend_full": {
+    "passed": 634,
+    "failed": 0,
+    "timeouts": 0,
+    "seconds": 20.46,
+    "warning": "Existing Starlette/httpx TestClient deprecation"
+  },
+  "backend_focused": {
+    "passed": 59,
+    "failed": 0,
+    "seconds": 2.12
+  },
+  "frontend_with_captured_snapshots": {
+    "passed": 109,
+    "failed": 0,
+    "skipped": 0
+  },
+  "frontend_default": {
+    "passed": 105,
+    "failed": 0,
+    "skipped": 4,
+    "reason": "Optional captured-snapshot inputs absent in default invocation"
+  },
+  "typecheck": "passed",
+  "build": "passed",
+  "pip_check": "passed",
+  "npm_ls": "passed",
+  "baseline_uninstrumented": {
+    "runs": 10,
+    "success": 9,
+    "failure": 0,
+    "timeout": 1
+  },
+  "baseline_instrumented": {
+    "runs": 6,
+    "success": 6,
+    "failure": 0,
+    "timeout": 0
+  },
+  "post_change_target_batches": {
+    "runs": 30,
+    "success": 30,
+    "failure": 0,
+    "timeout": 0,
+    "parametrized_cases": 120
+  },
+  "paid_or_real_provider_requests": 0,
+  "browser_render_measurement": null,
+  "existing_smokes": [
+    {
+      "name": "persistence-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_milestone7.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "name": "generation-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_live_generation.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "name": "endgame-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_adaptive_narrative.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "name": "campaign-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_milestone5.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    },
+    {
+      "name": "frontend-reconnect",
+      "command": [
+        "node",
+        "--experimental-websocket",
+        "frontend/tests/smokeReconnection.mjs"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 60
+    }
+  ],
+  "additional_smokes": [
+    {
+      "name": "review-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_milestone6.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 65
+    },
+    {
+      "name": "expansion-network",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/smoke_milestone8.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 65
+    },
+    {
+      "name": "captured-chat",
+      "command": [
+        "/home/attila_unix/projects/consensus-engine/.venv/bin/python",
+        "backend/tests/test_chat_acceptance.py"
+      ],
+      "result": "passed",
+      "exit_code": 0,
+      "timeout_seconds": 65
+    }
+  ],
+  "historical_artifacts_unchanged": 35,
+  "provider_prompt_config_validation_and_mechanics": "unchanged",
+  "remaining_limitations": [
+    "Finite stability sample cannot prove every previous or future stall has the same cause.",
+    "Real provider latency not remeasured; 15-second target not established.",
+    "No live browser/device timing; only local client receipt measured.",
+    "Lifecycle samples are content-free process-local logs, not persisted gameplay state.",
+    "Starlette TestClient internal hooks/deprecation need review on dependency upgrades."
+  ]
+}

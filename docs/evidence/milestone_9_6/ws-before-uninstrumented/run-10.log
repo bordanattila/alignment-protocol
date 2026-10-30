@@ -1,0 +1,55 @@
+..Timeout (0:00:03)!
+Thread 0x00007aaecb2ab6c0 (most recent call first):
+  File "/usr/lib/python3.12/selectors.py", line 468 in select
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 1949 in _run_once
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 641 in run_forever
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 674 in run_until_complete
+  File "/usr/lib/python3.12/asyncio/runners.py", line 118 in run
+  File "/home/attila_unix/projects/alignement-protocol/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 2548 in run
+  File "/home/attila_unix/projects/alignement-protocol/.venv/lib/python3.12/site-packages/anyio/_core/_eventloop.py", line 83 in run
+  File "/home/attila_unix/projects/alignement-protocol/.venv/lib/python3.12/site-packages/anyio/from_thread.py", line 538 in run_blocking_portal
+  File "/usr/lib/python3.12/threading.py", line 1010 in run
+  File "/usr/lib/python3.12/threading.py", line 1073 in _bootstrap_inner
+  File "/usr/lib/python3.12/threading.py", line 1030 in _bootstrap
+
+Thread 0x00007aaece7ba080 (most recent call first):
+  File "/usr/lib/python3.12/threading.py", line 355 in wait
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 451 in result
+  File "/home/attila_unix/projects/alignement-protocol/.venv/lib/python3.12/site-packages/anyio/from_thread.py", line 340 in call
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/starlette/testclient.py", line 176 in receive
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/starlette/testclient.py", line 189 in receive_json
+  File "/home/attila_unix/projects/consensus-engine/backend/tests/test_campaign.py", line 164 in states
+  File "/home/attila_unix/projects/consensus-engine/backend/tests/test_campaign.py", line 202 in restore
+  File "/home/attila_unix/projects/consensus-engine/backend/tests/test_campaign.py", line 248 in test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/python.py", line 157 in pytest_pyfunc_call
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/python.py", line 1671 in runtest
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 178 in pytest_runtest_call
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 246 in <lambda>
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 344 in from_call
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 245 in call_and_report
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 136 in runtestprotocol
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/runner.py", line 117 in pytest_runtest_protocol
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/main.py", line 367 in pytest_runtestloop
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/main.py", line 343 in _main
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/main.py", line 289 in wrap_session
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/main.py", line 336 in pytest_cmdline_main
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 175 in main
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/_pytest/config/__init__.py", line 201 in console_main
+  File "/home/attila_unix/projects/consensus-engine/.venv/lib/python3.12/site-packages/pytest/__main__.py", line 9 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 198 in _run_module_as_main

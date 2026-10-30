@@ -1,0 +1,15 @@
+import json,os,subprocess,sys
+from pathlib import Path
+out=Path(sys.argv[1]);out.mkdir(exist_ok=True)
+runs=[]
+for i in range(int(sys.argv[2])):
+ cmd=[sys.executable,'-m','pytest','backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect','backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only','-q','-o','faulthandler_timeout=3']
+ if len(sys.argv)>3:cmd+=['-p','ce96_ws_audit_plugin','-s']
+ try:
+  r=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=7,env={**os.environ,'PYTHONPATH':'backend:/tmp'})
+  text=r.stdout.decode(errors='replace');status='success' if r.returncode==0 else 'failure'
+ except subprocess.TimeoutExpired as e:text=(e.stdout or b'').decode(errors='replace');status='timeout'
+ (out/f'run-{i+1}.log').write_text(text)
+ runs.append({'run':i+1,'status':status,'tests':['foundation reconnect','campaign reconnect counts 2,3,4']})
+ (out/'summary.json').write_text(json.dumps(runs,indent=2)+'\n')
+ print(json.dumps(runs[-1]),flush=True)

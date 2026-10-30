@@ -1,0 +1,20 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.2, pluggy-1.7.0 -- /home/attila_unix/projects/consensus-engine/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/attila_unix/projects/consensus-engine/backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 4 items
+
+backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect <- ../../alignement-protocol/backend/tests/test_foundation.py PASSED [ 25%]
+backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only[2] PASSED [ 50%]
+backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only[3] PASSED [ 75%]
+backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only[4] PASSED [100%]
+
+=============================== warnings summary ===============================
+backend/tests/conftest.py:3
+  /home/attila_unix/projects/consensus-engine/backend/tests/conftest.py:3: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    import starlette.testclient
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================= 4 passed, 1 warning in 2.19s =========================

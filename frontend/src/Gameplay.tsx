@@ -149,6 +149,11 @@ export function ActiveGameplay({ mission, connected, sendIntent, sample, continu
     region.current?.focus({ preventScroll: true });
     region.current?.scrollIntoView({ block: 'start', behavior: 'auto' });
   }, [mission.phase, roundId, interactive]);
+  if (mission.phase === 'preparing' && mission.result) return <section className="panel" aria-label="Recorded outcome during preparation">
+    <p>Preparing next crisis. You can review the recorded outcome while you wait.</p>
+    <h2>{mission.result.choice_title}</h2>
+    <ConsequenceOutcome mission={mission} connected={connected} continuing={continuing} onContinue={onContinue} />
+  </section>;
   if (!interactive) return null;
   return <section className="active-gameplay" aria-label="Active gameplay" tabIndex={-1} ref={region}>
     <PhaseClock mission={mission} sample={sample} />

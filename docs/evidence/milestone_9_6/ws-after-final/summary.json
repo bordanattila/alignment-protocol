@@ -1,0 +1,92 @@
+[
+  {
+    "run": 1,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  },
+  {
+    "run": 2,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  },
+  {
+    "run": 3,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  },
+  {
+    "run": 4,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  },
+  {
+    "run": 5,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  },
+  {
+    "run": 6,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  },
+  {
+    "run": 7,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  },
+  {
+    "run": 8,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  },
+  {
+    "run": 9,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  },
+  {
+    "run": 10,
+    "status": "success",
+    "tests": [
+      "backend/tests/test_foundation.py::test_sync_privacy_multitab_disconnect_and_reconnect",
+      "backend/tests/test_campaign.py::test_ten_crisis_multiplayer_campaign_with_ties_privacy_reconnect_and_once_only"
+    ],
+    "timeout_seconds": 7.0
+  }
+]

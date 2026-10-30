@@ -1,0 +1,26 @@
+import asyncio,json
+import pytest
+from app.connections import LobbyConnections
+from starlette.testclient import WebSocketTestSession
+
+@pytest.fixture(autouse=True)
+def trace(monkeypatch,request):
+    events=[]
+    original=LobbyConnections.broadcast
+    async def broadcast(self,token,*args,**kwargs):
+        events.append({'event':'broadcast_start','phase':str(self.store.get(token).phase)})
+        try:
+            await original(self,token,*args,**kwargs)
+            events.append({'event':'broadcast_done'})
+        except BaseException as e:
+            events.append({'event':'broadcast_interrupted','exception_type':type(e).__name__})
+            print(json.dumps({'test':request.node.nodeid,'events':events[-12:]}),flush=True)
+            raise
+    monkeypatch.setattr(LobbyConnections,'broadcast',broadcast)
+    old=WebSocketTestSession.__exit__
+    def exit(self,*args):
+        events.append({'event':'test_context_exit'})
+        result=old(self,*args)
+        events.append({'event':'test_context_exited'})
+        return result
+    monkeypatch.setattr(WebSocketTestSession,'__exit__',exit)
