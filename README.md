@@ -41,6 +41,12 @@ The backend suite covers membership, validation, capacity, credential privacy, W
 
 ## Serve the built app
 
+For the approved **Render backend + owner-private ChatGPT Sites frontend**
+configuration, see [the deployment runbook](docs/RENDER_SITES_DEPLOYMENT.md).
+It preserves the existing game engine and SQLite format. The earlier
+[Railway preparation](docs/RAILWAY_SITES_DEPLOYMENT.md) remains reference material.
+Local development below is unchanged.
+
 ```sh
 cd frontend
 npm ci

@@ -1,0 +1,9 @@
+{
+  "name": "consensus-engine-sites-deployment",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node deploy/sites/build.mjs",
+    "test:relay": "node --test deploy/sites/worker.test.mjs"
+  }
+}

@@ -1,0 +1,29 @@
+# Preparation only. Applying this Blueprint creates billable resources and
+# starts an initial deployment, even with automatic deployments disabled.
+previews:
+  generation: "off"
+services:
+  - type: web
+    name: consensus-engine-backend
+    runtime: docker
+    branch: codex/render-deploy
+    plan: 0.5c-512mb
+    region: virginia
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    numInstances: 1
+    autoDeployTrigger: "off"
+    healthCheckPath: /api/health
+    disk:
+      name: consensus-missions
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: CONSENSUS_DB_PATH
+        value: /data/consensus-engine.sqlite3
+      - key: CONSENSUS_LLM_ENABLED
+        value: "false"
+      - key: CONSENSUS_SITE_ORIGIN
+        value: https://consensus-engine-playtest.justfrog18.chatgpt.site
+      - key: CONSENSUS_GATEWAY_KEY
+        sync: false

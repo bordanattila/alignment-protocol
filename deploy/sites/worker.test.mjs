@@ -1,0 +1,80 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createWorker } from './worker.mjs';
+
+const origin = 'https://private-site.example';
+const env = { CONSENSUS_BACKEND_ORIGIN: 'https://backend.example', CONSENSUS_GATEWAY_KEY: 'test-only-' + 'x'.repeat(32) };
+const request = (path, options = {}) => {
+  const headers = new Headers(options.headers);
+  headers.set('oai-authenticated-user-id', 'authorized-test-visitor');
+  return new Request(origin + path, { ...options, headers });
+};
+
+test('serves the retained frontend assets, including HEAD, without backend calls', async () => {
+  const worker = createWorker({ '/': { body: btoa('<h1>Consensus Engine</h1>'), type: 'text/html' } }, () => assert.fail());
+  assert.equal(await (await worker.fetch(request('/?mission=invite'), {})).text(), '<h1>Consensus Engine</h1>');
+  assert.equal(await (await worker.fetch(request('/', { method: 'HEAD' }), {})).text(), '');
+  assert.equal((await worker.fetch(request('/missing'), {})).status, 404);
+});
+
+test('forwards intents and credentials only to the configured backend, without visitor cookies or identity headers', async () => {
+  const worker = createWorker({}, async (url, options) => {
+    assert.equal(url, 'https://backend.example/api/missions');
+    assert.equal(options.headers.get('X-Consensus-Gateway-Key'), env.CONSENSUS_GATEWAY_KEY);
+    assert.equal(options.headers.get('Origin'), origin);
+    assert.equal(options.headers.get('X-Mission-Session'), 'seat-secret');
+    for (const name of ['Cookie', 'Authorization', 'oai-authenticated-user-id']) assert.equal(options.headers.get(name), null);
+    assert.equal(options.redirect, 'manual');
+    assert.deepEqual(await new Response(options.body).json(), { callsign: 'Host', mode: 'authored' });
+    return Response.json({ token: 'invite', credential: 'seat-secret' }, {
+      status: 201, headers: { 'Set-Cookie': 'upstream-cookie', 'X-Internal': 'private' },
+    });
+  });
+  const result = await worker.fetch(request('/api/missions?key=never-forward', {
+    method: 'POST', headers: { Origin: origin, Cookie: 'sites-session', Authorization: 'private',
+      'oai-authenticated-user-id': 'visitor', 'Content-Type': 'application/json', 'X-Mission-Session': 'seat-secret' },
+    body: JSON.stringify({ callsign: 'Host', mode: 'authored' }),
+  }), env);
+  assert.equal(result.status, 201);
+  assert.equal(result.headers.get('Cache-Control'), 'no-store');
+  assert.equal(result.headers.get('Set-Cookie'), null);
+  assert.equal(result.headers.get('X-Internal'), null);
+  assert.equal((await result.json()).credential, 'seat-secret');
+});
+
+test('rejects cross-origin requests and unconfigured or unsafe upstreams without contacting backend', async () => {
+  const worker = createWorker({}, () => assert.fail());
+  assert.equal((await worker.fetch(new Request(origin + '/api/capabilities'), env)).status, 401);
+  assert.equal((await worker.fetch(request('/api/missions', { method: 'POST', headers: { Origin: 'https://other.example' } }), env)).status, 403);
+  assert.equal((await worker.fetch(request('/api/capabilities'), {})).status, 503);
+  for (const upstream of ['http://backend.example', 'https://user:pass@backend.example', 'https://backend.example/path', 'https://backend.example?key=x']) {
+    assert.equal((await worker.fetch(request('/api/capabilities'), { ...env, CONSENSUS_BACKEND_ORIGIN: upstream })).status, 503);
+  }
+  assert.equal((await worker.fetch(request('/api/unknown'), env)).status, 404);
+  assert.equal((await worker.fetch(request('/api/missions/token/ws'), env)).status, 404);
+});
+
+test('passes the runtime WebSocket upgrade response through unchanged', async () => {
+  // Node cannot construct status 101: this sentinel checks object identity.
+  // Cloudflare/Sites hosted upgrade behavior still needs remote verification.
+  const upgrade = { status: 101, webSocket: {} };
+  const worker = createWorker({}, async (url, options) => {
+    assert.equal(url, 'https://backend.example/api/missions/token/ws');
+    assert.equal(options.headers.get('Upgrade'), 'websocket');
+    return upgrade;
+  });
+  const result = await worker.fetch(request('/api/missions/token/ws', {
+    headers: { Upgrade: 'websocket', Origin: origin },
+  }), env);
+  assert.equal(result, upgrade);
+  assert.equal((await worker.fetch(request('/api/missions/token/ws', { headers: { Upgrade: 'websocket' } }), env)).status, 403);
+});
+
+test('does not follow backend redirects and returns sanitized connection errors', async () => {
+  const redirected = createWorker({}, async () => new Response(null, { status: 307, headers: { Location: 'https://other.example' } }));
+  assert.equal((await redirected.fetch(request('/api/capabilities'), env)).status, 502);
+  const failed = createWorker({}, async () => { throw new Error(env.CONSENSUS_GATEWAY_KEY); });
+  const result = await failed.fetch(request('/api/capabilities'), env);
+  assert.equal(result.status, 502);
+  assert.ok(!(await result.text()).includes(env.CONSENSUS_GATEWAY_KEY));
+});

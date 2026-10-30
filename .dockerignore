@@ -1,0 +1,10 @@
+**
+!Dockerfile
+!backend/
+!backend/pyproject.toml
+!backend/app/
+!backend/app/**
+**/__pycache__
+**/*.pyc
+**/.env*
+**/*.sqlite*
