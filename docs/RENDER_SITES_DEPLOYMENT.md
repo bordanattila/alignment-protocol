@@ -53,6 +53,18 @@ flow can create the approved service and disk together once source is pushed,
 or the user can attach the approved disk to a connector-created service. No
 Render service or disk has been created yet.
 
+Source handoff update: deployment source was committed and pushed to
+`codex/render-deploy`. The Blueprint explicitly selects that branch and the
+registered private Sites origin. Render generates the initial gateway key, so
+no key needs to be entered or shared during Blueprint creation. After the
+service exists, the deployment agent can set a fresh matching key on Render
+and Sites through their native secret-setting tools before preview deployment.
+Do not disclose either key in chat. In the Dashboard, create a Blueprint from
+this repository, select `codex/render-deploy`, review exactly one $7 service
+and one 1 GB $0.25 disk, and apply the already authorized configuration. Do not
+use the older default branch. The missing step is Dashboard interaction, not
+additional resource authorization.
+
 ## Prepared configuration
 
 `render.yaml` defines exactly one Docker web service, plan `0.5c-512mb`, one

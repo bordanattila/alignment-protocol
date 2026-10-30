@@ -26,4 +26,4 @@ services:
       - key: CONSENSUS_SITE_ORIGIN
         value: https://consensus-engine-playtest.justfrog18.chatgpt.site
       - key: CONSENSUS_GATEWAY_KEY
-        sync: false
+        generateValue: true
