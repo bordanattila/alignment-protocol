@@ -21,13 +21,19 @@ from .generation.config import GenerationSettings, ConfigurationError
 from .generation.live import LiveGeneration
 from .generation.conclusion_live import LiveConclusions
 from .generation.provider import ScenarioProvider
+from .safety import SafetyControls, SafetyLimit, SafetyMiddleware, SafetySettings, visitor_key
 
 
 def create_app(clock: Callable[[], float] | None = None,
                crisis_loader: Callable[[], list[Crisis]] | None = None,
                database_path: str | Path | None = None,
                generation_settings: GenerationSettings | None = None,
-               generation_provider: ScenarioProvider | None = None) -> FastAPI:
+               generation_provider: ScenarioProvider | None = None,
+               safety_settings: SafetySettings | None = None,
+               rate_clock: Callable[[], float] | None = None) -> FastAPI:
+    safety_settings = safety_settings or SafetySettings.from_env()
+    limiter_clock = rate_clock or clock
+    safety = SafetyControls(safety_settings, **({'clock': limiter_clock} if limiter_clock else {}))
     try:
         settings = generation_settings if generation_settings is not None else GenerationSettings.from_env()
     except ConfigurationError:
@@ -44,20 +50,35 @@ def create_app(clock: Callable[[], float] | None = None,
         options["campaign_loader"] = load_campaign_catalog
     if database_path is not None:
         options["persistence"] = SQLiteMissions(database_path)
-    store = MissionStore(**options, generation_enabled=available)
+    store = MissionStore(**options, generation_enabled=available, safety_settings=safety_settings)
     lock = asyncio.Lock()
     # Keep membership semantics, but isolate socket delivery from state mutation.
-    connections = LobbyConnections(store, lock)
+    connections = LobbyConnections(store, lock, max_per_seat=safety_settings.sockets_per_seat)
     generation = LiveGeneration(store, lock, connections, settings, generation_provider)
     conclusions = LiveConclusions(store, lock, connections, settings, generation_provider)
 
+    next_cleanup = float('-inf')
+
     async def tick():
+        nonlocal next_cleanup
         changed = set()
         async with lock:
+            if store.clock() >= next_cleanup:
+                removed = store.cleanup_expired()
+                for token in removed:
+                    connections.pending.discard(token)
+                    connections.delivery_locks.pop(token, None)
+                if store.persistence is not None:
+                    store.persistence.checkpoint()
+                if removed:
+                    logging.getLogger('consensus.safety').info('retention_removed count=%d', len(removed))
+                next_cleanup = store.clock() + safety_settings.cleanup_interval_seconds
             generation.launch_pending()
             for token in store.mission_tokens():
                 try:
-                    if store.advance_due(token): changed.add(token)
+                    # Retained, idle aggregates need no deep copy/serialization
+                    # on every 100ms wakeup. Deadlines remain server-owned.
+                    if store.is_due(token) and store.advance_due(token): changed.add(token)
                 except PersistenceError:
                     logging.getLogger(__name__).error("Mission storage unavailable; timer will retry.")
             conclusions.launch_pending()
@@ -77,7 +98,9 @@ def create_app(clock: Callable[[], float] | None = None,
 
     @asynccontextmanager
     async def lifespan(_app):
+        nonlocal next_cleanup
         store.initialize()
+        next_cleanup = store.clock() + safety_settings.startup_cleanup_grace_seconds
         task = asyncio.create_task(scheduler())
         _app.state.scheduler_task = task
         try:
@@ -97,6 +120,8 @@ def create_app(clock: Callable[[], float] | None = None,
     app.state.lock = lock
     app.state.generation = generation
     app.state.conclusions = conclusions
+    app.state.safety = safety
+    app.add_middleware(SafetyMiddleware, controls=safety)
 
     @app.exception_handler(PersistenceError)
     async def storage_error(_request: Request, _exc: PersistenceError):
@@ -105,6 +130,8 @@ def create_app(clock: Callable[[], float] | None = None,
 
     @app.exception_handler(MissionError)
     async def mission_error(_request: Request, exc: MissionError):
+        if exc.code in {'mission_capacity', 'creator_capacity', 'storage_capacity'}:
+            safety.record(exc.code)
         return JSONResponse({"detail": exc.message, "code": exc.code}, status_code=exc.status)
 
     @app.get("/api/health")
@@ -116,9 +143,9 @@ def create_app(clock: Callable[[], float] | None = None,
         return {'generated_missions': available}
 
     @app.post("/api/missions", status_code=201)
-    async def create(body: CreateMissionRequest):
+    async def create(body: CreateMissionRequest, request: Request):
         async with lock:
-            mission, player = store.create(body.callsign, body.mode)
+            mission, player = store.create(body.callsign, body.mode, creator_key=visitor_key(request.scope))
             return {"token": mission.token, "credential": player.credential}
 
     @app.post("/api/missions/{token}/join")
@@ -164,13 +191,15 @@ def create_app(clock: Callable[[], float] | None = None,
     async def lobby(socket: WebSocket, token: str):
         await socket.accept()
         player = None
+        registered = False
         try:
             # Credentials go in a first frame, not a URL that access logs retain.
             frame = await asyncio.wait_for(socket.receive(), timeout=10)
             if frame["type"] == "websocket.disconnect":
                 return
             text = frame.get("text")
-            if text is None or len(text) > 4096:
+            if text is None or len(text.encode('utf-8')) > safety_settings.websocket_bytes:
+                safety.record('websocket_payload')
                 await close_socket(socket, reason="Expected a small text authentication message")
                 return
             message = json.loads(text)
@@ -185,6 +214,7 @@ def create_app(clock: Callable[[], float] | None = None,
                 player = store.authorize(token, credential)
                 store.advance_due(token)
                 connections.add(token, player.id, socket)
+                registered = True
             await connections.broadcast(token)
             if socket.application_state == WebSocketState.DISCONNECTED:
                 return
@@ -193,8 +223,14 @@ def create_app(clock: Callable[[], float] | None = None,
                 if frame["type"] == "websocket.disconnect":
                     break
                 text = frame.get("text")
-                if text is None or len(text) > 4096:
+                if text is None or len(text.encode('utf-8')) > safety_settings.websocket_bytes:
+                    safety.record('websocket_payload')
                     await close_socket(socket, reason="Expected a small text action message")
+                    break
+                try:
+                    safety.allow('frames', visitor_key(socket.scope), safety_settings.frames_per_10sec, 10)
+                except SafetyLimit:
+                    await close_socket(socket, code=1013, reason='Too many actions; reconnect shortly.')
                     break
                 message = json.loads(text)
                 if not isinstance(message, dict) or message.get("type") not in ("chat", "vote"):
@@ -206,29 +242,37 @@ def create_app(clock: Callable[[], float] | None = None,
                     await connections.error(socket, "Invalid action fields or message length.")
                     continue
                 error = None
+                limited = False
                 async with lock:
                     try:
                         if isinstance(intent, ChatIntent):
+                            safety.allow('chat', player.id, safety_settings.chat_per_10sec, 10)
                             store.send_chat(token, credential, intent.text)
                         else:
                             store.vote(token, credential, intent.round_id, intent.choice_id)
                         conclusions.launch_pending()
                     except MissionError as exc:
                         error = exc.message
+                    except SafetyLimit:
+                        error = 'Too many chat messages. Wait briefly before sending again.'
+                        limited = True
                 # A late rejected intent may itself have advanced an expired phase.
-                await connections.broadcast(token)
+                if not limited:
+                    await connections.broadcast(token)
                 if error:
                     await connections.error(socket, error)
         except PersistenceError:
             await close_socket(socket, code=1011, reason="Mission storage unavailable; reconnect to retry")
-        except MissionError:
-            await close_socket(socket, reason="Mission session unavailable")
+        except MissionError as exc:
+            if exc.code == 'socket_capacity': safety.record('socket_capacity')
+            await close_socket(socket, code=1013 if exc.code == 'socket_capacity' else 1008,
+                               reason='Server busy; reconnect shortly.' if exc.code == 'socket_capacity' else 'Mission session unavailable')
         except (ValueError, RecursionError, asyncio.TimeoutError):
             await close_socket(socket, reason="Invalid session message")
         except WebSocketDisconnect:
             pass
         finally:
-            if player:
+            if registered:
                 try:
                     async with lock:
                         connections.remove(token, player.id, socket)

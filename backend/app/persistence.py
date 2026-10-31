@@ -10,6 +10,7 @@ import sqlite3
 from .domain import Mission, Phase, Role, Crisis
 from .callsigns import callsign_key
 from .campaign import validate_catalog, STAGES
+from .retention import MissionActivity
 
 
 class PersistenceError(Exception):
@@ -61,6 +62,11 @@ class SQLiteMissions:
                 raise PersistenceError('Unsupported mission database version; recovery stopped.')
             self._check_columns('missions', ['token', 'format_version', 'payload', 'checksum'])
             self._check_columns('resolutions', ['mission_token', 'result_id', 'crisis_number', 'record_hash'])
+            # Optional additive metadata, deliberately outside checksummed game
+            # aggregates. Older v2 applications ignore this table safely.
+            with self.connection:
+                self.connection.execute('CREATE TABLE IF NOT EXISTS mission_activity (token TEXT PRIMARY KEY REFERENCES missions(token), created_at REAL NOT NULL, last_activity REAL NOT NULL, finalized_at REAL, creator TEXT NOT NULL)')
+            self._check_columns('mission_activity', ['token', 'created_at', 'last_activity', 'finalized_at', 'creator'])
         except (OSError, sqlite3.Error):
             self.close()
             raise PersistenceError('Mission database unavailable, locked, or corrupt; recovery stopped.') from None
@@ -262,7 +268,7 @@ class SQLiteMissions:
             raise PersistenceError('Persisted mission record is invalid or incompatible; recovery stopped. Records retained for repair.') from None
         return missions
 
-    def save(self, mission: Mission):
+    def save(self, mission: Mission, activity: MissionActivity | None = None):
         self.validate_generated(mission)
         payload = self.payload(mission)
         checksum = hashlib.sha256(payload.encode()).hexdigest()
@@ -290,8 +296,52 @@ class SQLiteMissions:
                 self.connection.execute('INSERT INTO missions VALUES (?,?,?,?) ON CONFLICT(token) DO UPDATE SET payload=excluded.payload, checksum=excluded.checksum', (mission.token,1,payload,checksum))
                 for result in mission.results:
                     self.connection.execute('INSERT INTO resolutions VALUES (?,?,?,?) ON CONFLICT(mission_token,result_id) DO NOTHING', (mission.token,result.id,result.crisis_number,records[result.id]))
+                if activity is not None:
+                    self._write_activity(mission.token, activity)
         except sqlite3.Error:
             raise PersistenceError('Mission storage failed. The operation was not accepted; retry after storage recovers.') from None
+
+    def _write_activity(self, token, activity):
+        activity.validate()
+        self.connection.execute('INSERT INTO mission_activity VALUES (?,?,?,?,?) ON CONFLICT(token) DO UPDATE SET last_activity=excluded.last_activity, finalized_at=excluded.finalized_at',
+                                (token, activity.created_at, activity.last_activity, activity.finalized_at, activity.creator))
+
+    def load_activity(self, missions, now):
+        try:
+            result = {}
+            with self.connection:
+                for token, created, last, finalized, creator in self.connection.execute('SELECT * FROM mission_activity'):
+                    if token not in missions:
+                        raise ValueError('Orphaned activity')
+                    result[token] = MissionActivity(created, last, finalized, creator)
+                    result[token].validate()
+                # Legacy missions receive a full retention period from first
+                # adoption. Restarts do not renew already-recorded activity.
+                for token, mission in missions.items():
+                    if token not in result:
+                        result[token] = MissionActivity(now, now, now if mission.phase in (Phase.COMPLETED, Phase.FAILED) else None)
+                        self._write_activity(token, result[token])
+            return result
+        except (ValueError, TypeError, sqlite3.Error):
+            raise PersistenceError('Mission activity metadata is invalid; recovery stopped.') from None
+
+    def delete_expired(self, tokens):
+        """One atomic whole-mission deletion; never rewrite a finalized result."""
+        try:
+            with self.connection:
+                for token in tokens:
+                    self.connection.execute('DELETE FROM resolutions WHERE mission_token=?', (token,))
+                    self.connection.execute('DELETE FROM mission_activity WHERE token=?', (token,))
+                    self.connection.execute('DELETE FROM missions WHERE token=?', (token,))
+        except sqlite3.Error:
+            raise PersistenceError('Retention cleanup could not commit; records retained.') from None
+
+    def checkpoint(self):
+        # Nonblocking: released database pages are reusable without VACUUM.
+        try:
+            self.connection.execute('PRAGMA wal_checkpoint(PASSIVE)')
+        except sqlite3.Error:
+            raise PersistenceError('Database checkpoint deferred.') from None
 
     def close(self):
         if self.connection is not None:

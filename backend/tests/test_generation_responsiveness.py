@@ -153,7 +153,7 @@ def test_admission_retry_retains_ready_time_without_repeating_inference(tmp_path
         store,mission,credentials,game_clock,live=setup(tmp_path/'retry.sqlite3',provider)
         clock=MonotonicClock(); live.clock=clock
         save=store.persistence.save
-        def unavailable(mission): raise PersistenceError('test storage outage')
+        def unavailable(mission, **_metadata): raise PersistenceError('test storage outage')
         try:
             monkeypatch.setattr(store.persistence,'save',unavailable)
             await launch(live); await settle(live)

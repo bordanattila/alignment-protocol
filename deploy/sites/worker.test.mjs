@@ -78,3 +78,40 @@ test('does not follow backend redirects and returns sanitized connection errors'
   assert.equal(result.status, 502);
   assert.ok(!(await result.text()).includes(env.CONSENSUS_GATEWAY_KEY));
 });
+
+test('gateway visitor identity is stable per account, differs across accounts, and ignores spoofed forwarding headers', async () => {
+  const seen = [];
+  const worker = createWorker({}, async (_url, options) => {
+    seen.push(options.headers.get('X-Consensus-Visitor'));
+    for (const name of ['X-Forwarded-For', 'X-Real-IP', 'Forwarded', 'oai-authenticated-user-id']) {
+      assert.equal(options.headers.get(name), null);
+    }
+    return Response.json({ generated_missions: false });
+  });
+  for (const ip of ['first', 'second']) {
+    await worker.fetch(request('/api/capabilities', { headers: { 'X-Consensus-Visitor': 'spoofed', 'X-Forwarded-For': ip } }), env);
+  }
+  const other = new Request(origin + '/api/capabilities', { headers: { 'oai-authenticated-user-id': 'different-account' } });
+  await worker.fetch(other, env);
+  assert.match(seen[0], /^[a-f0-9]{64}$/);
+  assert.equal(seen[0], seen[1]);
+  assert.notEqual(seen[0], seen[2]);
+  assert.ok(!seen[0].includes('authorized-test-visitor'));
+});
+
+test('relay rejects declared and streamed oversize bodies in bytes without contacting backend', async () => {
+  const worker = createWorker({}, () => assert.fail());
+  for (const body of ['x'.repeat(4097), '\u00e9'.repeat(2049)]) {
+    assert.equal((await worker.fetch(request('/api/missions', { method: 'POST', body }), env)).status, 413);
+  }
+  assert.equal((await worker.fetch(request('/api/missions', { method: 'POST', headers: { 'Content-Length': '999999999' } }), env)).status, 413);
+});
+
+test('relay preserves sanitized retry guidance for backend rate limiting', async () => {
+  const worker = createWorker({}, async () => Response.json({ code: 'rate_limited' }, {
+    status: 429, headers: { 'Retry-After': '15' },
+  }));
+  const response = await worker.fetch(request('/api/capabilities'), env);
+  assert.equal(response.status, 429);
+  assert.equal(response.headers.get('Retry-After'), '15');
+});

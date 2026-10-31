@@ -106,7 +106,7 @@ def test_storage_retry_and_duplicate_progression_do_not_repeat_inference_or_diag
         path=tmp_path/'retry.sqlite3';provider=ProgressiveProvider()
         store,mission,credentials,clock,live=setup(path,provider)
         save=store.persistence.save
-        def broken(mission):raise PersistenceError('temporary')
+        def broken(mission, **_metadata):raise PersistenceError('temporary')
         monkeypatch.setattr(store.persistence,'save',broken)
         await launch(live);await settle(live)
         assert not mission.generation_diagnostics and inspect(path)==[] and len(provider.requests)==1

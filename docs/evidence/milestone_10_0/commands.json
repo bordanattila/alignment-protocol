@@ -1,0 +1,105 @@
+{
+  "working_directory": "repository root",
+  "environment": {
+    "CONSENSUS_LLM_ENABLED": "false"
+  },
+  "commands": [
+    [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "backend/tests",
+      "-q"
+    ],
+    [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "backend/tests/test_public_safety.py",
+      "-q"
+    ],
+    [
+      ".venv/bin/python",
+      "-m",
+      "pip",
+      "check"
+    ],
+    [
+      "npm",
+      "--prefix",
+      "frontend",
+      "test"
+    ],
+    [
+      "npm",
+      "run",
+      "test:relay"
+    ],
+    [
+      "npm",
+      "--prefix",
+      "frontend",
+      "run",
+      "build"
+    ],
+    [
+      "node",
+      "frontend/tests/browserAcceptance.mjs",
+      "NEW_TEMP_OUTPUT_DIRECTORY",
+      "--require-clean"
+    ],
+    [
+      "node",
+      "frontend/tests/browserAcceptance.mjs",
+      "ANOTHER_NEW_TEMP_OUTPUT_DIRECTORY",
+      "--require-clean",
+      "--fast-fake-regression"
+    ],
+    [
+      "docker",
+      "build",
+      "-t",
+      "consensus-engine-safety:local",
+      "."
+    ],
+    [
+      ".venv/bin/python",
+      "backend/tests/smoke_milestone7.py"
+    ],
+    [
+      ".venv/bin/python",
+      "backend/tests/smoke_live_generation.py"
+    ],
+    [
+      ".venv/bin/python",
+      "backend/tests/smoke_adaptive_narrative.py"
+    ],
+    [
+      ".venv/bin/python",
+      "backend/tests/smoke_milestone5.py"
+    ],
+    [
+      ".venv/bin/python",
+      "backend/tests/smoke_milestone6.py"
+    ],
+    [
+      ".venv/bin/python",
+      "backend/tests/smoke_milestone8.py"
+    ],
+    [
+      ".venv/bin/python",
+      "backend/tests/smoke_railway.py"
+    ],
+    [
+      "node",
+      "--experimental-websocket",
+      "frontend/tests/smokeReconnection.mjs"
+    ]
+  ],
+  "notes": [
+    "Browser runtime paths and LD_LIBRARY_PATH are documented in MILESTONE_9_7_BROWSER_ACCEPTANCE.md.",
+    "Optional frontend checks used CHAT_ACCEPTANCE_FILE, MISSION_RESTART_FILE, MISSION_REVIEW_FILE and EXPANSION_REVIEW_FILE pointing to newly captured local fixtures.",
+    "Fixtures use temporary databases, controlled clocks and fake providers; never point them at production.",
+    "Raw fixture captures/backups were not copied into this evidence directory."
+  ]
+}

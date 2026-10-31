@@ -54,15 +54,58 @@ export function createWorker(assets, upstreamFetch = fetch) {
       }
       if (origin) headers.set('Origin', origin);
       headers.set('X-Consensus-Gateway-Key', env.CONSENSUS_GATEWAY_KEY);
+      // Sites supplies this identity after authentication. Never forward a
+      // visitor-selected proxy identity or IP header. HMAC prevents exporting
+      // the raw account ID and scopes identifiers to this gateway secret.
+      const account = request.headers.get('oai-authenticated-user-id');
+      if (account.length > 256) return failure(403, 'Invalid visitor identity.');
+      const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.CONSENSUS_GATEWAY_KEY),
+        { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode('visitor:' + account));
+      headers.set('X-Consensus-Visitor', [...new Uint8Array(signature)].map(b => b.toString(16).padStart(2, '0')).join(''));
+      let body;
+      if (request.method === 'POST') {
+        const length = request.headers.get('Content-Length');
+        if (length !== null && (!/^\d{1,10}$/.test(length) || Number(length) > 4096)) {
+          return failure(413, 'Request body too large.');
+        }
+        const reader = request.body?.getReader();
+        if (reader) {
+          const chunks = [];
+          let size = 0;
+          let timeout;
+          try {
+            await Promise.race([
+              (async () => {
+                while (true) {
+                  const { value, done } = await reader.read();
+                  if (done) break;
+                  size += value.byteLength;
+                  if (size > 4096) throw new RangeError();
+                  chunks.push(value);
+                }
+              })(),
+              new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error()), 5000); }),
+            ]);
+            body = new Uint8Array(size);
+            let offset = 0;
+            for (const chunk of chunks) { body.set(chunk, offset); offset += chunk.byteLength; }
+          } catch (error) {
+            void reader.cancel().catch(() => {});
+            return failure(error instanceof RangeError ? 413 : 408, 'Request body too large or timed out.');
+          } finally { clearTimeout(timeout); }
+        }
+      }
       try {
         const response = await upstreamFetch(upstream.href, {
           method: request.method, headers, redirect: 'manual',
-          body: request.method === 'POST' ? request.body : undefined,
+          body,
         });
         // Preserve the runtime's WebSocket object by returning the 101 unchanged.
         if (response.status === 101) return response;
         if (response.status >= 300 && response.status < 400) return failure(502, 'Mission server redirected unexpectedly.');
         const output = new Headers({ 'Cache-Control': 'no-store' });
+        if (response.headers.has('Retry-After')) output.set('Retry-After', response.headers.get('Retry-After'));
         output.set('Content-Type', response.headers.get('Content-Type') || 'application/json');
         return new Response(response.body, { status: response.status, headers: output });
       } catch { return failure(502, 'Mission server is temporarily unavailable. Reconnect to retry.'); }

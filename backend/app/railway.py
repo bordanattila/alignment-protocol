@@ -1,6 +1,7 @@
 """Deployment boundary only; game rules and local development stay unchanged."""
 import os
 import secrets
+import re
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -11,10 +12,11 @@ from .main import create_app
 
 
 class SitesGateway:
-    def __init__(self, app, secret: str, site_origin: str):
+    def __init__(self, app, secret: str, site_origin: str, require_visitor: bool = False):
         self.app = app
         self.secret = secret
         self.site_origin = site_origin
+        self.require_visitor = require_visitor
 
     async def __call__(self, scope, receive, send):
         if scope['type'] not in ('http', 'websocket'):
@@ -28,8 +30,11 @@ class SitesGateway:
             headers.setdefault(key.lower(), []).append(value)
         keys = headers.get(b'x-consensus-gateway-key', [])
         origins = headers.get(b'origin', [])
+        visitors = headers.get(b'x-consensus-visitor', [])
+        visitor_valid = len(visitors) == 1 and re.fullmatch(rb'[a-f0-9]{64}', visitors[0]) is not None
         authorized = (len(keys) == 1 and secrets.compare_digest(keys[0], self.secret.encode())
-                      and (not origins or origins == [self.site_origin.encode()]))
+                      and (not origins or origins == [self.site_origin.encode()])
+                      and (not self.require_visitor or visitor_valid))
         if not authorized:
             if scope['type'] == 'websocket':
                 await send({'type': 'websocket.close', 'code': 1008})
@@ -39,7 +44,10 @@ class SitesGateway:
             return
         # Never pass deployment credentials into game handlers or projections.
         scope = dict(scope, headers=[(k, v) for k, v in scope['headers']
-                                    if k.lower() != b'x-consensus-gateway-key'])
+                                    if k.lower() not in (b'x-consensus-gateway-key', b'x-consensus-visitor',
+                                                         b'x-forwarded-for', b'x-real-ip', b'forwarded')])
+        if visitor_valid:
+            scope['consensus.visitor'] = visitors[0].decode('ascii')
         await self.app(scope, receive, send)
 
 
@@ -61,4 +69,5 @@ def create_railway_app():
             or database.resolve() == mount.resolve()):
         raise RuntimeError('A persistent volume must be mounted and contain CONSENSUS_DB_PATH.')
     return SitesGateway(create_app(database_path=database,
-                                  generation_settings=GenerationSettings(enabled=False)), secret, origin)
+                                  generation_settings=GenerationSettings(enabled=False)), secret, origin,
+                        require_visitor=True)

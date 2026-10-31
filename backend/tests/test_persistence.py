@@ -223,7 +223,7 @@ def test_storage_failure_rolls_back_resolving_vote_metrics_and_ledger_atomically
 
 def test_failed_create_not_acknowledged_and_cache_restored(tmp_path,monkeypatch):
     clock=Clock(); store=open_store(tmp_path/'missions.sqlite3',clock)
-    def fail(_mission): raise PersistenceError('Storage unavailable')
+    def fail(_mission, **_metadata): raise PersistenceError('Storage unavailable')
     monkeypatch.setattr(store.persistence,'save',fail)
     with pytest.raises(PersistenceError): store.create('Host')
     assert not store._missions
@@ -293,7 +293,7 @@ def test_sqlite_prevents_duplicate_crisis_records_and_history_mutation(tmp_path)
 def test_http_storage_failure_returns_503_without_accepting_a_mission(tmp_path,monkeypatch):
     app=create_app(database_path=tmp_path/'missions.sqlite3')
     with TestClient(app) as client:
-        def fail(_mission): raise PersistenceError('Storage unavailable')
+        def fail(_mission, **_metadata): raise PersistenceError('Storage unavailable')
         monkeypatch.setattr(app.state.missions.persistence,'save',fail)
         response=client.post('/api/missions',json={'callsign':'Host'})
         assert response.status_code==503 and response.json()['code']=='storage_unavailable'
@@ -317,7 +317,7 @@ def test_restore_final_voting_and_tallies_after_unexpired_consensus_restart(tmp_
 
 def test_transient_disconnect_is_not_rolled_back_when_storage_is_unavailable(tmp_path,monkeypatch):
     path=tmp_path/'missions.sqlite3'; clock=Clock(); store,mission,_=team(path,clock)
-    def fail(_mission): raise PersistenceError('Storage unavailable')
+    def fail(_mission, **_metadata): raise PersistenceError('Storage unavailable')
     monkeypatch.setattr(store.persistence,'save',fail)
     store.set_connected(mission.token,mission.players[1].id,False)
     assert not mission.players[1].connected

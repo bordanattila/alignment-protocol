@@ -79,7 +79,7 @@ def test_admission_diagnostics_follow_commit_and_do_not_duplicate_on_storage_ret
     async def run():
         store,mission,credentials,clock,live=setup(tmp_path/'logging.sqlite3')
         save=store.persistence.save
-        def broken(mission):raise PersistenceError('safe temporary failure')
+        def broken(mission, **_metadata):raise PersistenceError('safe temporary failure')
         monkeypatch.setattr(store.persistence,'save',broken)
         await launch(live);await settle(live)
         assert 'crisis_admitted' not in caplog.text

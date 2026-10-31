@@ -9,7 +9,7 @@ from app.railway import SitesGateway, create_railway_app
 
 KEY = 'test-only-gateway-key-' + 'x' * 32
 ORIGIN = 'https://private-site.example'
-HEADERS = {'X-Consensus-Gateway-Key': KEY, 'Origin': ORIGIN}
+HEADERS = {'X-Consensus-Gateway-Key': KEY, 'Origin': ORIGIN, 'X-Consensus-Visitor': 'a' * 64}
 
 
 def test_gateway_protects_http_and_websocket_and_preserves_identity(tmp_path):

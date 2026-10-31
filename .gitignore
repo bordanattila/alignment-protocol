@@ -15,3 +15,16 @@ data/
 *.sqlite3-wal
 *.sqlite3-shm
 *.sqlite3.lock
+
+# Operator backups must never enter a source upload.
+operator-backups/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db-wal
+*.db-shm
+
+# Private operator approvals and production-backup evidence stay local.
+docs/MILESTONE_10_0_DEPLOYMENT_AUTHORIZATION.md
+docs/evidence/milestone_10_0/offdisk_backup_2026_10_31.json

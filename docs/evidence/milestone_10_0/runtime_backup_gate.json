@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-30",
+  "base_commit": "a486417fed5e2c452305afcbfc72a65683f222ca",
+  "deployment_performed": false,
+  "commit_or_push_performed": false,
+  "resources_created": false,
+  "secrets_rotated": false,
+  "production_data_restored_or_overwritten": false,
+  "production_runtime_verified": false,
+  "production_backup_created": false,
+  "production_integrity_check_completed": false,
+  "production_isolated_restore_completed": false,
+  "off_disk_backup_retention_verified": false,
+  "production_gate": "pending existing operator SSH key connection and owner encrypted destination",
+  "sqlite": {
+    "version": "3.51.3",
+    "source_id": "2026-03-13 10:38:09 737ae4a34738ffa0c3ff7f9bb18df914dd1cad163f28fd6b6e114a344fe6d618",
+    "archive_sha256": "81f5be397049b0cae1b167f2225af7646fc0f82e4a9b3c48c9ea3a533e21d77a",
+    "amalgamation_sha3_256": "32d5424f97e0a7fc5ed2f6335afbb58be4e0298bd7117a34e39d345ff13d859e",
+    "python_dynamic_library": "/opt/sqlite/lib/libsqlite3.so.0",
+    "python_threadsafety": 3,
+    "debian_deb13u2_walreset_patch_present": false
+  },
+  "checks": {
+    "patched_container_backend_tests": 704,
+    "relay_tests": 8,
+    "memory_limit_mib": 512,
+    "cpu_limit": 0.5,
+    "synthetic_old_container_backup_and_compatibility": {
+      "old_runtime": "3.46.1",
+      "patched_runtime": "3.51.3",
+      "missions": 3,
+      "results": 10,
+      "old_container_online_backup": "ok",
+      "isolated_restore": "identical_all_rows",
+      "source_rows_unchanged": true,
+      "patched_read_write_compatible": true,
+      "old_application_rollback_read_write_compatible": true,
+      "production_data_used": false
+    },
+    "patched_container_gateway_backup_restart": {
+      "passed": true,
+      "memory_limit_mib": 512,
+      "cpu_limit": 0.5,
+      "checks": [
+        "strict_gateway_identity",
+        "independent_visitor_quotas",
+        "forwarded_header_spoof_rejected",
+        "private_roles",
+        "online_backup",
+        "isolated_restore",
+        "container_restart_persistence"
+      ]
+    },
+    "live_checks_after_deployment": "not_run; deployment forbidden",
+    "baseline_commit_app_with_patched_sqlite_rollback_read_write": "passed"
+  },
+  "site_access_readonly": {
+    "mode": "custom",
+    "allowed_users": 1,
+    "external_visitors": 0
+  },
+  "source_sha256": {
+    "Dockerfile": "a7c858d96a0e10118da8d4edecd0099fb3fdbbcf70e17ece9b645212caec994b",
+    "deploy/backup_current.py": "0fdfd1d82a868f2d75983f39326e6f65f137ad22a61ecbb10d39e63cc48cdfdf",
+    "backend/tests/test_deployed_backup.py": "c37bce855a99dfd8492cc128b3436d1d41fa217a1b8eba5066f5ee016bd66321"
+  },
+  "local_image_ids": {
+    "consensus-engine-sqlite-fixed:local": "sha256:a5b32b2f42192ad303e4668752c7818d1bbdcd07d9c4383a328cc36b07b6a46d",
+    "consensus-engine-rollback-sqlite-fixed:local": "sha256:356014aca3a05984c86d0f6bc1d599f2f9f957c892a629491876c5be6bde2d34"
+  },
+  "real_provider_requests": 0,
+  "notes": [
+    "Compatibility preserved immutable result-index rows and aggregate meaning. Acknowledged-result set serialization order can differ between Python processes.",
+    "Synthetic backup rehearsal is not a production backup.",
+    "Earlier test invocation had missing repository fixture paths; rerun with full read-only repository mount and correct working directory passed all 704 tests."
+  ]
+}

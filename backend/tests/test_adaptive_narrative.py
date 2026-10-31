@@ -224,7 +224,7 @@ def test_storage_failure_reuses_story_without_a_second_inference_and_snapshot_is
     async def run():
         path=tmp_path/'storage.sqlite3';store,mission,credentials,clock,live=await completed(path)
         provider=StoryProvider();end=coordinator(store,live,provider);save=store.persistence.save
-        def broken(mission):raise PersistenceError('temporary')
+        def broken(mission, **_metadata):raise PersistenceError('temporary')
         monkeypatch.setattr(store.persistence,'save',broken)
         await launch(end);await settle(end)
         assert mission.conclusion.status=='pending' and len(provider.requests)==1

@@ -88,7 +88,10 @@ async def settle(live):
 
 
 def test_mode_api_defaults_availability_and_validation():
-    with TestClient(create_app()) as client:
+    from app.safety import SafetySettings
+    # This test exercises invalid mode combinations in a burst; abuse thresholds
+    # are tested separately with the actual production defaults.
+    with TestClient(create_app(safety_settings=SafetySettings(create_per_10min=20))) as client:
         assert client.get('/api/capabilities').json() == {'generated_missions':False}
         response = client.post('/api/missions',json={'callsign':'Legacy'})
         assert response.status_code == 201
@@ -265,7 +268,7 @@ def test_transient_admission_storage_failure_retains_result_without_regeneration
     async def exercise():
         provider=ProgressiveProvider();store,mission,credentials,clock,live=setup(tmp_path/'storage.sqlite3',provider)
         save=store.persistence.save
-        def broken(mission):raise PersistenceError('safe test failure')
+        def broken(mission, **_metadata):raise PersistenceError('safe test failure')
         monkeypatch.setattr(store.persistence,'save',broken)
         await launch(live);await settle(live)
         assert mission.phase==Phase.PREPARING and len(provider.requests)==1 and not mission.sequence

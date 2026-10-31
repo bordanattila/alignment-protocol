@@ -3,7 +3,7 @@ import asyncio
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from .missions import MissionStore
+from .missions import MissionStore, MissionError
 from .persistence import PersistenceError
 
 
@@ -16,16 +16,21 @@ async def close_socket(socket: WebSocket, code: int = 1008, reason: str = ""):
 
 
 class LobbyConnections:
-    def __init__(self, store: MissionStore, lock: asyncio.Lock | None = None):
+    def __init__(self, store: MissionStore, lock: asyncio.Lock | None = None, max_per_seat: int = 3):
         self.store = store
         self.lock = lock or asyncio.Lock()
         self.delivery_lock = asyncio.Lock()
+        self.delivery_locks: dict[str, asyncio.Lock] = {}
         self.pending: set[str] = set()
         self.sockets: dict[str, dict[str, set[WebSocket]]] = {}
+        self.max_per_seat = max_per_seat
 
     def add(self, token: str, player_id: str, socket: WebSocket):
-        self.sockets.setdefault(token, {}).setdefault(player_id, set()).add(socket)
+        existing = self.sockets.get(token, {}).get(player_id, set())
+        if len(existing) >= self.max_per_seat:
+            raise MissionError('Too many connections for this seat.', 429, 'socket_capacity')
         self.store.set_connected(token, player_id, True)
+        self.sockets.setdefault(token, {}).setdefault(player_id, set()).add(socket)
 
     def remove(self, token: str, player_id: str, socket: WebSocket):
         players = self.sockets.get(token, {})
@@ -42,19 +47,20 @@ class LobbyConnections:
         # projections only after acquiring the delivery lock, preventing old
         # broadcasts from overtaking newer snapshots. Never await network under
         # the state lock. Failed sends republish corrected presence.
-        async with self.delivery_lock:
+        async with self.delivery_locks.setdefault(token, asyncio.Lock()):
             if retry_only and token not in self.pending:
                 return
             self.pending.discard(token)
             try:
-                while True:
+                # Churn must not hold a publisher indefinitely. A subsequent
+                # scheduler pass retries corrected state after two waves.
+                for _ in range(2):
                     async with self.lock:
                         self.store.bump_revision(token)
                         frames = [(player_id, socket, self.store.project(token, player_id))
                                   for player_id, sockets in self.sockets.get(token, {}).items()
                                   for socket in list(sockets)]
-                    failed = False
-                    for player_id, socket, state in frames:
+                    async def deliver(player_id, socket, state):
                         try:
                             await asyncio.wait_for(socket.send_json({
                                 "type": "state", "mission": state
@@ -63,10 +69,13 @@ class LobbyConnections:
                             async with self.lock:
                                 self.remove(token, player_id, socket)
                             await close_socket(socket, code=1011, reason="Connection interrupted")
-                            failed = True
+                            return True
+                        return False
+                    failed = any(await asyncio.gather(*(deliver(*frame) for frame in frames)))
                     if not failed:
                         self.pending.discard(token)
                         return
+                self.pending.add(token)
             except PersistenceError:
                 self.pending.add(token)
                 raise

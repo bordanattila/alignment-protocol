@@ -3,11 +3,16 @@ import secrets
 import hashlib
 import logging
 import time
+import shutil
+from dataclasses import replace
+from pathlib import Path
 from functools import wraps
 from collections.abc import Callable
 
 from .domain import Mission, Player, Phase, Role, VotingRound, Decision, ChatMessage, Crisis, CrisisResult, Metrics, MetricDeltas, PublicChoice, RecordedRound
 from .persistence import SQLiteMissions, credential_digest
+from .retention import MissionActivity
+from .safety import SafetySettings
 from .voting import plurality
 from .crises import load_crisis_sequence
 from .campaign import Campaign, initial_sequence, select_crisis, validate_catalog
@@ -31,10 +36,16 @@ def persisted(method):
     """Commit one complete outer intent, including an expired-phase rejection."""
     @wraps(method)
     def execute(self, *args, **kwargs):
-        if self.persistence is None or self._transaction_depth:
+        if self._transaction_depth:
             return method(self, *args, **kwargs)
+        if self.persistence is None:
+            result = method(self, *args, **kwargs)
+            token = result[0].token if method.__name__ == 'create' else (args[0] if args else kwargs.get('token'))
+            self._activity_after(method.__name__, token, result)
+            return result
         token = (args[0] if args else kwargs.get("token")) if method.__name__ != "create" else None
         before = self._missions[token].model_copy(deep=True) if token in self._missions else None
+        activity_before = replace(self.activity[token]) if token in self.activity else None
         keys = set(self._missions)
         self._transaction_depth += 1
         rejection = None
@@ -44,12 +55,20 @@ def persisted(method):
             except MissionError as error:
                 rejection = error
             changed = self._missions.get(token) if token else next((m for k,m in self._missions.items() if k not in keys), None)
-            if changed is not None and (before is None or self.persistence.payload(changed) != self.persistence.payload(before)):
-                self.persistence.save(changed)
+            if changed is not None:
+                self._activity_after(method.__name__ if rejection is None else '_transition',
+                                     changed.token, result if rejection is None else None)
+                activity = self.activity.get(changed.token)
+                if (before is None or self.persistence.payload(changed) != self.persistence.payload(before)
+                        or activity != activity_before):
+                    self.persistence.save(changed, activity=activity)
         except Exception:
             if before is not None:
                 self._missions[token].__dict__.update(before.__dict__)
-            for key in set(self._missions)-keys: del self._missions[key]
+                if activity_before is not None: self.activity[token] = activity_before
+            for key in set(self._missions)-keys:
+                del self._missions[key]
+                self.activity.pop(key, None)
             raise
         finally:
             self._transaction_depth -= 1
@@ -63,7 +82,8 @@ class MissionStore:
                  crisis_loader: Callable[[], list[Crisis]] = load_crisis_sequence,
                  persistence: SQLiteMissions | None = None,
                  campaign_loader: Callable[[], list[Scenario]] | None = None,
-                 generation_enabled: bool = False):
+                 generation_enabled: bool = False,
+                 safety_settings: SafetySettings | None = None):
         self.persistence = persistence
         self._transaction_depth = 0
         self.clock = clock
@@ -71,12 +91,56 @@ class MissionStore:
         self.campaign_loader = campaign_loader
         self.generation_enabled = generation_enabled
         self._missions: dict[str, Mission] = {}
+        self.activity: dict[str, MissionActivity] = {}
+        self.safety_settings = safety_settings
+
+    def _activity_after(self, action, token, result):
+        if token not in self._missions:
+            return
+        mission = self._missions[token]
+        now = self.clock()
+        activity = self.activity.setdefault(token, MissionActivity(now, now))
+        if action in {'create', 'join', 'start', 'begin_discussion', 'vote', 'continue_mission',
+                      'retry_generation', 'send_chat', 'set_connected'} and result is not False:
+            activity.last_activity = max(activity.last_activity, now)
+        if mission.phase in (Phase.COMPLETED, Phase.FAILED) and activity.finalized_at is None:
+            activity.finalized_at = max(activity.last_activity, now)
+
+    def cleanup_expired(self):
+        """Caller holds the same state lock as membership and accepted intents."""
+        settings = self.safety_settings
+        if settings is None:
+            return []
+        now = self.clock()
+        expired = []
+        for token, mission in self._missions.items():
+            if any(p.connected for p in mission.players):
+                continue
+            activity = self.activity[token]
+            if mission.phase in (Phase.COMPLETED, Phase.FAILED):
+                ttl = settings.completed_retention_seconds
+            elif mission.phase == Phase.LOBBY:
+                ttl = settings.lobby_retention_seconds
+            else:
+                ttl = settings.unfinished_retention_seconds
+            last = max(activity.last_activity, activity.finalized_at or activity.last_activity)
+            if now - last >= ttl:
+                expired.append(token)
+            if len(expired) >= settings.cleanup_batch:
+                break
+        if expired and self.persistence is not None:
+            self.persistence.delete_expired(expired)
+        for token in expired:
+            del self._missions[token]
+            del self.activity[token]
+        return expired
 
     def initialize(self):
         if self.persistence is None: return
         self.persistence.open()
         try:
             self._missions = self.persistence.load()
+            self.activity = self.persistence.load_activity(self._missions, self.clock())
             for mission in self._missions.values():
                 for player in mission.players: player.connected = False
                 if mission.conclusion and mission.conclusion.status == 'pending':
@@ -153,7 +217,19 @@ class MissionStore:
         return self._missions[token]
 
     @persisted
-    def create(self, callsign: str, mode: str = 'authored') -> tuple[Mission, Player]:
+    def create(self, callsign: str, mode: str = 'authored', creator_key: str = '') -> tuple[Mission, Player]:
+        settings = self.safety_settings
+        if settings is not None:
+            if len(self._missions) >= settings.missions_total:
+                raise MissionError('Mission capacity reached. Try again later.', 503, 'mission_capacity')
+            if creator_key and sum(a.creator == creator_key for a in self.activity.values()) >= settings.missions_per_creator:
+                raise MissionError('Too many retained missions for this visitor. Try again later.', 429, 'creator_capacity')
+            if self.persistence is not None and self.persistence.path != ':memory:':
+                path = Path(self.persistence.path)
+                size = sum(p.stat().st_size for p in (path, Path(str(path) + '-wal')) if p.exists())
+                if (size >= settings.database_max_bytes
+                        or shutil.disk_usage(path.parent).free < settings.disk_reserve_bytes):
+                    raise MissionError('Mission storage capacity reached. Try again later.', 503, 'storage_capacity')
         if mode not in ('authored', 'generated'):
             raise MissionError('Choose a supported mission mode.', 422)
         if mode == 'generated' and not self.generation_enabled:
@@ -161,6 +237,7 @@ class MissionStore:
         player = self._player(callsign)
         mission = Mission(token=secrets.token_urlsafe(24), host_id=player.id, players=[player], mode=mode)
         self._missions[mission.token] = mission
+        self.activity[mission.token] = MissionActivity(self.clock(), self.clock(), creator=creator_key)
         return mission, player
 
     @persisted
@@ -260,8 +337,14 @@ class MissionStore:
     def mission_tokens(self) -> tuple[str, ...]:
         return tuple(self._missions)
 
+    def is_due(self, token: str) -> bool:
+        mission = self.get(token)
+        deadline = (mission.recovery_deadline if mission.phase == Phase.RECONNECT_WAIT
+                    and mission.recovery_phase == Phase.VOTING else mission.deadline)
+        return deadline is not None and self.clock() >= deadline
+
     def advance_all_due(self) -> list[str]:
-        return [token for token in self._missions if self.advance_due(token)]
+        return [token for token in self._missions if self.is_due(token) and self.advance_due(token)]
 
     def _open_vote(self, mission: Mission):
         mission.phase = Phase.VOTING

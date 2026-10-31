@@ -1,0 +1,166 @@
+{
+  "date": "2026-10-30",
+  "base_commit": "a486417fed5e2c452305afcbfc72a65683f222ca",
+  "deployed": false,
+  "live_database_accessed": false,
+  "paid_provider_requests": 0,
+  "before": {
+    "backend_passed": 673,
+    "frontend_passed": 105,
+    "frontend_skipped": 4,
+    "relay_passed": 5
+  },
+  "after": {
+    "backend_passed": 700,
+    "focused_safety_passed": 27,
+    "frontend_passed": 109,
+    "frontend_skipped": 0,
+    "relay_passed": 8,
+    "production_frontend_build": "passed",
+    "pip_check": "passed"
+  },
+  "browser": {
+    "status": "completed",
+    "findings": 0,
+    "headless": true,
+    "mode": "realistic-delay-acceptance",
+    "real_provider_requests": 0
+  },
+  "fast_browser": {
+    "status": "completed",
+    "findings": 0,
+    "headless": true,
+    "mode": "fast-fake-regression",
+    "real_provider_requests": 0
+  },
+  "network": [
+    {
+      "check": "smoke_milestone7",
+      "exit_code": 0,
+      "seconds": 4.47
+    },
+    {
+      "check": "smoke_live_generation",
+      "exit_code": 0,
+      "seconds": 3.02
+    },
+    {
+      "check": "smoke_adaptive_narrative",
+      "exit_code": 0,
+      "seconds": 9.03
+    },
+    {
+      "check": "smoke_milestone5",
+      "exit_code": 0,
+      "seconds": 46.28
+    },
+    {
+      "check": "smoke_milestone6",
+      "exit_code": 0,
+      "seconds": 46.32
+    },
+    {
+      "check": "smoke_milestone8",
+      "exit_code": 0,
+      "seconds": 3.75
+    },
+    {
+      "check": "smoke_railway",
+      "exit_code": 0,
+      "seconds": 3.58
+    },
+    {
+      "check": "smokeReconnection",
+      "exit_code": 0,
+      "seconds": 11.04
+    }
+  ],
+  "container": {
+    "passed": true,
+    "memory_limit_mib": 512,
+    "cpu_limit": 0.5,
+    "checks": [
+      "strict_gateway_identity",
+      "independent_visitor_quotas",
+      "forwarded_header_spoof_rejected",
+      "private_roles",
+      "online_backup",
+      "isolated_restore",
+      "container_restart_persistence"
+    ]
+  },
+  "capacity": {
+    "missions": 200,
+    "database": {
+      "database_bytes": 18092032,
+      "wal_bytes": 4190072,
+      "logical_bytes": 18092032,
+      "reusable_bytes": 0,
+      "warning": false
+    },
+    "aggregate_payload_bytes": 17818547,
+    "peak_process_rss_kib": 107052,
+    "elapsed_seconds": 1.886
+  },
+  "historical_files_verified_unchanged": 608,
+  "proposed_defaults": {
+    "http_body_bytes": 4096,
+    "websocket_bytes": 4096,
+    "body_timeout_seconds": 5,
+    "http_concurrent": 32,
+    "sockets_total": 128,
+    "sockets_per_visitor": 16,
+    "sockets_per_seat": 3,
+    "limiter_keys": 4096,
+    "create_per_10min": 5,
+    "create_global_per_minute": 30,
+    "joins_per_minute": 30,
+    "http_per_minute": 120,
+    "ws_attempts_per_minute": 60,
+    "ws_global_per_minute": 300,
+    "frames_per_10sec": 30,
+    "chat_per_10sec": 10,
+    "missions_total": 200,
+    "missions_per_creator": 8,
+    "database_max_bytes": 268435456,
+    "disk_reserve_bytes": 67108864,
+    "lobby_retention_seconds": 86400,
+    "unfinished_retention_seconds": 604800,
+    "completed_retention_seconds": 2592000,
+    "cleanup_interval_seconds": 60,
+    "cleanup_batch": 10,
+    "startup_cleanup_grace_seconds": 300
+  },
+  "changed_files": [
+    ".gitignore",
+    "Dockerfile",
+    "backend/app/backup.py",
+    "backend/app/connections.py",
+    "backend/app/main.py",
+    "backend/app/missions.py",
+    "backend/app/persistence.py",
+    "backend/app/railway.py",
+    "backend/app/retention.py",
+    "backend/app/safety.py",
+    "backend/tests/test_adaptive_narrative.py",
+    "backend/tests/test_durable_generation_diagnostics.py",
+    "backend/tests/test_generation_diagnostics.py",
+    "backend/tests/test_generation_responsiveness.py",
+    "backend/tests/test_live_generation.py",
+    "backend/tests/test_persistence.py",
+    "backend/tests/test_public_safety.py",
+    "backend/tests/test_railway_deployment.py",
+    "deploy/sites/worker.mjs",
+    "deploy/sites/worker.test.mjs",
+    "docs/MILESTONE_10_0_PUBLIC_SAFETY.md",
+    "docs/evidence/milestone_10_0/commands.json",
+    "docs/evidence/milestone_10_0/verification.json"
+  ],
+  "warnings": [
+    "Existing Starlette/httpx deprecation",
+    "SQLite vendor backport status requires verification before public rollout"
+  ],
+  "public_access_activated": false,
+  "new_commits": 0,
+  "pushes": 0
+}
