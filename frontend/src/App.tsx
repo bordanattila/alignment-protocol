@@ -6,16 +6,28 @@ import { ActiveGameplay, ChatPanel, ResponseOptions, phaseLabel } from './Gamepl
 import { MissionReview } from './MissionReview';
 import { ConnectionNotice, PlayerPresence } from './MissionPresence';
 import { useLobby } from './useLobby';
-import { MissionEntryRequest, generatedMissionsAvailable } from './missionEntry';
+import { GameRequestError, MissionEntryRequest, generatedMissionsAvailable } from './missionEntry';
 import { MissionEntryForm } from './MissionEntryForm';
+import { useAccess } from './useAccess';
+import { missionInvite, safeReturnPath } from './access';
+import { AccessPage, SeatControls } from './AccessExperience';
+import { DataPrivacy, PublicInformation } from './PublicInformation';
 import type { Session, MissionMode } from './types';
 
-const inviteToken = new URLSearchParams(location.search).get('mission');
 const metricNames: Record<string, string> = {
   infrastructure: 'Infrastructure', public_trust: 'Public Trust', economy: 'Economy', safety: 'Safety',
 };
 
 export default function App() {
+  const access = useAccess();
+  const invite = missionInvite(location.search);
+  const returnTo = safeReturnPath('/' + location.search);
+  if (access.state !== 'signedIn' || invite.invalid) return <AccessPage state={access.state} refresh={access.refresh} returnTo={returnTo} invalidInvite={invite.invalid} />;
+  return <Game checkAccess={access.refresh} inviteToken={invite.token} />;
+}
+
+function Game({ checkAccess, inviteToken }: { checkAccess: () => Promise<boolean | null>; inviteToken: string | null }) {
+  const returnTo = safeReturnPath('/' + location.search);
   const [session, setSession] = useState<Session | null>(() => restoreSession(inviteToken));
   const [callsign, setCallsign] = useState('');
   const [mode, setMode] = useState<MissionMode>('authored');
@@ -30,8 +42,17 @@ export default function App() {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const entryRequest = useRef(new MissionEntryRequest());
-  const { mission, status, rejected, sendIntent, actionError, clockSample, connected = status === 'Connected' } = useLobby(session);
+  const { mission, status, rejected, sendIntent, actionError, clockSample, disconnect, connected = status === 'Connected' } = useLobby(session, checkAccess);
   const activeMission = mission != null && mission.phase !== 'lobby';
+  useEffect(() => {
+    const forgotten = (event: StorageEvent) => {
+      if (session && (event.key === null || (event.key === `consensus.session.${session.token}` && event.newValue === null))) {
+        disconnect?.(); setSession(null); void checkAccess();
+      }
+    };
+    window.addEventListener('storage', forgotten);
+    return () => window.removeEventListener('storage', forgotten);
+  }, [session?.token, checkAccess]);
   const crisisHeading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     if (mission?.phase !== 'briefing') return;
@@ -56,6 +77,7 @@ export default function App() {
       history.replaceState(null, '', `?mission=${encodeURIComponent(result.token)}`);
       setSession(result);
     } catch (cause) {
+      if (cause instanceof GameRequestError && cause.status === 401) await checkAccess();
       setError(cause instanceof Error ? cause.message : 'Unable to connect. Please try again.');
     } finally { setBusy(false); }
   }
@@ -70,6 +92,7 @@ export default function App() {
         body: action === 'continue' ? JSON.stringify({ result_id: mission?.result?.id }) : undefined,
       });
       if (!response.ok) {
+        if (response.status === 401) await checkAccess();
         const result = await response.json();
         throw new Error(typeof result.detail === 'string' ? result.detail : 'Unable to update mission.');
       }
@@ -80,21 +103,23 @@ export default function App() {
 
   async function copyInvite() {
     try {
-      await navigator.clipboard.writeText(location.href);
+      await navigator.clipboard.writeText(new URL(returnTo, location.origin).href);
       setCopied(true);
     } catch { setError('Copy the invite URL from the field below.'); }
   }
 
   if (mission?.summary && (mission.phase === 'completed' || mission.phase === 'failed')) return <main className="active-mission">
     <header><a className="brand" href="/">CE <span>Consensus Engine</span></a></header>
+    <SeatControls signedIn returnTo={returnTo} onForget={signingOut => { disconnect?.(); setSession(null); if (!signingOut) location.assign('/'); }} />
     <ConnectionNotice status={status} connected={connected} />
     <PlayerPresence mission={mission} connected={connected} />
-    <MissionReview mission={mission} />
+    <MissionReview mission={mission} /><DataPrivacy />
     <footer><a href="/">Return to mission creation</a><span>Collective judgment. Shared consequences.</span></footer>
   </main>;
 
   return <main className={activeMission ? 'active-mission' : undefined}>
     <header><a className="brand" href="/">CE <span>Consensus Engine</span></a><span className="badge">v0.1 · Collective decision</span></header>
+    <SeatControls signedIn returnTo={returnTo} onForget={signingOut => { disconnect?.(); setSession(null); if (!signingOut) location.assign('/'); }} />
     {session && <ConnectionNotice status={status} connected={connected} />}
     {mission && <PlayerPresence mission={mission} connected={connected} />}
     {activeMission ? <section className="mission-header" aria-label="Current mission">
@@ -110,7 +135,7 @@ export default function App() {
     {!session ? <section className="panel entry">
       <div><p className="eyebrow">{inviteToken ? 'Mission invitation' : 'Assemble your team'}</p>
         <h2>{inviteToken ? 'Join the mission' : 'Open a mission'}</h2>
-        <p>Bring 2–4 people into a shared operations room. No account required.</p></div>
+        <p>Bring 2–4 people into a shared operations room. Sign in with ChatGPT to play. No separate game account or password.</p></div>
       <MissionEntryForm callsign={callsign} busy={busy} error={error} joining={Boolean(inviteToken)} onCallsign={setCallsign} onSubmit={enter}
         mode={mode} onMode={setMode} generatedAvailable={generatedAvailable} />
     </section> : <section className="lobby-grid">
@@ -137,7 +162,7 @@ export default function App() {
           </li>)}</ul>}
           {mission.phase === 'lobby' && <><button onClick={copyInvite}>{copied ? 'Invite link copied' : 'Copy Invite Link'}</button>
           <label className="invite-label" htmlFor="invite">Mission invite</label>
-          <input id="invite" value={location.href} readOnly onFocus={event => event.target.select()} /></>}
+          <input id="invite" value={new URL(returnTo, location.origin).href} readOnly onFocus={event => event.target.select()} /></>}
         </> : <p role="status">{rejected ? 'This session is unavailable. Check your invite or ask the host to restore access.' : 'Restoring your mission seat…'}</p>}
         {rejected && <button onClick={() => { clearSession(session.token); location.assign('/'); }}>Return to mission creation</button>}
       </div>
@@ -152,6 +177,7 @@ export default function App() {
     {mission && (mission.phase === 'reconnect_wait' || mission.phase === 'voting' || mission.phase === 'decision_locked' || mission.phase === 'failed' || mission.phase === 'completed') && <div className="chat-archive"><ChatPanel mission={mission} connected={connected} sendIntent={sendIntent} /></div>}
     {session && error && <p className="error" role="alert">{error}</p>}
     <section className="scope"><span className="eyebrow">Mission protocol</span><p>Combine your information, decide together, and carry the consequences across ten crises.</p></section>
+    {!session && <PublicInformation />}<DataPrivacy />
     <footer>Consensus Engine <span>Collective judgment. Shared consequences.</span></footer>
   </main>;
 }

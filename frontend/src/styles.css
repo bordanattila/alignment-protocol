@@ -25,6 +25,17 @@ form button { width: 100%; margin-top: 14px; }
 button:hover { background: #c5f3e6; }
 button:disabled { opacity: .5; cursor: wait; }
 :focus-visible { outline: 3px solid #e3c37c; outline-offset: 3px; }
+.access-panel, .public-instructions, .data-privacy { margin: 24px 0; }
+.access-panel a, .seat-controls a, .data-privacy a { color: #a2dfce; overflow-wrap: anywhere; }
+.primary-link { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 22px; border: 1px solid #91cabb; border-radius: 5px; font-weight: 650; }
+.secondary { background: #24373e; color: #e6eeef; border: 1px solid #70868d; }
+.secondary:hover { background: #354c55; }
+.seat-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin: 16px 0; }
+.seat-controls a { display: inline-flex; align-items: center; min-height: 48px; }
+.public-instructions li { margin: 12px 0; color: #b6c7cd; line-height: 1.65; }
+.data-privacy summary { min-height: 48px; cursor: pointer; font-size: 17px; line-height: 1.5; color: #e6eeef; }
+.data-privacy p, .access-panel p { overflow-wrap: anywhere; }
+.release-dependency { border-left: 3px solid #e3c37c; padding-left: 14px; }
 .lobby-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
 .players { list-style: none; padding: 0; margin: 24px 0; }
 .players li { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-top: 1px solid #34474f; gap: 12px; }

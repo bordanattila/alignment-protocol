@@ -10,6 +10,49 @@ const request = (path, options = {}) => {
   return new Request(origin + path, { ...options, headers });
 };
 
+test('access status is relay-local, no-store and boolean only, including anonymous visitors', async () => {
+  const worker = createWorker({}, () => assert.fail('Access status must not reach Render'));
+  for (const [headers, expected] of [[{}, false], [{'oai-authenticated-user-email':'display@example.test'}, false],
+    [{'oai-authenticated-user-id':'site-scoped-fixture'},true], [{'oai-authenticated-user-id':'x'.repeat(257)},false]]) {
+    const response=await worker.fetch(new Request(origin+'/api/access?identity=ignored',{headers}),{});
+    assert.equal(response.status,200);
+    assert.equal(response.headers.get('Cache-Control'),'no-store');
+    assert.deepEqual(await response.json(),{signedIn:expected});
+  }
+  assert.equal((await worker.fetch(request('/api/access',{method:'POST'}),env)).status,405);
+  assert.equal((await worker.fetch(request('/api/access',{headers:{Upgrade:'websocket'}}),env)).status,405);
+  assert.equal((await worker.fetch(request('/api/access',{headers:{Origin:'https://foreign.example'}}),env)).status,403);
+});
+
+test('fixture dispatch strips caller identity before injecting its authenticated context (not hosted-dispatch proof)', async () => {
+  const seen=[];
+  const worker=createWorker({},async (_url,options)=>{seen.push(options.headers);return Response.json({});});
+  const dispatch=async (identity,options={})=>{
+    const headers=new Headers(options.headers);
+    for(const name of ['oai-authenticated-user-id','oai-authenticated-user-email','oai-authenticated-user-full-name'])headers.delete(name);
+    if(identity)headers.set('oai-authenticated-user-id',identity);
+    return worker.fetch(new Request(origin+'/api/capabilities',{...options,headers}),env);
+  };
+  const spoof={headers:{'oai-authenticated-user-id':'victim','oai-authenticated-user-email':'victim@example.test',
+    'X-Consensus-Visitor':'b'.repeat(64),'X-Forwarded-For':'spoofed'}};
+  assert.equal((await dispatch(null,spoof)).status,401);assert.equal(seen.length,0);
+  assert.equal((await dispatch('real-account',spoof)).status,200);
+  assert.equal((await dispatch('real-account')).status,200);
+  assert.equal(seen[0].get('X-Consensus-Visitor'),seen[1].get('X-Consensus-Visitor'));
+  for(const name of ['oai-authenticated-user-id','oai-authenticated-user-email','X-Forwarded-For'])assert.equal(seen[0].get(name),null);
+});
+
+test('anonymous create, join and WSS all fail before upstream; auth paths remain dispatch-owned', async()=>{
+  const worker=createWorker({},()=>assert.fail());
+  for(const path of ['/api/missions','/api/missions/invite/join']) {
+    assert.equal((await worker.fetch(new Request(origin+path,{method:'POST',body:'{}'}),env)).status,401);
+  }
+  assert.equal((await worker.fetch(new Request(origin+'/api/missions/invite/ws',{headers:{Upgrade:'websocket',Origin:origin}}),env)).status,401);
+  for(const path of ['/signin-with-chatgpt','/signout-with-chatgpt','/callback']) {
+    assert.equal((await worker.fetch(new Request(origin+path),env)).status,404); // Hosting dispatch intercepts these before the Worker.
+  }
+});
+
 test('serves the retained frontend assets, including HEAD, without backend calls', async () => {
   const worker = createWorker({ '/': { body: btoa('<h1>Consensus Engine</h1>'), type: 'text/html' } }, () => assert.fail());
   assert.equal(await (await worker.fetch(request('/?mission=invite'), {})).text(), '<h1>Consensus Engine</h1>');

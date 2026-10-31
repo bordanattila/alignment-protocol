@@ -22,10 +22,23 @@ export function createWorker(assets, upstreamFetch = fetch) {
           'Referrer-Policy': 'same-origin',
         } });
       }
+      // Identity belongs to Sites dispatch, which MUST strip/overwrite caller
+      // identity headers. A direct Worker invocation is not an authenticated
+      // internet boundary. Public dispatch HTTP/WSS sanitization is a release
+      // gate; never deploy this Worker through an untrusted forwarding proxy.
+      const account = request.headers.get('oai-authenticated-user-id');
+      const signedIn = Boolean(account && account.trim() && account.length <= 256);
+      if (url.pathname === '/api/access') {
+        if (request.method !== 'GET' || request.headers.get('Upgrade')) return failure(405, 'Use a normal access-status request.');
+        const origin = request.headers.get('Origin');
+        if (origin && origin !== url.origin) return failure(403, 'Use the game site.');
+        return Response.json({ signedIn }, { headers: { 'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff' } });
+      }
       // Supplied by Sites' authenticated access layer, never by app JavaScript.
       // Keep the audience owner-private; this check does not replace its policy.
-      if (!request.headers.get('oai-authenticated-user-id')) {
-        return failure(401, 'Sign in to the private playtest site.');
+      if (!signedIn) {
+        return failure(401, 'Sign in with ChatGPT to play.');
       }
       const upgrade = request.headers.get('Upgrade')?.toLowerCase() === 'websocket';
       const permitted = (request.method === 'GET' && ['/api/health', '/api/capabilities'].includes(url.pathname))
@@ -57,8 +70,6 @@ export function createWorker(assets, upstreamFetch = fetch) {
       // Sites supplies this identity after authentication. Never forward a
       // visitor-selected proxy identity or IP header. HMAC prevents exporting
       // the raw account ID and scopes identifiers to this gateway secret.
-      const account = request.headers.get('oai-authenticated-user-id');
-      if (account.length > 256) return failure(403, 'Invalid visitor identity.');
       const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(env.CONSENSUS_GATEWAY_KEY),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
       const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode('visitor:' + account));

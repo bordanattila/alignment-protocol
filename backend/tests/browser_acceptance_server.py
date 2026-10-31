@@ -50,7 +50,7 @@ def fixture_app(directory: Path):
     # Explicit settings/provider ensure operator environment and real API keys
     # are never loaded or used by the served fixture application.
     app=create_app(clock=lambda:time.time()+float(clock_path.read_text()),database_path=directory/'missions.sqlite3',
-        generation_settings=GenerationSettings(enabled=True,model='fixture',timeout_seconds=60),
+        generation_settings=GenerationSettings(enabled=os.environ.get('CE_BROWSER_ACCESS_TEST')!='true',model='fixture',timeout_seconds=60),
         generation_provider=Provider())
 
     @app.post('/__acceptance/control')
@@ -81,7 +81,53 @@ def fixture_app(directory: Path):
         return response
     # create_app's catch-all static mount must remain after this test-only API.
     app.router.routes.insert(0, app.router.routes.pop())
-    return app
+    return LocalAccessFixture(app, os.environ.get('CE_BROWSER_ACCESS_TEST') == 'true')
+
+
+class LocalAccessFixture:
+    """Loopback TEST adapter; never copied into Docker's backend/app source.
+
+    Models dispatch sign-in/cancellation for UI acceptance, NOT real SIWC or
+    public-header sanitization. All real platform/network requests are blocked
+    by the browser harness. Existing gameplay tests use an explicitly signed-in
+    fixture; access tests require a local fake cookie. No production auth code.
+    """
+    def __init__(self, app, require_cookie):
+        self.app, self.require_cookie = app, require_cookie
+
+    async def __call__(self, scope, receive, send):
+        from http.cookies import SimpleCookie
+        from urllib.parse import parse_qs, urlencode, urlsplit
+        from html import escape
+        from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
+        import re
+        headers = dict(scope.get('headers', []))
+        cookie = SimpleCookie()
+        try: cookie.load(headers.get(b'cookie', b'').decode())
+        except Exception: pass
+        signed_in = not self.require_cookie or ('ce-local-account' in cookie and cookie['ce-local-account'].value in ('fixture-a', 'fixture-b'))
+        path = scope.get('path', '')
+        if scope['type'] == 'http':
+            if path == '/api/access':
+                return await JSONResponse({'signedIn': signed_in}, headers={'Cache-Control': 'no-store'})(scope, receive, send)
+            if path in ('/signin-with-chatgpt', '/signout-with-chatgpt', '/__local/confirm-signin'):
+                query = parse_qs(scope.get('query_string', b'').decode())
+                target = query.get('return_to', ['/'])[0]
+                parsed = urlsplit(target)
+                invite = parse_qs(parsed.query).get('mission', [])
+                target = '/?'+urlencode({'mission': invite[0]}) if target.startswith('/') and not target.startswith('//') and not parsed.netloc and parsed.path == '/' and len(invite)==1 and re.fullmatch('[A-Za-z0-9_-]{1,128}',invite[0]) else '/'
+                if path == '/signin-with-chatgpt':
+                    confirm = '/__local/confirm-signin?'+urlencode({'return_to': target})
+                    response = HTMLResponse('<h1>Local sign-in fixture</h1><a href="'+escape(confirm)+'">Confirm local sign-in</a> <a href="'+escape(target)+'">Cancel sign-in</a>')
+                else:
+                    response = RedirectResponse(target, status_code=303)
+                    if path == '/signout-with-chatgpt': response.delete_cookie('ce-local-account')
+                    else: response.set_cookie('ce-local-account', 'fixture-a', httponly=True, samesite='lax')
+                return await response(scope, receive, send)
+        if path.startswith('/api/') and not signed_in:
+            if scope['type'] == 'websocket': return await send({'type':'websocket.close','code':1008})
+            return await JSONResponse({'detail':'Sign in with ChatGPT to play.'}, status_code=401)(scope, receive, send)
+        return await self.app(scope, receive, send)
 
 
 if __name__=='__main__':

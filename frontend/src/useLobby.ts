@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MissionConnection, type ConnectionStatus } from './missionConnection';
 import type { ClockSample, LobbyState, MissionIntent, Session } from './types';
 
-export function useLobby(session: Session | null) {
+export function useLobby(session: Session | null, checkAccess?: () => Promise<boolean | null>) {
   const [mission, setMission] = useState<LobbyState | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>('Connecting');
   const [actionError, setActionError] = useState('');
@@ -25,11 +25,13 @@ export function useLobby(session: Session | null) {
           setClockSample({ serverNow: state.server_now, receivedAt: performance.now() });
         },
         error: setActionError,
+        checkAccess,
+        accessLost: () => setStatus('Sign in required'),
       });
     connectionRef.current = connection;
     connection.start();
     return () => { connection.stop(); connectionRef.current = null; };
-  }, [token, credential]);
+  }, [token, credential, checkAccess]);
   function sendIntent(intent: MissionIntent): boolean {
     setActionError('');
     if (connectionRef.current?.send(intent)) return true;
@@ -37,5 +39,6 @@ export function useLobby(session: Session | null) {
     return false;
   }
   return { mission, status, rejected: status === 'Session no longer recoverable',
-    connected: status === 'Connected' || status === 'Reconnected', sendIntent, actionError, clockSample };
+    connected: status === 'Connected' || status === 'Reconnected', sendIntent, actionError, clockSample,
+    disconnect: () => connectionRef.current?.stop() };
 }

@@ -15,7 +15,7 @@ class Socket {
   fail() { this.onerror?.({}); } // Actual regression: error with no close event.
   disconnect(code = 1006) { this.readyState = 3; this.onclose?.({code}); }
 }
-function fixture() {
+function fixture(access?: { checkAccess: () => Promise<boolean | null>; accessLost?: () => void }) {
   let now=0, id=0;
   const timers=new Map<number,{at:number;callback:()=>void}>();
   const sockets: Socket[]=[]; const statuses: string[]=[]; const frames: LobbyState[]=[];
@@ -27,7 +27,7 @@ function fixture() {
     cancel: (timer:any) => {timers.delete(timer);}, random:()=>0.5,
   };
   const connection=new MissionConnection({token:'mission',credential:'saved-secret'},'ws://example/api/missions/mission/ws',{
-    status:value=>statuses.push(value),snapshot:value=>frames.push(value),error:value=>errors.push(value),
+    status:value=>statuses.push(value),snapshot:value=>frames.push(value),error:value=>errors.push(value), ...access,
   },runtime);
   const next=()=>{
     const [key,timer]=[...timers].sort((a,b)=>a[1].at-b[1].at)[0];
@@ -38,6 +38,34 @@ function fixture() {
 }
 const snapshot=(revision:number,extra:Partial<LobbyState>={})=>({token:'mission',revision,phase:'discussion',chat:[],voting:null,...extra} as LobbyState);
 function ready(f:ReturnType<typeof fixture>,revision=1){const socket=f.sockets.at(-1)!;socket.open();socket.message(snapshot(revision));return socket;}
+async function settle(){for(let i=0;i<8;i++)await Promise.resolve();}
+
+test('expired Sites session stops repeated handshake retries without deleting the saved seat',async()=>{
+  let checks=0,lost=0;
+  const f=fixture({checkAccess:async()=>{checks++;return false;},accessLost:()=>lost++});
+  f.connection.start();
+  for(let i=0;i<2;i++){f.sockets.at(-1)!.fail();f.next();}
+  f.sockets.at(-1)!.fail();await settle();
+  assert.equal(checks,1);assert.equal(lost,1);assert.equal(f.timers.size,0);
+  assert.equal(f.statuses.at(-1),'Sign in required');
+  assert.equal(f.connection.send({type:'chat',text:'not authorized'}),false);
+});
+
+test('policy close with valid Sites access stays an invalid seat, not a sign-in loop',async()=>{
+  let lost=0;const f=fixture({checkAccess:async()=>true,accessLost:()=>lost++});
+  f.connection.start();ready(f).disconnect(1008);await settle();
+  assert.equal(f.statuses.at(-1),'Session no longer recoverable');assert.equal(lost,0);assert.equal(f.timers.size,0);
+});
+
+test('unknown auth/network result retries safely and obsolete auth probes cannot change a stopped connection',async()=>{
+  const f=fixture({checkAccess:async()=>null});f.connection.start();
+  ready(f).disconnect(1008);await settle();assert.equal(f.timers.size,1);f.next();ready(f,2);
+  assert.equal(f.statuses.at(-1),'Reconnected');f.connection.stop();
+  let resolve!: (value:boolean)=>void;let lost=0;
+  const g=fixture({checkAccess:()=>new Promise<boolean>(r=>resolve=r),accessLost:()=>lost++});
+  g.connection.start();ready(g).disconnect(1008);await settle();g.connection.stop();resolve(false);await settle();
+  assert.equal(lost,0);assert.equal(g.timers.size,0);
+});
 
 test('reconnect during preparation restores authoritative status and then the same ready crisis',()=>{
   const f=fixture();f.connection.start();const first=f.sockets[0];first.open();

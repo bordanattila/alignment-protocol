@@ -3,12 +3,14 @@ import type { LobbyState, MissionIntent, Session } from './types';
 
 export type ConnectionStatus = 'Connecting' | 'Connected' | 'Reconnected'
   | 'Connection lost — reconnecting' | 'Connection unavailable — continuing to retry'
-  | 'Session no longer recoverable';
+  | 'Session no longer recoverable' | 'Sign in required';
 
 type Callbacks = {
   status: (status: ConnectionStatus) => void;
   snapshot: (mission: LobbyState) => void;
   error: (message: string) => void;
+  checkAccess?: () => Promise<boolean | null>;
+  accessLost?: () => void;
 };
 type Runtime = {
   socket: (url: string) => WebSocket;
@@ -33,6 +35,7 @@ export class MissionConnection {
   private ready = false;
   private failures = 0;
   private interrupted = false;
+  private attempt = 0;
   private readonly snapshots = new SnapshotOrder();
 
   constructor(private session: Session, private url: string, private callbacks: Callbacks,
@@ -45,6 +48,7 @@ export class MissionConnection {
   }
 
   stop() {
+    this.attempt++;
     this.stopped = true;
     this.ready = false;
     this.clearTimers();
@@ -71,12 +75,31 @@ export class MissionConnection {
     this.interrupted = true;
     this.clearTimers();
     this.retireSocket();
-    if (terminal) {
-      this.stopped = true;
-      this.callbacks.status('Session no longer recoverable');
+    this.failures += 1;
+    if (this.callbacks.checkAccess && (terminal || this.failures >= 3)) {
+      const attempt = ++this.attempt;
+      this.callbacks.status('Connection unavailable — continuing to retry');
+      void Promise.resolve().then(() => this.callbacks.checkAccess!()).catch(() => null).then(access => {
+        if (this.stopped || this.attempt !== attempt) return;
+        if (access === false) {
+          this.stopped = true;
+          this.callbacks.status('Sign in required');
+          this.callbacks.accessLost?.();
+        } else if (terminal && access === true) this.rejectSeat();
+        else this.retryConnection();
+      });
       return;
     }
-    this.failures += 1;
+    if (terminal) { this.rejectSeat(); return; }
+    this.retryConnection();
+  }
+
+  private rejectSeat() {
+    this.stopped = true;
+    this.callbacks.status('Session no longer recoverable');
+  }
+
+  private retryConnection() {
     this.callbacks.status(this.failures >= 3
       ? 'Connection unavailable — continuing to retry' : 'Connection lost — reconnecting');
     // Equal jitter: 0.5–1s initially, capped at 5–10s. No retry limit.
@@ -89,6 +112,7 @@ export class MissionConnection {
 
   private connect() {
     if (this.stopped || this.socket) return;
+    this.attempt++;
     let socket: WebSocket;
     try { socket = this.runtime.socket(this.url); }
     catch { this.failed(); return; }
