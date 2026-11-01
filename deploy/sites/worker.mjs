@@ -7,6 +7,20 @@ const failure = (status, detail) => Response.json({ detail }, {
   status, headers: { 'Cache-Control': 'no-store' },
 });
 
+// Diagnostic-only parsing: never used to authorize gameplay. Reject ambiguous
+// combined headers; normalize only the email domain, not local-part aliases/case.
+function diagnosticIdentity(headers) {
+  const id = headers.get('oai-authenticated-user-id');
+  const email = headers.get('oai-authenticated-user-email');
+  const validId = id && id.length <= 256 && !/[\s,\x00-\x1f\x7f]/.test(id) ? id : null;
+  const validEmail = email && email.length <= 254 && /^[A-Za-z0-9.!#$%&'*+\/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?$/.test(email)
+    && email.split('@')[0].length <= 64 && !email.split('@')[0].startsWith('.')
+    && !email.split('@')[0].endsWith('.') && !email.includes('..')
+    && email.split('@')[1].split('.').every(label => label.length <= 63 && !label.startsWith('-') && !label.endsWith('-'))
+    ? email.slice(0, email.lastIndexOf('@') + 1) + email.slice(email.lastIndexOf('@') + 1).toLowerCase() : null;
+  return { id: validId, email: validEmail };
+}
+
 export function createWorker(assets, upstreamFetch = fetch) {
   return {
     async fetch(request, env) {
@@ -42,18 +56,23 @@ export function createWorker(assets, upstreamFetch = fetch) {
         const label = request.headers.get('X-Consensus-Canary-Case') ?? url.searchParams.get('case') ?? '';
         if (!/^[ab]-(http|ws)-(base|id|email|duplicate|mixed|proxy)$/.test(label)) return failure(400,'Use the approved probe.');
         if (!env.CONSENSUS_GATEWAY_KEY || env.CONSENSUS_GATEWAY_KEY.length < 32) return failure(503,'Probe unavailable.');
-        let fingerprint = null;
-        if (signedIn) {
-          const key = await crypto.subtle.importKey('raw',new TextEncoder().encode(env.CONSENSUS_GATEWAY_KEY),
-            {name:'HMAC',hash:'SHA-256'},false,['sign']);
-          const signature = await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(`canary:${canaryUntil}:${account}`));
-          fingerprint = [...new Uint8Array(signature)].map(b=>b.toString(16).padStart(2,'0')).join('');
-        }
-        // Operator-only diagnostic, scoped to this short window. No raw ID,
-        // email, cookie, seat secret, gateway key or backend visitor claim.
-        console.log(JSON.stringify({event:'consensus_security_canary',case:label,
-          transport:ws?'ws':'http',signedIn,fingerprint}));
-        return failure(signedIn ? 503 : 401,'Security verification only; gameplay admission is closed.');
+        const identity = diagnosticIdentity(request.headers);
+        const key = await crypto.subtle.importKey('raw',new TextEncoder().encode(env.CONSENSUS_GATEWAY_KEY),
+          {name:'HMAC',hash:'SHA-256'},false,['sign']);
+        const fingerprint = async (source, value) => {
+          if (!value) return null;
+          const input = JSON.stringify(['consensus-identity-diagnostic', 2, canaryUntil, source, value]);
+          const signature = await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(input));
+          return [...new Uint8Array(signature)].map(b=>b.toString(16).padStart(2,'0')).join('');
+        };
+        const idFingerprint = await fingerprint('sites-id', identity.id);
+        const emailFingerprint = await fingerprint('sites-email', identity.email);
+        // Operator-only, window-scoped pseudonyms. Never emit raw identity,
+        // caller headers, cookies, seats, key material or backend visitor claims.
+        console.log(JSON.stringify({event:'consensus_security_canary',diagnosticVersion:2,case:label,
+          transport:ws?'ws':'http',idPresent:Boolean(identity.id),emailValid:Boolean(identity.email),
+          idFingerprint,emailFingerprint}));
+        return failure(identity.id || identity.email ? 503 : 401,'Security verification only; gameplay admission is closed.');
       }
       if (url.pathname === '/api/access') {
         if (request.method !== 'GET' || request.headers.get('Upgrade')) return failure(405, 'Use a normal access-status request.');

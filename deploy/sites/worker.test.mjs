@@ -33,9 +33,9 @@ test('canary is time-limited, logs only scoped operator fingerprints and never s
       const r=await worker.fetch(request(path,{headers}),configured);assert.equal(r.status,503);
       const body=await r.text();assert.ok(!body.includes('authorized-test-visitor')&&!body.includes('fingerprint'));
     }
-    assert.equal(entries[0].fingerprint,null);
-    assert.equal(entries[1].fingerprint,entries[2].fingerprint);
-    assert.match(entries[1].fingerprint,/^[a-f0-9]{64}$/);
+    assert.equal(entries[0].idFingerprint,null);
+    assert.equal(entries[1].idFingerprint,entries[2].idFingerprint);
+    assert.match(entries[1].idFingerprint,/^[a-f0-9]{64}$/);
     assert.ok(!JSON.stringify(entries).includes(env.CONSENSUS_GATEWAY_KEY));
     assert.equal((await worker.fetch(request('/api/release-probe?case=a-ws-base',{headers:{Upgrade:'websocket',Origin:'https://foreign.example'}}),configured)).status,403);
     assert.equal((await worker.fetch(request('/api/release-probe?case=arbitrary-untrusted-log-value'),configured)).status,400);
@@ -190,4 +190,73 @@ test('relay preserves sanitized retry guidance for backend rate limiting', async
   const response = await worker.fetch(request('/api/capabilities'), env);
   assert.equal(response.status, 429);
   assert.equal(response.headers.get('Retry-After'), '15');
+});
+
+test('dual diagnostics separate emails despite a shared ID; both transports resist spoofing under a modeled sanitizing dispatch ONLY', async () => {
+  const worker=createWorker({},()=>assert.fail('Diagnostic must not reach Render'));
+  const configured={...env,CONSENSUS_ADMISSION_MODE:'canary',CONSENSUS_SECURITY_CANARY_UNTIL:String(Date.now()+300000)};
+  const attacks=[[],[['oai-authenticated-user-id','forged-id']],
+    [['oai-authenticated-user-email','forged@invalid.test'],['oai-authenticated-user-full-name','Forged']],
+    [['oai-authenticated-user-email','first@invalid.test'],['oai-authenticated-user-email','second@invalid.test']],
+    [['OaI-AuThEnTiCaTeD-UsEr-EmAiL','first@invalid.test'],['oai-authenticated-user-email','second@invalid.test']],
+    [['X-Consensus-Visitor','f'.repeat(64)],['X-Consensus-Gateway-Key','forged'],['Forwarded','for=192.0.2.1']]];
+  const entries=[];const log=console.log;console.log=value=>entries.push(JSON.parse(value));
+  try {
+    const groups={a:[],b:[]};let authenticated=0,anonymous=0;
+    for(const who of ['a','b',null])for(const transport of ['http','ws'])for(const attack of attacks) {
+      const headers=new Headers(attack);headers.set('Origin',origin);if(transport==='ws')headers.set('Upgrade','websocket');
+      // This is a deliberately modeled contract, NOT evidence about Sites.
+      for(const name of [...headers.keys()])if(name.startsWith('oai-authenticated-user-'))headers.delete(name);
+      if(who){headers.set('oai-authenticated-user-id','shared-workspace-fixture');headers.set('oai-authenticated-user-email',who+'@example.test');}
+      const response=await worker.fetch(new Request(origin+'/api/release-probe'+(transport==='ws'?'/ws':'')+'?case='+(who||'a')+'-'+transport+'-base',{headers}),configured);
+      assert.equal(response.status,who?503:401);assert.equal(response.headers.get('Cache-Control'),'no-store');
+      const body=await response.text();assert.ok(!body.includes('@')&&!body.includes('Fingerprint')&&!body.includes(env.CONSENSUS_GATEWAY_KEY));
+      const event=entries.at(-1);assert.equal(event.diagnosticVersion,2);assert.equal(event.transport,transport);
+      assert.equal(event.idPresent,Boolean(who));assert.equal(event.emailValid,Boolean(who));
+      if(who){groups[who].push(event);authenticated++;}else{assert.equal(event.idFingerprint,null);assert.equal(event.emailFingerprint,null);anonymous++;}
+    }
+    assert.equal(authenticated,24);assert.equal(anonymous,12);
+    for(const group of Object.values(groups))for(const field of ['idFingerprint','emailFingerprint']) {
+      assert.equal(new Set(group.map(x=>x[field])).size,1);assert.match(group[0][field],/^[a-f0-9]{64}$/);
+    }
+    assert.equal(groups.a[0].idFingerprint,groups.b[0].idFingerprint);
+    assert.notEqual(groups.a[0].emailFingerprint,groups.b[0].emailFingerprint);
+    const serialized=JSON.stringify(entries);
+    for(const secret of ['shared-workspace-fixture','a@example.test','b@example.test',env.CONSENSUS_GATEWAY_KEY,'forged@invalid.test'])assert.ok(!serialized.includes(secret));
+    // A new diagnostic window gets new pseudonyms; never compare across windows.
+    await worker.fetch(request('/api/release-probe?case=a-http-base',{headers:{'oai-authenticated-user-email':'a@example.test'}}),{...configured,CONSENSUS_SECURITY_CANARY_UNTIL:String(Number(configured.CONSENSUS_SECURITY_CANARY_UNTIL)+1)});
+    assert.notEqual(entries.at(-1).emailFingerprint,groups.a[0].emailFingerprint);
+  } finally {console.log=log;}
+});
+
+test('diagnostic email validation rejects ambiguity; HMAC namespaces differ; unsanitized headers remain forgeable',async()=>{
+  const worker=createWorker({},()=>assert.fail());
+  const configured={...env,CONSENSUS_ADMISSION_MODE:'canary',CONSENSUS_SECURITY_CANARY_UNTIL:String(Date.now()+300000)};
+  const entries=[];const log=console.log;console.log=value=>entries.push(JSON.parse(value));
+  const probe=async headers=>worker.fetch(new Request(origin+'/api/release-probe?case=a-http-base',{headers}),configured);
+  try {
+    for(const email of ['', 'not-an-email','a@example.test,b@example.test','a @example.test','a@example..test','a@-example.test','.a@example.test','a.@example.test','a'.repeat(65)+'@example.test','a@'+'b'.repeat(64)+'.test']) {
+      assert.equal((await probe({'oai-authenticated-user-email':email})).status,401);assert.equal(entries.at(-1).emailFingerprint,null);
+    }
+    for(const secondName of ['oai-authenticated-user-email','OaI-AuThEnTiCaTeD-UsEr-EmAiL']) {
+      const headers=new Headers();headers.append('oai-authenticated-user-email','a@example.test');headers.append(secondName,'b@example.test');
+      assert.equal((await probe(headers)).status,401);assert.equal(entries.at(-1).emailValid,false);
+    }
+    // Domain normalization is stable; local-part case/aliases are not collapsed.
+    await probe({'oai-authenticated-user-email':'A@EXAMPLE.TEST'});const first=entries.at(-1).emailFingerprint;
+    await probe({'oai-authenticated-user-email':'A@example.test'});assert.equal(entries.at(-1).emailFingerprint,first);
+    await probe({'oai-authenticated-user-email':'a@example.test'});assert.notEqual(entries.at(-1).emailFingerprint,first);
+    await probe({'oai-authenticated-user-id':'a@example.test','oai-authenticated-user-email':'a@example.test'});
+    assert.notEqual(entries.at(-1).idFingerprint,entries.at(-1).emailFingerprint);
+    // Negative control: direct invocation with caller email produces a pseudonym.
+    // HMAC does not authenticate the input. Dispatch sanitization is indispensable.
+    assert.equal((await probe({'oai-authenticated-user-email':'forged@example.test'})).status,503);
+    assert.equal(entries.at(-1).emailValid,true);
+    // Diagnostics do not silently change access-status or gameplay authorization.
+    const onlyEmail=new Request(origin+'/api/access',{headers:{'oai-authenticated-user-email':'a@example.test'}});
+    assert.deepEqual(await (await worker.fetch(onlyEmail,env)).json(),{signedIn:false});
+    assert.equal((await worker.fetch(new Request(origin+'/api/capabilities',{headers:{'oai-authenticated-user-email':'a@example.test'}}),env)).status,401);
+    assert.equal((await worker.fetch(request('/api/missions',{method:'POST',body:'{}'}),configured)).status,503);
+    assert.equal((await worker.fetch(request('/api/missions/token/ws',{headers:{Upgrade:'websocket',Origin:origin}}),configured)).status,503);
+  } finally {console.log=log;}
 });
