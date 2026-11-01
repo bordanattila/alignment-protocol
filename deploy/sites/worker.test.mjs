@@ -3,12 +3,45 @@ import assert from 'node:assert/strict';
 import { createWorker } from './worker.mjs';
 
 const origin = 'https://private-site.example';
-const env = { CONSENSUS_BACKEND_ORIGIN: 'https://backend.example', CONSENSUS_GATEWAY_KEY: 'test-only-' + 'x'.repeat(32) };
+const env = { CONSENSUS_BACKEND_ORIGIN: 'https://backend.example', CONSENSUS_GATEWAY_KEY: 'test-only-' + 'x'.repeat(32), CONSENSUS_ADMISSION_MODE:'public' };
 const request = (path, options = {}) => {
   const headers = new Headers(options.headers);
   headers.set('oai-authenticated-user-id', 'authorized-test-visitor');
   return new Request(origin + path, { ...options, headers });
 };
+
+test('admission fails closed for missing, invalid, closed, canary and expired settings without any upstream call',async()=>{
+  const worker=createWorker({},()=>assert.fail('Closed admission reached backend'));
+  for(const mode of [undefined,'closed','false','canary']) {
+    const configured={...env,CONSENSUS_ADMISSION_MODE:mode};
+    assert.equal((await worker.fetch(request('/api/missions',{method:'POST',body:'{}'}),configured)).status,503);
+    assert.equal((await worker.fetch(request('/api/missions/token/ws',{headers:{Upgrade:'websocket',Origin:origin}}),configured)).status,503);
+    assert.deepEqual(await (await worker.fetch(request('/api/access'),configured)).json(),{signedIn:true});
+  }
+  assert.equal((await worker.fetch(request('/api/release-probe'),{...env,CONSENSUS_ADMISSION_MODE:'canary',CONSENSUS_SECURITY_CANARY_UNTIL:String(Date.now()-1)})).status,404);
+});
+
+test('canary is time-limited, logs only scoped operator fingerprints and never sends a game request',async()=>{
+  const worker=createWorker({},()=>assert.fail('Canary reached backend'));
+  const configured={...env,CONSENSUS_ADMISSION_MODE:'canary',CONSENSUS_SECURITY_CANARY_UNTIL:String(Date.now()+600000)};
+  const entries=[];const log=console.log;console.log=value=>entries.push(JSON.parse(value));
+  try {
+    const anon=await worker.fetch(new Request(origin+'/api/release-probe?case=a-http-base'),configured);
+    assert.equal(anon.status,401);
+    for(const [path,headers] of [['/api/release-probe?case=a-http-base',{}],
+      ['/api/release-probe/ws?case=a-ws-base',{Upgrade:'websocket',Origin:origin}]]) {
+      const r=await worker.fetch(request(path,{headers}),configured);assert.equal(r.status,503);
+      const body=await r.text();assert.ok(!body.includes('authorized-test-visitor')&&!body.includes('fingerprint'));
+    }
+    assert.equal(entries[0].fingerprint,null);
+    assert.equal(entries[1].fingerprint,entries[2].fingerprint);
+    assert.match(entries[1].fingerprint,/^[a-f0-9]{64}$/);
+    assert.ok(!JSON.stringify(entries).includes(env.CONSENSUS_GATEWAY_KEY));
+    assert.equal((await worker.fetch(request('/api/release-probe?case=a-ws-base',{headers:{Upgrade:'websocket',Origin:'https://foreign.example'}}),configured)).status,403);
+    assert.equal((await worker.fetch(request('/api/release-probe?case=arbitrary-untrusted-log-value'),configured)).status,400);
+    assert.equal(entries.length,3);
+  } finally {console.log=log;}
+});
 
 test('access status is relay-local, no-store and boolean only, including anonymous visitors', async () => {
   const worker = createWorker({}, () => assert.fail('Access status must not reach Render'));

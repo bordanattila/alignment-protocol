@@ -28,6 +28,33 @@ export function createWorker(assets, upstreamFetch = fetch) {
       // gate; never deploy this Worker through an untrusted forwarding proxy.
       const account = request.headers.get('oai-authenticated-user-id');
       const signedIn = Boolean(account && account.trim() && account.length <= 256);
+      // Fail closed on absent/malformed configuration. Public dispatch can be
+      // tested without granting any game request or seat access to Render.
+      const admission = env.CONSENSUS_ADMISSION_MODE ?? 'closed';
+      const canaryUntil = Number(env.CONSENSUS_SECURITY_CANARY_UNTIL ?? 0);
+      const canaryActive = admission === 'canary' && Number.isSafeInteger(canaryUntil)
+        && canaryUntil > Date.now() && canaryUntil <= Date.now() + 15 * 60 * 1000;
+      if (url.pathname === '/api/release-probe' || url.pathname === '/api/release-probe/ws') {
+        if (!canaryActive || request.method !== 'GET') return failure(404, 'Unknown mission endpoint.');
+        const ws = request.headers.get('Upgrade')?.toLowerCase() === 'websocket';
+        const origin = request.headers.get('Origin');
+        if ((origin && origin !== url.origin) || (ws && origin !== url.origin)) return failure(403,'Use the game site.');
+        const label = request.headers.get('X-Consensus-Canary-Case') ?? url.searchParams.get('case') ?? '';
+        if (!/^[ab]-(http|ws)-(base|id|email|duplicate|mixed|proxy)$/.test(label)) return failure(400,'Use the approved probe.');
+        if (!env.CONSENSUS_GATEWAY_KEY || env.CONSENSUS_GATEWAY_KEY.length < 32) return failure(503,'Probe unavailable.');
+        let fingerprint = null;
+        if (signedIn) {
+          const key = await crypto.subtle.importKey('raw',new TextEncoder().encode(env.CONSENSUS_GATEWAY_KEY),
+            {name:'HMAC',hash:'SHA-256'},false,['sign']);
+          const signature = await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(`canary:${canaryUntil}:${account}`));
+          fingerprint = [...new Uint8Array(signature)].map(b=>b.toString(16).padStart(2,'0')).join('');
+        }
+        // Operator-only diagnostic, scoped to this short window. No raw ID,
+        // email, cookie, seat secret, gateway key or backend visitor claim.
+        console.log(JSON.stringify({event:'consensus_security_canary',case:label,
+          transport:ws?'ws':'http',signedIn,fingerprint}));
+        return failure(signedIn ? 503 : 401,'Security verification only; gameplay admission is closed.');
+      }
       if (url.pathname === '/api/access') {
         if (request.method !== 'GET' || request.headers.get('Upgrade')) return failure(405, 'Use a normal access-status request.');
         const origin = request.headers.get('Origin');
@@ -40,6 +67,7 @@ export function createWorker(assets, upstreamFetch = fetch) {
       if (!signedIn) {
         return failure(401, 'Sign in with ChatGPT to play.');
       }
+      if (admission !== 'public') return failure(503,'Gameplay admission is temporarily closed for release verification.');
       const upgrade = request.headers.get('Upgrade')?.toLowerCase() === 'websocket';
       const permitted = (request.method === 'GET' && ['/api/health', '/api/capabilities'].includes(url.pathname))
         || (request.method === 'POST' && (url.pathname === '/api/missions' || mission.test(url.pathname)))

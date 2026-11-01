@@ -148,6 +148,7 @@ class ChatCompletionsProvider:
             ],
             'response_format': response_format,
         }
+        self.prepare_payload(payload, request)
         headers = {'Content-Type': 'application/json'}
         if settings.api_key:
             headers['Authorization'] = 'Bearer ' + settings.api_key.get_secret_value()
@@ -184,3 +185,6 @@ class ChatCompletionsProvider:
             return ProviderResponse(message['content'], http_status=200, usage=usage)
         except (ValueError, TypeError, KeyError, AttributeError, RecursionError, UnicodeError):
             raise GenerationError(FailureCategory.UNSUPPORTED_RESPONSE, 200, usage=usage) from None
+
+    def prepare_payload(self, payload, request):
+        """Deployment-specific admission hook; ordinary adapter behavior is unchanged."""

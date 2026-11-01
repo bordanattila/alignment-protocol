@@ -6,7 +6,7 @@ export function PublicInformation() {
       <li>The host creates a mission and shares its invite link. Teammates open it, sign in and join. The host starts once every occupied seat is connected.</li>
       <li>Compare the public briefing and AI recommendation with your own private intelligence. Use team chat during the 60-second discussion, then submit a hidden vote.</li>
       <li>The choice with the most votes wins. A top tie opens a 20-second Consensus Window and a new vote. If that vote is still tied, the AI recommendation executes.</li>
-      <li>Survive ten authored crises together. Review the shared consequences and final score. Live LLM generation is disabled.</li>
+      <li>Survive ten crises together and review the shared consequences and final score. Choose authored missions for scripted play, or AI-generated missions when the server offers them. AI generation is validated and uses authored fallback when unavailable or its usage allowance is exhausted.</li>
     </ol>
     <h3>Keep your seat</h3>
     <p>Keep the same browser profile and invite link to reconnect. Signing in on a different device does not recover your seat. Tabs in one profile may share a seat and private intelligence.</p>
@@ -32,6 +32,7 @@ export function DataPrivacy({ contact = import.meta.env?.VITE_OWNER_CONTACT_URL 
     <summary>Data, privacy and saved seats</summary>
     <p>Callsigns, team chat, votes, civilization metrics and mission history are saved on the game server. Team members see shared chat and outcomes; each player receives only their assigned private intelligence. Votes stay hidden until resolution. Do not enter sensitive personal information.</p>
     <p>Sites handles ChatGPT sign-in. The relay uses a Site-scoped account identifier for pseudonymous abuse limits. It does not forward your account ID, email, name or sign-in cookies to the game backend, or show them to teammates. Sites and the hosting provider also process requests under their own policies.</p>
+    <p>AI-generated missions send public scenario context, civilization metrics and recorded decisions to OpenAI to propose a crisis or ending. Player account identities, seat secrets, private chat and unresolved votes are excluded. Authored missions do not make model requests.</p>
     <p>This browser remembers a secret that restores your seat. Sign-in alone cannot recover a lost secret. Clearing storage, forgetting seats or changing browser profiles may make that seat irrecoverable. A person with access to this browser profile may be able to reuse it.</p>
     <p>When everyone is offline, inactive lobbies expire after 24 hours, unfinished missions after 7 days, and finished or failed missions after 30 days. Returning or accepted activity can extend these periods. Missions do not expire while anyone remains connected. Cleanup runs periodically; these are not exact deletion times.</p>
     <p>Forgetting seats removes this browser’s credentials only; it does not delete shared server history. There is no self-service server deletion tool. Encrypted operator backups are separate copies and are not erased by mission expiry.</p>

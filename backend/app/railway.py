@@ -60,14 +60,23 @@ def create_railway_app():
             or parsed.username is not None or parsed.password is not None
             or parsed.path or parsed.query or parsed.fragment):
         raise RuntimeError('Configure a strong gateway key and an exact HTTPS Sites origin.')
-    if os.environ.get('CONSENSUS_LLM_ENABLED', 'false').lower() != 'false':
-        raise RuntimeError('Railway playtests require CONSENSUS_LLM_ENABLED=false.')
     mount = Path(os.environ.get('RAILWAY_VOLUME_MOUNT_PATH', '/data'))
     database = Path(os.environ.get('CONSENSUS_DB_PATH', '/data/consensus-engine.sqlite3'))
     if (not mount.is_absolute() or not mount.is_mount()
             or not database.is_absolute() or not database.resolve().is_relative_to(mount.resolve())
             or database.resolve() == mount.resolve()):
         raise RuntimeError('A persistent volume must be mounted and contain CONSENSUS_DB_PATH.')
+    settings = GenerationSettings.from_env()
+    provider = None
+    if settings.enabled:
+        from .generation.release_budget import ReleaseBudget, BoundedReleaseProvider
+        budget_path = Path('/data/consensus-llm-budget.sqlite3')
+        if not budget_path.resolve().is_relative_to(mount.resolve()):
+            raise RuntimeError('Release request accounting must use the persistent volume.')
+        budget = ReleaseBudget(budget_path)
+        budget.status()  # Missing or corrupt ledgers fail startup, never initialize.
+        try: provider = BoundedReleaseProvider(settings,budget)
+        except ValueError: raise RuntimeError('Configure the approved bounded inference settings.') from None
     return SitesGateway(create_app(database_path=database,
-                                  generation_settings=GenerationSettings(enabled=False)), secret, origin,
+                                  generation_settings=settings,generation_provider=provider), secret, origin,
                         require_visitor=True)
